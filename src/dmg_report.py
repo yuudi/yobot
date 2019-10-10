@@ -35,6 +35,10 @@ class Report():
             time.strftime("_%Y%m%d_%H%M%S", time.localtime())
         self.__rpt = {}
         self.txt_list = []
+        if not os.path.exists(os.path.join(self.__path, "report")):
+            os.mkdir(os.path.join(self.__path, "report"))
+        if not os.path.exists(os.path.join(self.__path, "report", "daily")):
+            os.mkdir(os.path.join(self.__path, "report", "daily"))
 
     def __del__(self):
         pass
@@ -55,6 +59,20 @@ class Report():
         # self.__rpt["period"] = (data[0][0][1],
         #                         data[0][-1][1])
         return mdata, bdata
+
+    def _get_nick(self, data):
+        nicks = []
+        for m in self.__rpt["mem_list"]:
+            if data[1][m][0] == m:
+                # 使用老李api
+                res = requests.get("http://laoliapi.cn/king/qq.php?qq=" + m)
+                if res.status_code == 200:
+                    nicks.append(json.loads(res.text).get("name", m))
+                else:
+                    nicks.append(data[1][m][0])
+            else:
+                nicks.append(data[1][m][0])
+        return nicks
 
     def _bmean(self, bdata):
         assert len(bdata) == 15
@@ -194,8 +212,6 @@ class Report():
         return table, table_count
 
     def _gen_report(self, table, count):
-        if not os.path.exists(os.path.join(self.__path, "report")):
-            os.mkdir(os.path.join(self.__path, "report"))
         rpt_path = os.path.join(self.__path, "report", self.rpt_name)
         if not os.path.exists(rpt_path):
             os.mkdir(rpt_path)
@@ -324,8 +340,6 @@ class Report():
                         mem_daily[2] += 1
             daily.append(mem_daily)
         daily_header = ["QQ号", "群名片", "出刀数", "出刀详情"]
-        if not os.path.exists(os.path.join(self.__path, "report", "daily")):
-            os.mkdir(os.path.join(self.__path, "report", "daily"))
         filename = os.path.join(
             self.__path, "report", "daily", self.rpt_name+".csv")
         with open(filename, "w", newline="", encoding="utf-8-sig") as f:
@@ -351,8 +365,7 @@ class Report():
             raw_data = pickle.load(f)
         mem_data, boss_data = self._filt(raw_data)  # 取出成员伤害表与boss伤害表
         self.__rpt["mem_list"] = list(mem_data)
-        self.__rpt["nicknames"] = [raw_data[1][m][0]
-                                   for m in self.__rpt["mem_list"]]
+        self.__rpt["nicknames"] = self._get_nick(raw_data)
         if mathod == "uploaddaily":
             self._gen_daily(mem_data, date)
             self._upload_daily()
