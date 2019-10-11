@@ -15,8 +15,8 @@ class Message():
             return 2
         elif cmd == "十连抽图" or cmd == "检查卡池" or cmd == "更新卡池":
             return 3
-        elif cmd.startswith("jjc查询"):
-            return 4
+        # elif cmd.startswith("jjc查询"):
+        #     return 4
         elif cmd == "台服活动" or cmd == "台服新闻" or cmd == "日服活动" or cmd == "日服新闻":
             return 5
         else:

@@ -1,5 +1,5 @@
 {
-    "version": 2060,
-    "url": "http://api.v3.yobot.xyz:32222/download/yobot2060.zip",
+    "version": 2100,
+    "url": "http://api.v3.yobot.xyz:32222/download/yobot2100.zip",
     "requiredUpdate": false
 }
