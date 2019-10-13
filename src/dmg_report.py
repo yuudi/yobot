@@ -63,7 +63,7 @@ class Report():
     def _get_nick(self, data):
         nicks = []
         for m in self.__rpt["mem_list"]:
-            if data[1][m][0] == m:
+            if data[1][m][0] == m and m.isdigit():
                 # 使用老李api
                 res = requests.get("http://laoliapi.cn/king/qq.php?qq=" + m)
                 if res.status_code == 200:

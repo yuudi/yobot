@@ -19,12 +19,14 @@ class Message():
         #     return 4
         elif cmd == "台服活动" or cmd == "台服新闻" or cmd == "日服活动" or cmd == "日服新闻":
             return 5
+        elif cmd == "ver" or cmd =="V" or cmd =="version":
+            return 99
         else:
             return 0
 
     @staticmethod
     def msg(func_num):
-        if func_num:
-            return "此功能已经不再可用，请查看https://yobot.xyz/functions_2/"
+        if func_num==99:
+            return "yobot [ver 2.1.1.0]"
         else:
-            return "匹配错误"
+            return "此功能已经不再可用，请查看https://yobot.xyz/functions_2/"

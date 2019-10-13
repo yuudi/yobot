@@ -140,7 +140,7 @@ class Record():
                 if self.__qqid == "unknown":
                     self.__comment += "未记录"
                     return
-            if self.__data[1][self.__qqid][0] == self.__qqid:
+            if self.__nickname != self.__qqid:
                 self.__data[1][self.__qqid][0] = self.__nickname
             now = int(time.time())
             self.__conf[self.__groupid]["remain"] = remain - dmg
@@ -417,7 +417,9 @@ class Record():
         elif (cmd == "尾刀" or cmd == "收尾" or cmd == "收掉" or cmd == "击败"):
             return 3
         elif re.match(r"\[CQ:at,qq=\d{5,10}\].+", cmd):
-            return 4
+            return 400
+        elif re.match(r"@.+[:：].+", cmd):
+            return 401
         elif cmd == "撤销":
             return 5
         elif cmd == "状态":
@@ -474,9 +476,12 @@ class Record():
             self.__damage(cmd)
         elif func_num == 3:
             self.__eliminate()
-        elif func_num == 4:
+        elif func_num == 400 or func_num == 401:
             self.__comment += "由{}代报,".format(self.__qqid)
-            match = re.match(r"\[CQ:at,qq=(\d{5,10})\] *(.+)", cmd)
+            if func_num == 400:
+                match = re.match(r"\[CQ:at,qq=(\d{5,10})\] *(.+)", cmd)
+            else:
+                match = re.match(r"@(.+)[:：] *(.+)", cmd)
             self.__qqid = match.group(1)
             self.__nickname = self.__qqid
             cmd = match.group(2)

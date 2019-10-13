@@ -15,10 +15,6 @@ def yobot(*cmd_list):
     if len(cmd_list) != 4:
         txt_list.append("100参数错误")
     else:
-        # 版本信息
-        if cmd_list[3] == "ver":
-            txt_list.append("yobot [ver 2.1.0.0]")
-            return txt_list
         # 检查更新
         u = Check()
         if cmd_list[3] == "更新":
