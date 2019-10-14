@@ -31,14 +31,15 @@ class Lock():
         with open(os.path.join(self.__path, "bosslock.json"), "w", encoding="utf-8") as f:
             json.dump(self.__data, f, ensure_ascii=False, indent=2)
 
-    def __apply_lock(self):
+    def __apply_lock(self, comment=None):
         now = int(time.time())
         if self.__data.get(self.__groupid, [0])[0] == 0:
             self.__data[self.__groupid] = [
                 1,  # 0无锁，1有锁
                 self.__qqid,
                 self.__nickname,
-                now]
+                now,
+                comment]
             self.txt_list.append(self.__nickname+"已锁定boss")
             self.__save()
         else:
@@ -47,6 +48,8 @@ class Lock():
                 self.__data[self.__groupid][2],
                 bef // 60,
                 bef % 60))
+            if len(self.__data[self.__groupid]) == 5 and self.__data[self.__groupid][4] != None:
+                self.txt_list.append("留言："+self.__data[self.__groupid][4])
 
     def __cancel_lock(self):
         if self.__data.get(self.__groupid, [0])[0] == 0:
@@ -94,11 +97,11 @@ class Lock():
             return 3  # 他人解锁
         return 0
 
-    def lockboss(self, cmd, func_num=None):
+    def lockboss(self, cmd, func_num=None, comment=None):
         if func_num == None:
             func_num = self.match(cmd)
         if func_num == 1:
-            self.__apply_lock()
+            self.__apply_lock(comment)
         elif func_num == 2:
             self.__cancel_lock()
         elif func_num == 3:

@@ -105,7 +105,9 @@ class Record():
             # self.txt_list.append("你还没有报名公会战")
             pass
 
-    def __write_log(self, cmd):
+    def __write_log(self, cmd, comment=None):
+        if comment != None:
+            self.__comment += ("//"+comment)
         with open(os.path.join(self.__path, "data", self.__groupid+".log"), "a", encoding="utf-8-sig") as f:
             if self.__show_status:
                 f.writelines("{} {}({}) {} [{},{},{}] ({})\n".format(
@@ -127,7 +129,7 @@ class Record():
                     cmd,
                     self.__comment))
 
-    def __damage(self, cmd):
+    def __damage(self, cmd, comment = None):
         dmg = self._cmdtoint(cmd)
         remain = self.__conf[self.__groupid]["remain"]
         if(dmg >= remain):
@@ -152,7 +154,8 @@ class Record():
                 self.__conf[self.__groupid]["boss"],
                 dmg,
                 self.__data[1][self.__qqid][1],
-                remain - dmg])
+                remain - dmg,
+                comment])
             time_offset = 14400 if self.__conf[self.__groupid]["area"] == "jp" \
                 else 10800  # GMT偏移：日服4小时，台服3小时
             if time.gmtime(self.__data[1][self.__qqid][2]+time_offset)[0:3] \
@@ -172,7 +175,7 @@ class Record():
             self.__comment += "已记录"
             self._boss_status()
 
-    def __eliminate(self):
+    def __eliminate(self, comment = None):
         if not (self.__qqid in self.__data[1].keys()):
             self.__creat_mem()
             if self.__qqid == "unknown":
@@ -189,7 +192,8 @@ class Record():
             self.__conf[self.__groupid]["boss"],
             self.__conf[self.__groupid]["remain"],
             self.__data[1][self.__qqid][1]+1,
-            0])
+            0,
+            comment])
         time_offset = 14400 if self.__conf[self.__groupid]["area"] == "jp" \
             else 10800  # GMT偏移：日服+4小时，台服+3小时
         if time.gmtime(self.__data[1][self.__qqid][2]+time_offset)[0:3] \
@@ -449,7 +453,7 @@ class Record():
         else:
             return 0
 
-    def rep(self, cmd, func_num=None):
+    def rep(self, cmd, func_num=None, comment=None):
         """
         实施命令
         """
@@ -473,9 +477,9 @@ class Record():
                     "由于日服、台服boss血量不同、每日重置时间不同，请发送“#选择日服”或“#选择台服”")
                 self.__comment += "未选择"
         elif func_num == 2:
-            self.__damage(cmd)
+            self.__damage(cmd, comment)
         elif func_num == 3:
-            self.__eliminate()
+            self.__eliminate(comment)
         elif func_num == 400 or func_num == 401:
             self.__comment += "由{}代报,".format(self.__qqid)
             if func_num == 400:
@@ -486,9 +490,9 @@ class Record():
             self.__nickname = self.__qqid
             cmd = match.group(2)
             if re.match(r"\d+[wWkK万]?$", cmd):
-                self.__damage(cmd)
+                self.__damage(cmd, comment)
             elif (cmd == "尾刀" or cmd == "收尾" or cmd == "收掉" or cmd == "击败"):
-                self.__eliminate()
+                self.__eliminate(comment)
             else:
                 self.__comment += "参数错误"
                 self.txt_list.append("300参数错误")
@@ -529,7 +533,7 @@ class Record():
         elif func_num == 0:
             self.__comment += "参数错误"
             self.txt_list.append("200参数错误")
-        self.__write_log(cmd)
+        self.__write_log(cmd, comment)
 
     def text(self):
         return "\n".join(self.txt_list)

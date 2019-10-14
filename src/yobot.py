@@ -15,9 +15,15 @@ def yobot(*cmd_list):
     if len(cmd_list) != 4:
         txt_list.append("100参数错误")
     else:
+        cmd = cmd_list[3].split("//", 1)
+        cmt = None
+        if len(cmd) == 1:
+            cmd = cmd[0]
+        else:
+            cmd, cmt = cmd
         # 检查更新
         u = Check()
-        if cmd_list[3] == "更新":
+        if cmd == "更新":
             txt_list.append(u.update())
             return txt_list
         r = u.check()
@@ -25,40 +31,40 @@ def yobot(*cmd_list):
             txt_list.append(r)
         del u
         # 提示信息
-        func = Message.match(cmd_list[3])
+        func = Message.match(cmd)
         if func != 0:
             txt_list.append(Message.msg(func))
             return txt_list
         # jjc查询
-        if cmd_list[3].startswith("jjc查询"):
+        if cmd.startswith("jjc查询"):
             c = Consult()
-            r = c.user_input(cmd_list[3][5:])
+            r = c.user_input(cmd[5:])
             if r == 0:
                 c.jjcsearch()
             txt_list.extend(c.txt_list)
             return txt_list
         # 锁定boss
-        func = Lock.match(cmd_list[3])
+        func = Lock.match(cmd)
         if func != 0:
             lockboss = Lock(cmd_list[:3])
-            lockboss.lockboss(cmd_list[3], func)
+            lockboss.lockboss(cmd, func, comment=cmt)
             txt_list.extend(lockboss.txt_list)
             return txt_list
         # 记录伤害
-        func = Record.match(cmd_list[3])
+        func = Record.match(cmd)
         if func != 0:
             report = Record(cmd_list[:3])
-            report.rep(cmd_list[3], func)
+            report.rep(cmd, func)
             txt_list.extend(report.txt_list)
             if func == 3 or func == 4:
                 pass  # 后面可能继续运行
             else:
                 return txt_list  # 后面不再运行
         # 预约boss
-        func = Reserve.match(cmd_list[3])
+        func = Reserve.match(cmd)
         if func != 0:
             rsv = Reserve(cmd_list[:3])
-            rsv.rsv(cmd_list[3], func)
+            rsv.rsv(cmd, func)
             txt_list.extend(rsv.txt_list)
             return txt_list  # 后面不再运行
     if txt_list == []:

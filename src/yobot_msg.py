@@ -27,6 +27,6 @@ class Message():
     @staticmethod
     def msg(func_num):
         if func_num==99:
-            return "yobot [ver 2.1.1.0]"
+            return "yobot [ver 2.1.2.00]"
         else:
             return "此功能已经不再可用，请查看https://yobot.xyz/functions_2/"

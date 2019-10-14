@@ -261,7 +261,7 @@ class Report():
             return
         sender = mailconfig["sender"]["sender"]
         receivers = mailconfig["subscriber"][self.__groupid]
-        receivers.append("yu@yobot.xyz")  # 给我也来一份
+        receivers.append(self.mailaddr)
         message = MIMEMultipart()
         mail_text = MIMEText("公会战的统计报告已生成，详见附件", "plain", "utf-8")
         message.attach(mail_text)
@@ -321,6 +321,7 @@ class Report():
                 "%m/%d",
                 time.gmtime(time.time()+time_offset-86400))  # pcr日
         daily = []
+        daily_all = 0
         for qq, nik in zip(self.__rpt["mem_list"], self.__rpt["nicknames"]):
             mem_daily = [qq, nik, 0]
             for d in mdata[qq]:
@@ -339,6 +340,8 @@ class Report():
                     if d[3] != 1:
                         mem_daily[2] += 1
             daily.append(mem_daily)
+            daily_all += mem_daily[2]
+        daily.sort()  # 按QQ号升序排序
         daily_header = ["QQ号", "群名片", "出刀数", "出刀详情"]
         filename = os.path.join(
             self.__path, "report", "daily", self.rpt_name+".csv")
@@ -346,6 +349,9 @@ class Report():
             wt = csv.writer(f)
             wt.writerow(daily_header)
             wt.writerows(daily)
+            wt.writerow(["共{}人".format(len(self.__rpt["mem_list"])),
+                         None,
+                         "共{}刀".format(daily_all)])
 
     def _upload_daily(self):
         url = 'http://api.yobot.xyz/v2/reports/'
@@ -385,6 +391,7 @@ class Report():
         self.__rpt["proportion"] = self._proportion(
             self.__rpt["yb_sorce"], self.__rpt["cy_sorce"])
         self.__rpt["count"] = self._count(mem_data)
+        self.mailaddr = "yu@yobot.xyz"
         table, count = self._gen_table(mem_data)
         self._gen_report(table=table, count=count)
         self._zip_report()
