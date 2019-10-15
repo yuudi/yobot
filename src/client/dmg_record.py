@@ -453,10 +453,13 @@ class Record():
         else:
             return 0
 
-    def rep(self, cmd, func_num=None, comment=None):
+    def rep(self, incmd, func_num=None, comment=None):
         """
         实施命令
         """
+        cmd = incmd.replace(" ", "")
+        if cmd.startswith("报刀"):  # 历史遗留问题
+            cmd = cmd[2:]
         if func_num == None:
             func_num = self.match(cmd)
         if not os.path.exists(os.path.join(self.__path, "data", self.__groupid+".dat")):

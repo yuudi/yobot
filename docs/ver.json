@@ -1,5 +1,6 @@
 {
-    "version": 2120,
-    "url": "http://api.v3.yobot.xyz:32222/download/yobot2120.zip",
+    "version": 2200,
+    "vername": "v2.2.0",
+    "url": "http://api.v3.yobot.xyz:32222/download/yobot2200.zip",
     "requiredUpdate": false
 }

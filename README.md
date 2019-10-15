@@ -1,6 +1,6 @@
 # yobot
 chatting bot for pcr(mobile game)
 
-ver 2.0.5.2
+ver 2.2.0
 
-see [/src](/src) folder
+see [/src](https://github.com/yuudi/yobot/tree/master/src/client) folder
