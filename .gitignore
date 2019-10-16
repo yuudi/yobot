@@ -1,6 +1,4 @@
-/src/*.json
-/src/__pycache__
-/src/data
-/src/report
-/src/temp
-/src/*.csv
+/src/client/*/
+/src/client/*.json
+/src/client/*.csv
+/src/client/*.db

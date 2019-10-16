@@ -10,6 +10,9 @@ import requests
 
 
 class Consult():
+    URL = "http://api.yobot.xyz/v2/nicknames/?type=csv"
+    Feedback_URL = "http://api.yobot.xyz/v2/nicknames/?type=feedback&name="
+
     def __init__(self):
         path = os.path.dirname(sys.argv[0])
         self.nickname = {}
@@ -18,7 +21,10 @@ class Consult():
         nickfile = os.path.join(path, "nickname.csv")
         self.txt_list = []
         if not os.path.exists(nickfile):
-            self.txt_list.append("nickname.csv文件不存在")
+            res = requests.get(self.URL)
+            assert res.status_code == 200, "服务器不可用"
+            with open(nickfile, "w", encoding="utf-8-sig") as f:
+                f.write(res.text)
         with open(nickfile, encoding="utf-8-sig")as f:
             f_csv = csv.reader(f)
             for row in f_csv:
@@ -29,12 +35,15 @@ class Consult():
     def user_input(self, cmd):
         in_list = cmd.split()
         if len(in_list) > 5:
-            self.txt_list.append("error: more than 5")
+            self.txt_list.append("防守人数过多")
             return 5
         for index in in_list:
             item = self.nickname.get(index.lower(), "error")
             if item == "error":
-                self.txt_list.append("error: "+index+" not found")
+                requests.get(self.Feedback_URL+index)
+                self.txt_list.append("没有找到"+index+"，已发送反馈")
+                os.remove(os.path.join(os.path.dirname(
+                    sys.argv[0]), "nickname.csv"))
                 return 1
             self.def_lst.append(item)
         return 0

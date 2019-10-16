@@ -8,6 +8,7 @@ from gacha import Gacha
 from jjc_consult import Consult
 from lock_boss import Lock
 from reserve import Reserve
+from switcher import Switcher
 from yobot_msg import Message
 
 
@@ -36,14 +37,29 @@ def yobot(*cmd_list):
         if func != 0:
             txt_list.append(Message.msg(func))
             return txt_list
+        # 功能开关
+        swt = Switcher()
+        func = swt.match(cmd)
+        if func != 0:
+            swt.sw(func)
+            txt_list.extend(swt.txt_list)
+            return txt_list
+        switcher = swt.data
         # 抽卡
         func = Gacha.match(cmd)
         if func != 0:
+            if switcher.get("抽卡", True) == False:
+                txt_list.append("此功能已关闭")
+                return txt_list
             gacha = Gacha(cmd_list[:3])
             gacha.gc(func)
             txt_list.extend(gacha.txt_list)
+            return txt_list
         # jjc查询
         if cmd.startswith("jjc查询"):
+            if switcher.get("jjc查询", True) == False:
+                txt_list.append("此功能已关闭")
+                return txt_list
             c = Consult()
             r = c.user_input(cmd[5:])
             if r == 0:
@@ -75,7 +91,7 @@ def yobot(*cmd_list):
             txt_list.extend(rsv.txt_list)
             return txt_list  # 后面不再运行
     if txt_list == []:
-        txt_list.append("101无效命令")
+        txt_list.append("无效命令，请查看功能表")
     return txt_list
 
 

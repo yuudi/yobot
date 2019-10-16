@@ -20,9 +20,6 @@ def update():
         print(ver["url"], "code:", checkver.status_code)
         return
     verinfo = json.loads(checkver.text)
-    # if verinfo["version"] <= ver["localver"]:
-    #     print("already latest")
-    #     return
     download_file = requests.get(verinfo["url"])
     if download_file.status_code != 200:
         print(ver["url"], "code:", download_file.status_code)
@@ -35,13 +32,13 @@ def update():
         os.mkdir(os.path.join(path, "temp", verstr))
     with zipfile.ZipFile(os.path.join(path, "temp", fname), "r") as z:
         z.extractall(path=os.path.join(path, "temp", verstr))
-    # shutil.move(os.path.join(path, "temp", verstr), path)
+    os.remove(os.path.join(path, "temp", fname))
     for ufile in os.listdir(os.path.join(path, "temp", verstr)):
         if os.path.exists(os.path.join(path, ufile)):
             os.remove(os.path.join(path, ufile))
         shutil.move(os.path.join(path, "temp", verstr, ufile),
                     os.path.join(path, ufile))
-    print("update success")
+    print("更新完成，目前版本："+verinfo["vername"])
     return
 
 

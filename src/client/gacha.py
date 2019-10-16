@@ -41,7 +41,7 @@ class Gacha():
                 try:
                     self.__pool = json5.load(f)
                 except:
-                    self.txt_list.append("卡池文件解析错误，请检查卡池文件语法，或者删除卡池文件")
+                    self.txt_list.append("卡池文件解析错误，请检查卡池文件语法，或者“#重置卡池”")
                     return 2
         return 0
 
@@ -57,7 +57,8 @@ class Gacha():
                 if resu < 0:
                     if i == 9 and p.get("guarantee", None) != None:
                         p = self.__pool["pool"][p["guarantee"]]
-                    result_list.append(p["prefix"]+random.choice(p["pool"]))
+                    result_list.append(p.get("prefix", "") +
+                                       random.choice(p["pool"]))
                     break
         return result_list
 
@@ -121,6 +122,14 @@ class Gacha():
         return 0
 
     def setting(self):
+        ld = self.load()
+        if ld == 0:
+            masters = self.__pool.get("settings", {}).get("master", [])
+            if masters != [] and self.__qqid not in masters:
+                self.txt_list.append("对不起，你没有权限")
+                return
+        elif ld == 1:
+            return
         if os.path.exists(os.path.join(self.__path, "pool.json5")):
             os.system("start notepad " + os.path.join(
                 os.path.join(self.__path, "pool.json5")))
@@ -128,18 +137,71 @@ class Gacha():
         else:
             self.txt_list.append("卡池文件丢失，下次抽卡时重新下载")
 
+    def del_pool(self):
+        ld = self.load()
+        if ld == 0:
+            masters = self.__pool.get("settings", {}).get("master", [])
+            if masters != [] and self.__qqid not in masters:
+                self.txt_list.append("对不起，你没有权限")
+                return
+        if os.path.exists(os.path.join(self.__path, "pool.json5")):
+            os.remove(os.path.join(self.__path, "pool.json5"))
+        self.txt_list.append("卡池已重置")
+
+    def show_colle(self):
+        if not os.path.exists(os.path.join(self.__path, "collections.db")):
+            self.txt_list.append("没有仓库")
+            return 1
+        db_conn = sqlite3.connect(os.path.join(self.__path, "collections.db"))
+        db = db_conn.cursor()
+        sql_info = list(db.execute(
+            "SELECT colle FROM Colle WHERE qqid=?", (self.__qqid,)))
+        if len(sql_info) != 1:
+            self.txt_list.append(self.__nickname + "的仓库为空")
+            db_conn.close()
+            return 2
+        colle = pickle.loads(sql_info[0][0])
+        if not os.path.exists(os.path.join(self.__path, "temp")):
+            os.mkdir(os.path.join(self.__path, "temp"))
+        colle_file = os.path.join(
+            self.__path, "temp",
+            str(self.__qqid)+time.strftime("_%Y%m%d_%H%M%S", time.localtime())+".csv")
+        with open(colle_file, "w", encoding="utf-8-sig") as f:
+            def d_line(d):
+                for k, v in zip(d.keys(), d.values()):
+                    yield str(k)+","+str(v)+"\n"
+            f.write("角色,数量\n")
+            f.writelines(d_line(colle))
+        f = open(colle_file, 'rb')
+        files = {'file': f}
+        response = requests.post(
+            'http://api.yobot.xyz/v2/reports/', files=files)
+        f.close()
+        p = response.text
+        self.txt_list.append(self.__nickname + "的仓库：" + p)
+        db_conn.close()
+        return 0
+
     @staticmethod
     def match(cmd):
         if cmd == "十连" or cmd == "十连抽":
             return 1
         elif cmd == "十连设置" or cmd == "抽卡设置" or cmd == "卡池设置":
             return 2
+        elif cmd == "重置卡池" or cmd == "删除卡池" or cmd == "更新卡池":
+            return 3
+        elif cmd == "仓库":
+            return 4
         else:
             return 0
 
     def gc(self, func_num):
-        if self.load() == 0:
+        if func_num == 2:
+            self.setting()
+        elif func_num == 3:
+            self.del_pool()
+        elif func_num == 4:
+            self.show_colle()
+        elif self.load() == 0:
             if func_num == 1:
                 self.gacha()
-            elif func_num == 2:
-                self.setting()

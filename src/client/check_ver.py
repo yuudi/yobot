@@ -66,6 +66,6 @@ class Check():
         app = os.path.join(self.__path, "updater.exe")
         if os.path.exists(app):
             os.system("start "+app)
-            return "更新程序已开始"
+            return "更新程序已开始，由于使用了备用的更新方式，本次更新完成不会有提示"
         else:
             return "更新程序丢失"
