@@ -85,6 +85,8 @@ class Record():
         cmd = cmd.replace("w", "0000")
         cmd = cmd.replace("W", "0000")
         cmd = cmd.replace("万", "0000")
+        if not cmd.isdigit():
+            return None
         return int(cmd)
 
     def __save(self):
@@ -131,6 +133,8 @@ class Record():
 
     def __damage(self, cmd, comment = None):
         dmg = self._cmdtoint(cmd)
+        if dmg == None:
+            return        
         remain = self.__conf[self.__groupid]["remain"]
         if(dmg >= remain):
             self.__comment += "未记录"

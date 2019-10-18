@@ -2,6 +2,7 @@
 import os
 import pickle
 import random
+import re
 import sqlite3
 import sys
 import time
@@ -63,6 +64,7 @@ class Gacha():
         return result_list
 
     def gacha(self):
+        self.check_ver()
         db_exists = os.path.exists(os.path.join(self.__path, "collections.db"))
         db_conn = sqlite3.connect(os.path.join(self.__path, "collections.db"))
         db = db_conn.cursor()
@@ -148,10 +150,14 @@ class Gacha():
             os.remove(os.path.join(self.__path, "pool.json5"))
         self.txt_list.append("卡池已重置")
 
-    def show_colle(self):
+    def show_colle(self, cmd=None):
         if not os.path.exists(os.path.join(self.__path, "collections.db")):
             self.txt_list.append("没有仓库")
             return 1
+        moreqq_list = []
+        if cmd != None:
+            pattern = r"(?<=\[CQ:at,qq=)\d+(?=\])"
+            moreqq_list = [int(x) for x in re.findall(pattern, cmd)]
         db_conn = sqlite3.connect(os.path.join(self.__path, "collections.db"))
         db = db_conn.cursor()
         sql_info = list(db.execute(
@@ -161,17 +167,39 @@ class Gacha():
             db_conn.close()
             return 2
         colle = pickle.loads(sql_info[0][0])
+        more_colle = []
+        for other_qq in moreqq_list:
+            sql_info = list(db.execute(
+                "SELECT colle FROM Colle WHERE qqid=?", (other_qq,)))
+            if len(sql_info) != 1:
+                self.txt_list.append("[CQ:at,qq={}]的仓库为空".format(other_qq))
+                db_conn.close()
+                return 2
+            more_colle.append(pickle.loads(sql_info[0][0]))
         if not os.path.exists(os.path.join(self.__path, "temp")):
             os.mkdir(os.path.join(self.__path, "temp"))
         colle_file = os.path.join(
             self.__path, "temp",
             str(self.__qqid)+time.strftime("_%Y%m%d_%H%M%S", time.localtime())+".csv")
+        showed_colle = set(colle)
+        for item in more_colle:
+            showed_colle = showed_colle.union(item)
         with open(colle_file, "w", encoding="utf-8-sig") as f:
-            def d_line(d):
-                for k, v in zip(d.keys(), d.values()):
-                    yield str(k)+","+str(v)+"\n"
-            f.write("角色,数量\n")
-            f.writelines(d_line(colle))
+            f.write("角色,"+self.__nickname)
+            for memb in moreqq_list:
+                f.write(",")
+                # 使用老李api
+                res = requests.get("http://laoliapi.cn/king/qq.php?qq=" + str(memb))
+                if res.status_code == 200:
+                    f.write(json5.loads(res.text).get("name", str(memb)))
+                else:
+                    f.write(str(memb))
+            f.write("\n")
+            for char in sorted(showed_colle):
+                f.write(char + "," + str(colle.get(char, 0)))
+                for item in more_colle:
+                    f.write("," + str(item.get(char, 0)))
+                f.write("\n")
         f = open(colle_file, 'rb')
         files = {'file': f}
         response = requests.post(
@@ -182,6 +210,31 @@ class Gacha():
         db_conn.close()
         return 0
 
+    def check_ver(self):
+        auto_update = self.__pool.get("settings", {}).get("联网更新卡池", False)
+        if not auto_update:
+            return
+        f = open(os.path.join(self.__path, "version.json"),
+                 "r+", encoding="utf-8")
+        ver = json5.load(f)
+        now = int(time.time())
+        if ver.get("pool_checktime", 0) < now:
+            res = requests.get(self.URL)
+            if res.status_code == 200:
+                online_ver = json5.loads(res.text)
+                if self.__pool["info"]["name"] != online_ver["info"]["name"]:
+                    self.__pool = online_ver
+                    with open(os.path.join(self.__path, "pool.json5"), "w", encoding="utf-8") as pf:
+                        pf.write(res.text)
+                    self.txt_list.append("卡池已自动更新，目前卡池：" +
+                                         self.__pool["info"]["name"])
+                ver["pool_checktime"] = now + 80000
+                f.seek(0)
+                f.truncate()
+                json5.dump(ver, f, indent=2,
+                           quote_keys=True, trailing_commas=False)
+        f.close()
+
     @staticmethod
     def match(cmd):
         if cmd == "十连" or cmd == "十连抽":
@@ -190,18 +243,18 @@ class Gacha():
             return 2
         elif cmd == "重置卡池" or cmd == "删除卡池" or cmd == "更新卡池":
             return 3
-        elif cmd == "仓库":
+        elif cmd.startswith("仓库"):
             return 4
         else:
             return 0
 
-    def gc(self, func_num):
+    def gc(self, func_num, cmd=None):
         if func_num == 2:
             self.setting()
         elif func_num == 3:
             self.del_pool()
         elif func_num == 4:
-            self.show_colle()
+            self.show_colle(cmd)
         elif self.load() == 0:
             if func_num == 1:
                 self.gacha()

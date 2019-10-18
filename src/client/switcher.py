@@ -6,7 +6,7 @@ import sys
 
 
 class Switcher:
-    func_list = ["抽卡", "jjc查询"]
+    func_list = ["抽卡", "jjc查询", "无效命令提示"]
     data = {}
 
     def __init__(self):

@@ -16,7 +16,7 @@ class Message():
             return 1
         elif cmd == "下来吧" or cmd == "下树":
             return 2
-        elif cmd == "十连抽图" or cmd == "检查卡池" or cmd == "更新卡池":
+        elif cmd == "十连抽图" or cmd == "检查卡池":
             return 3
         # elif cmd.startswith("jjc查询"):
         #     return 4
