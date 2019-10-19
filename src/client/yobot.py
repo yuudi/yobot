@@ -1,7 +1,9 @@
 # coding=utf-8
 
 import sys
+import os
 
+from char_consult import Char_consult
 from check_ver import Check
 from dmg_record import Record
 from gacha import Gacha
@@ -65,6 +67,14 @@ def yobot(*cmd_list):
             if r == 0:
                 c.jjcsearch()
             txt_list.extend(c.txt_list)
+            return txt_list
+        # 角色介绍页
+        func = Char_consult.match(cmd)
+        if func != 0:
+            char = Char_consult(
+                {"dirname": os.path.dirname(sys.argv[0])})
+            rep = char.excute(func, cmd)
+            txt_list.append(rep)
             return txt_list
         # 锁定boss
         func = Lock.match(cmd)
