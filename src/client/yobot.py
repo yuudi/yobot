@@ -1,7 +1,7 @@
 # coding=utf-8
 
-import sys
 import os
+import sys
 
 from char_consult import Char_consult
 from check_ver import Check
@@ -10,6 +10,7 @@ from gacha import Gacha
 from jjc_consult import Consult
 from lock_boss import Lock
 from reserve import Reserve
+from setting import Setting
 from switcher import Switcher
 from yobot_msg import Message
 
@@ -47,6 +48,15 @@ def yobot(*cmd_list):
             txt_list.extend(swt.txt_list)
             return txt_list
         switcher = swt.data
+        # 设置
+        func = Setting.match(cmd)
+        if func != 0:
+            setting = Setting(
+                {"dirname": os.path.dirname(sys.argv[0])})
+            rep = setting.excute(
+                func, {'raw_message': cmd, 'sender': {'user_id': cmd_list[1]}})
+            txt_list.append(rep)
+            return txt_list
         # 抽卡
         func = Gacha.match(cmd)
         if func != 0:
