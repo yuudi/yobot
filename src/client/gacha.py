@@ -87,7 +87,9 @@ class Gacha():
             info = {}
             times, last_day, day_times = 0, "", 0
         try:
-            day_limit = self.__pool["settings"]["每日抽卡次数"]
+            day_limit = self.__pool["settings"].get("每日抽卡次数", None)
+            if day_limit is None:
+                day_limit = self.__pool["settings"]["times"]
         except:
             self.txt_list.append("卡池信息错误")
             return 1
@@ -189,7 +191,8 @@ class Gacha():
             for memb in moreqq_list:
                 f.write(",")
                 # 使用老李api
-                res = requests.get("http://laoliapi.cn/king/qq.php?qq=" + str(memb))
+                res = requests.get(
+                    "http://laoliapi.cn/king/qq.php?qq=" + str(memb))
                 if res.status_code == 200:
                     f.write(json5.loads(res.text).get("name", str(memb)))
                 else:
@@ -211,7 +214,9 @@ class Gacha():
         return 0
 
     def check_ver(self):
-        auto_update = self.__pool.get("settings", {}).get("联网更新卡池", False)
+        auto_update = self.__pool.get("settings", {}).get("联网更新卡池", None)
+        if auto_update is None:
+            auto_update = self.__pool.get("settings", {}).get("upgrade", False)
         if not auto_update:
             return
         f = open(os.path.join(self.__path, "version.json"),

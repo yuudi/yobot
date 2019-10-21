@@ -235,7 +235,13 @@ class Report():
             wt.writerows(count)
 
     def _zip_report(self):
-        with zipfile.ZipFile(os.path.join(self.__path, "report", self.rpt_name, self.rpt_name+".zip"), "w") as z:
+        with zipfile.ZipFile(os.path.join(self.__path,
+                                          "report",
+                                          self.rpt_name,
+                                          self.rpt_name+".zip"),
+                             compression=ZIP_DEFLATED,
+                             mode="w",
+                             compresslevel=9) as z:
             z.write(os.path.join(self.__path, "data", self.__groupid+".log"),
                     arcname="日志.log")
             z.write(os.path.join(self.__path, "report", self.rpt_name, "stat.csv"),
