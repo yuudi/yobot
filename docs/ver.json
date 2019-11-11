@@ -1,6 +1,7 @@
 {
-    "version": 2401,
-    "vername": "yobot[v2.4.1]",
-    "url": "http://api.v3.yobot.xyz:32222/download/yobot2401.zip",
+    "__commet__": "this is 2nd generation and no more in use",
+    "version": 2409,
+    "vername": "yobot[v2.4.9]",
+    "url": "http://ybdown.zimingdh.com/yobot2409.zip",
     "requiredUpdate": false
 }

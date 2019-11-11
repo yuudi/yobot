@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
+    <title>邮件设置</title>
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+    <script>
+        function Gene_code() {
+            let a = document.forms["sender-setting"]["mailaddr"].value;
+            let b = document.forms["sender-setting"]["smtpaddr"].value;
+            let c = document.forms["sender-setting"]["sendername"].value;
+            let d = document.forms["sender-setting"]["password"].value;
+            if (a == "") {
+                alert("填写邮箱账号");
+                return;
+            } if (a.search(/^\w+@\w+(?:\.\w+)+$/)) {
+                alert("邮箱格式错误");
+                return;
+            } if (d == "") {
+                alert("填写邮箱密码");
+                return;
+            }
+            function getQueryVariable(variable) {
+                let query = window.location.search.substring(1);
+                let vars = query.split("&");
+                for (let i = 0; i < vars.length; i++) {
+                    let pair = vars[i].split("=");
+                    if (pair[0] == variable) { return pair[1]; }
+                }
+                return (false);
+            }
+            qqid = getQueryVariable('qq')
+            let dict = JSON.stringify({ "m": a, "s": b, "n": c, "p": d, "q": qqid });
+            let confirm = md5(dict);
+            let code = btoa(confirm + dict);
+            let eq_num = code.indexOf('=')
+            if (eq_num == -1) {
+                eq_num = code.length;
+            }
+            document.getElementById("result").innerHTML = "#设置AAAA" + (code.substring(0, eq_num).split("").reverse().join("") + code.substring(eq_num, code.length));
+            return;
+        }
+
+        function Copy_code() {
+            let a = document.forms["sender-code"]["result"];
+            a.select();
+            document.execCommand("Copy");
+            alert("已复制，请在群里粘贴。");
+        }
+    </script>
+</head>
+
+<body>
+    <h1>发件邮箱设置</h1>
+    <form name="sender-setting">
+        邮箱账号:<br>
+        <input type="text" name="mailaddr" />(必填)<br>
+        邮箱密码:<br>
+        <input type="text" name="password" />(必填)<br>
+        SMTP地址:<br>
+        <input type="text" name="smtpaddr" />(默认为smtp加邮箱后缀)<br>
+        发件者名称:<br>
+        <input type="text" name="sendername" />(默认与账号相同)<br><br>
+        <input type="button" value="确认" onclick="Gene_code()" />
+    </form><br><br>
+    <form name="sender-code">
+        <textarea id='result' rows="10" cols="40"></textarea><br><br>
+        <input type="button" value="复制" onclick="Copy_code()" />
+    </form>
+</body>
+
+</html>

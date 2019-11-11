@@ -1,126 +1,57 @@
 # coding=utf-8
-
+import json
 import os
 import sys
+from typing import List
 
-from char_consult import Char_consult
-from check_ver import Check
-from dmg_record import Record
-from gacha import Gacha
-from jjc_consult import Consult
-from lock_boss import Lock
-from reserve import Reserve
-from setting import Setting
-from switcher import Switcher
-from yobot_msg import Message
+from plugins import check_ver, switcher, yobot_msg, gacha, jjc_consult, boss_dmg, updater, yobot_errors
 
 
-def yobot(*cmd_list):
-    txt_list = []
-    if len(cmd_list) != 4:
-        txt_list.append("100参数错误")
-    else:
-        cmd = cmd_list[3].split("//", 1)
-        cmt = None
-        if len(cmd) == 1:
-            cmd = cmd[0]
-        else:
-            cmd, cmt = cmd
-        # 检查更新
-        u = Check()
-        if cmd == "更新":
-            txt_list.append(u.update())
-            return txt_list
-        r = u.check()
-        if r != None:
-            txt_list.append(r)
-        del u
-        # 提示信息
-        func = Message.match(cmd)
-        if func != 0:
-            txt_list.append(Message.msg(func))
-            return txt_list
-        # 功能开关
-        swt = Switcher()
-        func = swt.match(cmd)
-        if func != 0:
-            swt.sw(func)
-            txt_list.extend(swt.txt_list)
-            return txt_list
-        switcher = swt.data
-        # 设置
-        func = Setting.match(cmd)
-        if func != 0:
-            setting = Setting(
-                {"dirname": os.path.dirname(sys.argv[0])})
-            rep = setting.excute(
-                func, {'raw_message': cmd, 'sender': {'user_id': cmd_list[1]}})
-            txt_list.append(rep)
-            return txt_list
-        # 抽卡
-        func = Gacha.match(cmd)
-        if func != 0:
-            if switcher.get("抽卡", True) == False:
-                txt_list.append("此功能已关闭")
-                return txt_list
-            gacha = Gacha(cmd_list[:3])
-            gacha.gc(func, cmd)
-            txt_list.extend(gacha.txt_list)
-            return txt_list
-        # jjc查询
-        if cmd.startswith("jjc查询"):
-            if switcher.get("jjc查询", True) == False:
-                txt_list.append("此功能已关闭")
-                return txt_list
-            c = Consult()
-            r = c.user_input(cmd[5:])
-            if r == 0:
-                c.jjcsearch()
-            txt_list.extend(c.txt_list)
-            return txt_list
-        # 角色介绍页
-        func = Char_consult.match(cmd)
-        if func != 0:
-            char = Char_consult(
-                {"dirname": os.path.dirname(sys.argv[0])})
-            rep = char.excute(func, cmd)
-            txt_list.append(rep)
-            return txt_list
-        # 锁定boss
-        func = Lock.match(cmd)
-        if func != 0:
-            lockboss = Lock(cmd_list[:3])
-            lockboss.lockboss(cmd, func, comment=cmt)
-            txt_list.extend(lockboss.txt_list)
-            return txt_list
-        # 记录伤害
-        func = Record.match(cmd)
-        if func != 0:
-            report = Record(cmd_list[:3])
-            report.rep(cmd, func)
-            txt_list.extend(report.txt_list)
-            if func == 3 or func == 4:
-                pass  # 后面可能继续运行
-            else:
-                return txt_list  # 后面不再运行
-        # 预约boss
-        func = Reserve.match(cmd)
-        if func != 0:
-            rsv = Reserve(cmd_list[:3])
-            rsv.rsv(cmd, func)
-            txt_list.extend(rsv.txt_list)
-            return txt_list  # 后面不再运行
-    if txt_list == [] and switcher.get("无效命令提示", True) != False:
-        txt_list.append("无效命令，请查看功能表")
-    return txt_list
+class Yobot:
+    def __init__(self):
+        # dirname = os.__file__
+        dirname = os.path.dirname(sys.argv[0])
+        config_f_path = os.path.join(dirname, "yobot_config.json")
+        if not os.path.exists(config_f_path):
+            with open(config_f_path, "w", encoding="utf-8") as config_file:
+                config_file.write('{"port":9222,"run-as":"exe"}')
+        with open(config_f_path, "r", encoding="utf-8") as config_file:
+            try:
+                self.glo_setting = json.load(config_file)
+            except:
+                raise yobot_errors.File_error(
+                    config_f_path + " been damaged")
 
+        inner_info = {
+            "dirname": dirname,
+            "version": {
+                "ver_name": "yobot 3.0.0_alpha_b2",
+                "ver_id": 2910,
+                "checktime": 0,
+                "latest": True,
+                "check_url": ["https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
+                              "https://yuudi.github.io/yobot/v3/ver.json",
+                              "http://api.yobot.xyz/v3/version/"]}}
+        self.glo_setting.update(inner_info)
 
-# 这是一个示例，也是现在正在使用的入口
-if __name__ == "__main__":
-    # 主程序用法如下：
-    # yobot(groupid,qqid,nickname,msg)
-    txtlist = yobot(*sys.argv[1:])  # 获得输出文本的list
-    # 返回值时一个list，包含若干个字符串
+        self.plugins = []
+        # self.plugins.append(check_ver.Check(self.glo_setting))
+        self.plugins.append(switcher.Switcher(self.glo_setting))
+        self.plugins.append(yobot_msg.Message(self.glo_setting))
+        self.plugins.append(gacha.Gacha(self.glo_setting))
+        self.plugins.append(jjc_consult.Consult(self.glo_setting))
+        self.plugins.append(updater.Updater(self.glo_setting))
+        self.plugins.append(boss_dmg.Boss_dmg(self.glo_setting))
 
-    # 下一行是直接将内容输出到屏幕上
-    print("\n".join(txtlist))  # 随便怎么用，这里是直接连接并输出
+    def proc(self, msg: dict) -> str:
+        if msg["sender"].get("crad", "") == "":
+            msg["sender"]["card"] = msg["sender"]["nickname"]
+        replys = []
+        for pitem in self.plugins:
+            func_num = pitem.match(msg["raw_message"])
+            if func_num:
+                res = pitem.execute(func_num, msg)
+                replys.append(res["reply"])
+                if res["block"]:
+                    break
+        return "\n".join(replys)

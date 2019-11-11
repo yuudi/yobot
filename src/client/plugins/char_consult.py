@@ -49,8 +49,8 @@ class Char_consult:
         else:
             return 0
 
-    def excute(self, match_num: int, cmd) -> dict:
-        # def excute(self, match_num: int = 0, msg: dcit) -> dict:
+    def execute(self, match_num: int, cmd) -> dict:
+        # def execute(self, match_num: int = 0, msg: dcit) -> dict:
         #     if self.setting["char_consult"] == False:
         #         reply = "此功能未启用"
         #     else:

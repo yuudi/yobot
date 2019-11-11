@@ -1,4 +1,7 @@
 # coding=utf-8
+
+# todo:这个文件还没有为3.0修改过
+
 import json
 import os.path
 import re
@@ -89,11 +92,12 @@ class Reserve():
         if self.__groupid in self.__data:
             if boss in self.__data[self.__groupid]:
                 self.txt_list.append(
-                    "预约人数："+str(len(self.__data[self.__groupid][boss])))
+                    ("挂树人数：" if boss =="0" else "预约人数：")
+                    +str(len(self.__data[self.__groupid][boss])))
                 for name in self.__data[self.__groupid][boss].values():
                     self.txt_list.append(name)
                 return
-        self.txt_list.append("预约人数：0")
+        self.txt_list.append("挂树人数：0" if boss =="0" else "预约人数：0")
 
     @staticmethod
     def match(cmd):
@@ -119,6 +123,8 @@ class Reserve():
         match = re.match(r"查询?[预預]?[订约定訂約]?[ABCabc老]?([一二三四五12345])[号王]?", cmd)
         if match:
             return 0x40 | num[match.group(1)]
+        if cmd == "查树":
+            return 0x40
         return 0
 
     def rsv(self, cmd, func_num=None):

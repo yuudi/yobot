@@ -1,6 +1,13 @@
 # yobot
+`ver 3.0 alpha b1`
+
 chatting bot for pcr(mobile game)
 
-ver 2.4.1
+公主连接群聊机器人、公主链接、公主连结
 
-see [/src](https://github.com/yuudi/yobot/tree/master/src/client) folder
+
+source code in [/src](https://github.com/yuudi/yobot/tree/master/src/client) folder
+
+introduction in [yobot.xyz](https://yobot.xyz/) page
+
+alse see [pcr-bot league](https://www.pcrbot.com)

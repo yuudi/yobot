@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
+    <title>自定义卡池</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        function toUtf8(str) {
+            let out = "";
+            let len = str.length;
+            for (let i = 0; i < len; i++) {
+                let c = str.charCodeAt(i);
+                if ((c >= 0x0001) && (c <= 0x007F)) {
+                    out += str.charAt(i);
+                } else if (c > 0x07FF) {
+                    out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+                    out += String.fromCharCode(0x80 | ((c >> 6) & 0x3F));
+                    out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+                } else {
+                    out += String.fromCharCode(0xC0 | ((c >> 6) & 0x1F));
+                    out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+                }
+            }
+            return out;
+        }
+        function Copy_code() {
+            let a = document.forms["pc"]["result"];
+            a.select();
+            document.execCommand("Copy");
+            alert("已复制，请在群里粘贴。");
+        }
+        var form_num = 4;
+        function Pool_add() {
+            form_num += 1;
+            $("#forms").append('<form class="ps" id="' +
+                String(form_num) +
+                '" name="pool-setting"><h3>奖池' +
+                String(form_num) +
+                '</h3><a>名称:</a><input type="text" id="name"/><br><a>概率:</a><input type="number" id="prop"/><br><a>前缀:</a><input type="text" id="pref"/><br><a>内容:</a><br><textarea id="pool" rows="5" cols="40"></textarea><br><br></form>');
+        }
+        function Pool_drop() {
+            if (form_num > 0) {
+                form_num -= 1;
+                $("div#forms form.ps:last").remove();
+            }
+        }
+        function Gene_code() {
+            let ss = {};
+            for (let i = 0; i < form_num; i += 1) {
+                let ke = $("div#forms form.ps:eq(" + String(i) + ") #name").val();
+                let va = {
+                    "prop": parseInt($("div#forms form.ps:eq(" + String(i) + ") #prop").val()),
+                    "prefix": $("div#forms form.ps:eq(" + String(i) + ") #pref").val(),
+                    "pool": $("div#forms form.ps:eq(" + String(i) + ") #pool").val().split(/ *[,，\n] */g)
+                };
+                ss[ke] = va;
+            }
+            let jsn = (JSON.stringify({
+                pool: ss,
+                settings: {
+                    times: parseInt($("form#cfg input#times").val()),
+                    update: $("form#cfg input#update").is(':checked')
+                }
+            }));
+            jsn = btoa(toUtf8(jsn));
+            let eq_num = jsn.indexOf('=')
+            if (eq_num == -1) {
+                eq_num = jsn.length;
+            }
+            $("form#pc textarea").text("#设置AAAB" + (jsn.substring(0, eq_num).split("").reverse().join("") + jsn.substring(eq_num, jsn.length)));
+        }
+    </script>
+</head>
+
+<body>
+    <h1>自定义卡池</h1>
+    <div id="forms">
+        <form class="ps" id="1" name="pool-setting">
+            <h3>奖池1</h3>
+            <a>名称:</a><input type="text" id="name" value="up" /><br>
+            <a>概率:</a><input type="number" id="prop" value="7" /><br>
+            <a>前缀:</a><input type="text" id="pref" value="★★★" /><br>
+            <a>内容:<br>(逗号分隔或换行分隔)</a><br><textarea id='pool' rows="5" cols="40">美美（万圣节）</textarea>
+            <br><br>
+        </form>
+        <form class="ps" id="2" name="pool-setting">
+            <h3>奖池2</h3>
+            <a>名称:</a><input type="text" id="name" value="3星" /><br>
+            <a>概率:</a><input type="number" id="prop" value="18" /><br>
+            <a>前缀:</a><input type="text" id="pref" value="★★★" /><br>
+            <a>内容:</a><br><textarea id='pool' rows="5"
+                cols="40">初音，真琴，姬塔，咲恋，望，璃乃，妮侬，伊绪，秋乃，莫妮卡，静流，杏奈，纯，真步，亚里沙，镜华，伊利亚，智，流夏，霞，安，古蕾雅，空花（大江户），妮侬（大江户），碧（转校生），黑江，美美（万圣节）</textarea>
+            <br><br>
+        </form>
+        <form class="ps" id="3" name="pool-setting">
+            <h3>奖池3</h3>
+            <a>名称:</a><input type="text" id="name" value="2星" /><br>
+            <a>概率:</a><input type="number" id="prop" value="180" /><br>
+            <a>前缀:</a><input type="text" id="pref" value="★★" /><br>
+            <a>内容:</a><br><textarea id='pool' rows="5"
+                cols="40">空花，美冬，雪，阿卡丽，珠希，美美，真阳，忍，香织，千歌，深月，惠理子，宫子，栞，铃奈，铃，绫音，美里，纺希，茉莉，娜娜卡</textarea>
+            <br><br>
+        </form>
+        <form class="ps" id="4" name="pool-setting">
+            <h3>奖池4</h3>
+            <a>名称:</a><input type="text" id="name" value="1星" /><br>
+            <a>概率:</a><input type="number" id="prop" value="795" /><br>
+            <a>前缀:</a><input type="text" id="pref" value="★" /><br>
+            <a>内容:</a><br><textarea id='pool' rows="5" cols="40">怜，优花梨，碧，由里，禊，莉玛，铃莓，美咲，日和，胡桃，步美</textarea>
+            <br><br>
+        </form>
+    </div>
+    <input type="button" value="+" onclick="Pool_add()" />
+    <input type="button" value="-" onclick="Pool_drop()" /><br><br>
+    <form id="cfg">
+        <a>每日抽卡次数:</a><input id="times" value="2" type="number" /><br><br>
+        <input type="checkbox" id="update" checked="checked">自动更新卡池<br><br><br>
+    </form>
+    <input type="button" value="确认" onclick="Gene_code()" />
+    <form id="pc">
+        <textarea id='result' rows="5" cols="40"></textarea><br><br>
+        <input type="button" value="复制" onclick="Copy_code()" />
+    </form>
+</body>
+
+</html>

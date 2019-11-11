@@ -1,5 +1,8 @@
 # coding=utf-8
 
+# 祖传代码，写得稀烂，不想改了
+
+
 import json
 import os
 import pickle
@@ -9,7 +12,7 @@ import sqlite3
 import sys
 import time
 
-from dmg_report import Report
+from plugins.dmg_report import Report
 
 
 class Record():
@@ -65,7 +68,7 @@ class Record():
                 f.seek(0)
                 f.truncate()
                 json.dump(mailcfg, f, ensure_ascii=False, indent=2)
-            self.txt_list.append("本群第一次使用，数据已初始化，请仔细阅读说明yobot.xyz")
+            self.txt_list.append("本群第一次使用，数据已初始化，请仔细阅读说明http://h.yobot.monster/")
         else:
             with open(os.path.join(self.__path, "data", self.__groupid+".dat"), "rb") as f:
                 self.__data = pickle.load(f)
@@ -138,7 +141,7 @@ class Record():
         remain = self.__conf[self.__groupid]["remain"]
         if(dmg >= remain):
             self.__comment += "未记录"
-            self.txt_list.append("报刀无效，伤害量必须小于剩余血量，如果击败boss请发送“#尾刀”")
+            self.txt_list.append("报刀无效，伤害量必须小于剩余血量，如果击败boss请发送“尾刀”")
             self._boss_status()
         else:
             if not (self.__qqid in self.__data[1].keys()):
@@ -241,10 +244,10 @@ class Record():
                     self.__conf[self.__groupid]["boss"] = opt[4]
                     self.__conf[self.__groupid]["remain"] = opt[5]
                 if (opt[6] == 2 or opt[6] == 3):  # 余刀
-                    self.__data[1][self.__qqid][1] = 2  # 上一刀为尾刀
+                    self.__data[1][opt[2]][1] = 2  # 上一刀为尾刀
                 else:  # 非余刀
-                    self.__data[1][self.__qqid][1] = 0  # 上一刀非尾刀
-                    self.__data[1][self.__qqid][3] -= 1  # 本日刀数-1
+                    self.__data[1][opt[2]][1] = 0  # 上一刀非尾刀
+                    self.__data[1][opt[2]][3] -= 1  # 本日刀数-1
                 self.__save()
                 self.__comment += "已撤销"
                 self.txt_list.append("{}在{}对{}周目{}号boss造成的{:,}伤害已撤销".format(
@@ -343,7 +346,7 @@ class Record():
                 random.randint(0, 9999))
             self.__save()
             self.__comment += "未重置"
-            self.txt_list.append("注意：此操作将删除所有记录，公会战期间小心使用，如果确定重新开始请发送“#重新开始{}”"
+            self.txt_list.append("注意：此操作将删除所有记录，公会战期间小心使用，如果确定重新开始请发送“重新开始{}”"
                                  .format(self.__conf[self.__groupid]["res"]))
 
     def _mailopt(self, opt, addr=""):
@@ -418,9 +421,9 @@ class Record():
         匹配命令，返回触发功能的序号
         """
         cmd = incmd.replace(" ", "")
-        if cmd.startswith("报刀"):  # 历史遗留问题
-            cmd = cmd[2:]
-        if re.match(r"\d+[wWkK万]?$", cmd):
+        # if cmd.startswith("报刀"):  # 历史遗留问题
+        #     cmd = cmd[2:]
+        if re.match(r"(报刀|#)\d+[wWkK万]?$", cmd):
             return 2
         elif (cmd == "尾刀" or cmd == "收尾" or cmd == "收掉" or cmd == "击败"):
             return 3
@@ -462,8 +465,6 @@ class Record():
         实施命令
         """
         cmd = incmd.replace(" ", "")
-        if cmd.startswith("报刀"):  # 历史遗留问题
-            cmd = cmd[2:]
         if func_num == None:
             func_num = self.match(cmd)
         if not os.path.exists(os.path.join(self.__path, "data", self.__groupid+".dat")):
@@ -481,9 +482,13 @@ class Record():
                 self.__comment += "已成功选择"
             else:
                 self.txt_list.append(
-                    "由于日服、台服boss血量不同、每日重置时间不同，请发送“#选择日服”或“#选择台服”")
+                    "由于日服、台服boss血量不同、每日重置时间不同，请发送“选择日服”或“选择台服”")
                 self.__comment += "未选择"
         elif func_num == 2:
+            if cmd.startswith("报刀"):  # 历史遗留问题
+                cmd = cmd[2:]
+            if cmd.startswith("#"):  # 历史遗留问题
+                cmd = cmd[1:]
             self.__damage(cmd, comment)
         elif func_num == 3:
             self.__eliminate(comment)
@@ -500,9 +505,9 @@ class Record():
                 self.__damage(cmd, comment)
             elif (cmd == "尾刀" or cmd == "收尾" or cmd == "收掉" or cmd == "击败"):
                 self.__eliminate(comment)
-            else:
-                self.__comment += "参数错误"
-                self.txt_list.append("300参数错误")
+            # else:
+            #     self.__comment += "参数错误"
+            #     self.txt_list.append("300参数错误")
         elif func_num == 5:
             self.__undo()
         elif func_num == 6:

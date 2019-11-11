@@ -1,4 +1,7 @@
 # coding=utf-8
+
+# todo:这个文件还没有为3.0修改过
+
 import json
 import os.path
 import sys
@@ -66,7 +69,7 @@ class Lock():
                     bef // 60,
                     bef % 60))
                 if bef > 180:
-                    self.txt_list.append("你可以发送“#踢出队列”将其踢出")
+                    self.txt_list.append("你可以发送“踢出队列”将其踢出")
                 else:
                     self.txt_list.append("{}秒后你可以将其踢出".format(180-bef))
 
