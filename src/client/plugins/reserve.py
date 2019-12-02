@@ -103,24 +103,24 @@ class Reserve():
     def match(cmd):
         num = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5,
                "1": 1, "2": 2, "3": 3, "4": 4, "5": 5}
-        match = re.match(r"[预預][订约定訂約][ABCabc老]?([一二三四五12345])[号王]?", cmd)
+        match = re.match(r"^[预預][订约定訂約][ABCabc老]?([一二三四五12345])[号王]?$", cmd)
         if match:
             return 0x10 + num[match.group(1)]
-        match = re.match(r"我?[挂上]树上?了?", cmd)
+        match = re.match(r"^我?[挂上]树上?了?$", cmd)
         if match:
             return 0x10
         if (cmd.endswith("尾刀") or cmd.endswith("收尾") or cmd.endswith("收掉") or cmd.endswith("击败")):
             return 0x20
-        match = re.match(r"[到打该]?[ABCabc老]?([一二三四五12345])[号王]?了", cmd)
+        match = re.match(r"^[到打该]?[ABCabc老]?([一二三四五12345])[号王]?了$", cmd)
         if match:
             return 0x20 | num[match.group(1)]
-        match = re.match(r"[ABCabc老]?([一二三四五12345])[号王]?死了", cmd)
+        match = re.match(r"^[ABCabc老]?([一二三四五12345])[号王]?死了$", cmd)
         if match:
             return 0x21 + (num[match.group(1)] % 5)
-        match = re.match(r"取消[预預]?[订约定訂約]?[ABCabc老]?([一二三四五12345])[号王]?", cmd)
+        match = re.match(r"^取消[预預]?[订约定訂約]?[ABCabc老]?([一二三四五12345])[号王]?$", cmd)
         if match:
             return 0x30 | num[match.group(1)]
-        match = re.match(r"查询?[预預]?[订约定訂約]?[ABCabc老]?([一二三四五12345])[号王]?", cmd)
+        match = re.match(r"^查询?[预預]?[订约定訂約]?[ABCabc老]?([一二三四五12345])[号王]?$", cmd)
         if match:
             return 0x40 | num[match.group(1)]
         if cmd == "查树":

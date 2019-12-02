@@ -1,4 +1,4 @@
-# coding=utf-8
+# 不再使用，部分方法暂时保留，重构之前暂时使用
 
 import base64
 import hashlib
@@ -69,8 +69,8 @@ class Setting:
             config = json.loads(data.decode())
         except:
             return '设置码不完整，请检查'
-        if config['q'] != qqid:
-            return '身份错误'
+        # if config['q'] != qqid:
+        #     return '身份错误'
         if not os.path.exists(self.mailfile):
             return '未初始化'
         if config['s'] == '':

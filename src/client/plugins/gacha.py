@@ -1,7 +1,3 @@
-# coding=utf-8
-
-# todo:命令和执行顺序还没写
-
 import os
 import pickle
 import random
@@ -201,8 +197,13 @@ class Gacha:
                 f.write("\n")
         f = open(colle_file, 'rb')
         files = {'file': f}
-        response = requests.post(
-            'http://api.yobot.xyz/v2/reports/', files=files)
+        try:
+            response = requests.post(
+                'http://api.yobot.xyz/v2/reports/', files=files)
+        except expression as identifier:
+            print("无法连接到{}，错误信息：{}".format(
+                'http://api.yobot.xyz/v2/reports/', c))
+            return
         f.close()
         p = response.text
         reply = (nickname + "的仓库：" + p)
@@ -216,12 +217,13 @@ class Gacha:
             auto_update = self.__pool.get("settings", {}).get("upgrade", False)
         if not auto_update:
             return
-        # f = open(os.path.join(self.setting["dirname"], "version.json"),
-        #          "r+", encoding="utf-8")
-        # ver = json5.load(f)
         now = int(time.time())
         if self.pool_checktime < now:
-            res = requests.get(self.URL)
+            try:
+                res = requests.get(self.URL)
+            except requests.exceptions.ConnectionError as c:
+                print("无法连接到{}，错误信息：{}".format(self.URL, c))
+                return
             if res.status_code == 200:
                 online_ver = json5.loads(res.text)
                 if self.__pool["info"]["name"] != online_ver["info"]["name"]:
@@ -230,31 +232,25 @@ class Gacha:
                         pf.write(res.text)
                     return "卡池已自动更新，目前卡池：" + self.__pool["info"]["name"]
                 self.pool_checktime = now + 80000
-        #         f.seek(0)
-        #         f.truncate()
-        #         json5.dump(ver, f, indent=2,
-        #                    quote_keys=True, trailing_commas=False)
-        # f.close()
 
     @staticmethod
     def match(cmd: str) -> int:
         if cmd == "十连" or cmd == "十连抽":
             return 1
-        # elif cmd == "十连设置" or cmd == "抽卡设置" or cmd == "卡池设置":
-        #     return 2
-        # elif cmd == "重置卡池" or cmd == "删除卡池" or cmd == "更新卡池":
-        #     return 3
         elif cmd.startswith("仓库"):
             return 4
         else:
             return 0
 
     def execute(self, func_num: int, msg: dict):
-        # if func_num == 2:
-        #     self.setting()
-        # elif func_num == 3:
-        #     self.del_pool()
-        if func_num == 1:
+        if ((
+                msg["message_type"] == "group"
+                and not self.setting.get("gacha_on", True))
+            or (
+                msg["message_type"] == "private"
+                and not self.setting.get("gacha_private_on", True))):
+            reply = "功能已关闭"
+        elif func_num == 1:
             reply = self.gacha(
                 qqid=msg["sender"]["user_id"],
                 nickname=msg["sender"]["card"])

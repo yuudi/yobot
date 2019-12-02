@@ -1,16 +1,39 @@
 # 使用方法
+
 ## 运行环境
+
 在`python3.7.4`中通过测试，其他环境未测试
+
+python最低要求为`python3.6`
+
 ## 主程序
+
 导入yobot并调用
-```
+
+```python
 import yobot
-txtlist = yobot.yobot(groupid, qqid, nickname, msg)
+bot = yobot.Yobot()
+reply = bot.proc(context)
 ```
-输入四个参数均为字符串
-输出为list包含若干个字符串
 
-主文件`yobot.py`后面有一个例子
+其中：
+`reply`是一个`str`；
+`context`是一个`dict`，其结构为
 
-## 更新程序
-运行`updater.py`，会从`version.json`里读取更新信息并在线更新
+```python
+context = {
+    "group_id": 12345, # 聊天编号（QQ群号）
+    "raw_message": "你好", # 消息内容
+    "sender": {
+        "user_id": 456, # 用户编号（QQ号）
+        "nickname": "nickname", # 用户昵称
+        "role": "admin" # 用户身份
+    }
+}
+```
+
+主文件`main.py`是利用`aiocqhttp`的应用
+
+## 增加功能
+
+在![custom.py](https://github.com/yuudi/yobot/tree/master/src/client/plugins/custom.py)文件中可以增加简单的功能

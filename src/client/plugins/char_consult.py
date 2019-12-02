@@ -49,19 +49,17 @@ class Char_consult:
         else:
             return 0
 
-    def execute(self, match_num: int, cmd) -> dict:
-        # def execute(self, match_num: int = 0, msg: dcit) -> dict:
-        #     if self.setting["char_consult"] == False:
-        #         reply = "此功能未启用"
-        #     else:
+    def execute(self, match_num: int, msg: dict) -> dict:
+        cmd = msg["raw_message"]
         char_id = self.nickname.get(cmd[2:].lower(), None)
         if char_id == None:
-            reply = "没有找到"+cmd[2:]
+            reply = "没有找到【{}】".format(cmd[2:])
+        elif char_id not in self.char_page["page_id"]:
+            reply = "暂无{}的介绍".format(cmd[2:])
         else:
-            reply = self.char_page["prefix"] + \
-                str(self.char_page["page_id"][char_id])
-        return reply
-        # return {
-        #     "reply": reply
-        #     "block": True
-        # }
+            reply = (self.char_page["prefix"]
+                     + str(self.char_page["page_id"][char_id]))
+        return {
+            "reply": reply,
+            "block": True
+        }

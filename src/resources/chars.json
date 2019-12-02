@@ -1,0 +1,1015 @@
+{
+    "100101": {
+        "name_jp": "ヒヨリ",
+        "name_cn": "日和",
+        "nicknames": [
+            "猫拳"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92891"
+    },
+    "100201": {
+        "name_jp": "ユイ",
+        "name_cn": "优衣",
+        "nicknames": [
+            "种田",
+            "yui",
+            "ue"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92914"
+    },
+    "100301": {
+        "name_jp": "レイ",
+        "name_cn": "怜",
+        "nicknames": [
+            "剑圣"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92890"
+    },
+    "100401": {
+        "name_jp": "ミソギ",
+        "name_cn": "禊",
+        "nicknames": [
+            "未奏希",
+            "炸弹人",
+            "炸弹",
+            "熊孩子"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92892"
+    },
+    "100501": {
+        "name_jp": "マツリ",
+        "name_cn": "茉莉",
+        "nicknames": [
+            "跳跳虎",
+            "虎",
+            "跳刀虎",
+            "马自立"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94460"
+    },
+    "100601": {
+        "name_jp": "アカリ",
+        "name_cn": "茜里",
+        "nicknames": [
+            "妹法",
+            "阿卡丽"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92897"
+    },
+    "100701": {
+        "name_jp": "ミヤコ",
+        "name_cn": "宫子",
+        "nicknames": [
+            "布丁"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92882"
+    },
+    "100801": {
+        "name_jp": "ユキ",
+        "name_cn": "雪",
+        "nicknames": [
+            "镜子",
+            "小雪",
+            "镜法",
+            "伪娘"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92910"
+    },
+    "100901": {
+        "name_jp": "アンナ",
+        "name_cn": "杏奈",
+        "nicknames": [
+            "中二",
+            "煤气罐"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92894"
+    },
+    "101001": {
+        "name_jp": "マホ",
+        "name_cn": "真步",
+        "nicknames": [
+            "狐狸",
+            "真扎",
+            "maho",
+            "咕噜灵波",
+            "真布"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92907"
+    },
+    "101101": {
+        "name_jp": "リノ",
+        "name_cn": "璃乃",
+        "nicknames": [
+            "妹弓"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92906"
+    },
+    "101201": {
+        "name_jp": "ハツネ",
+        "name_cn": "初音",
+        "nicknames": [
+            "hego",
+            "星星法",
+            "星法",
+            "睡法"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92908"
+    },
+    "101301": {
+        "name_jp": "ナナカ",
+        "name_cn": "七七香",
+        "nicknames": [
+            "娜娜卡",
+            "nanaka",
+            "十十力"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94467"
+    },
+    "101401": {
+        "name_jp": "カスミ",
+        "name_cn": "霞",
+        "nicknames": [
+            "驴",
+            "侦探",
+            "香澄"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94465"
+    },
+    "101501": {
+        "name_jp": "ミサト",
+        "name_cn": "美里",
+        "nicknames": [
+            "圣母",
+            "绿帽"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94458"
+    },
+    "101601": {
+        "name_jp": "スズナ",
+        "name_cn": "玲奈",
+        "nicknames": [
+            "暴击弓",
+            "政委",
+            "辣妹弓"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92911"
+    },
+    "101701": {
+        "name_jp": "カオリ",
+        "name_cn": "香织",
+        "nicknames": [
+            "狗子",
+            "狗",
+            "狗拳"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92883"
+    },
+    "101801": {
+        "name_jp": "イオ",
+        "name_cn": "伊绪",
+        "nicknames": [
+            "老师",
+            "魅魔",
+            "依绪"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92920"
+    },
+    "102001": {
+        "name_jp": "ミミ",
+        "name_cn": "美美",
+        "nicknames": [
+            "兔子",
+            "兔",
+            "兔兔"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92898"
+    },
+    "102101": {
+        "name_jp": "クルミ",
+        "name_cn": "胡桃",
+        "nicknames": [
+            "铃铛"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92889"
+    },
+    "102201": {
+        "name_jp": "ヨリ",
+        "name_cn": "伊里",
+        "nicknames": [
+            "姐法",
+            "姐姐法",
+            "尤里",
+            "由里"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92905"
+    },
+    "102301": {
+        "name_jp": "アヤネ",
+        "name_cn": "绫音",
+        "nicknames": [
+            "熊锤"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94464"
+    },
+    "102501": {
+        "name_jp": "スズメ",
+        "name_cn": "铃莓",
+        "nicknames": [
+            "女仆",
+            "雀",
+            "umb",
+            "悠木碧"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92916"
+    },
+    "102601": {
+        "name_jp": "リン",
+        "name_cn": "铃",
+        "nicknames": [
+            "松鼠"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94466"
+    },
+    "102701": {
+        "name_jp": "エリコ",
+        "name_cn": "惠理子",
+        "nicknames": [
+            "病娇"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92884"
+    },
+    "102801": {
+        "name_jp": "サレン",
+        "name_cn": "咲恋",
+        "nicknames": [
+            "充电宝",
+            "大小姐"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92893"
+    },
+    "102901": {
+        "name_jp": "ノゾミ",
+        "name_cn": "望",
+        "nicknames": [
+            "偶像"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92870"
+    },
+    "103001": {
+        "name_jp": "ニノン",
+        "name_cn": "妮诺",
+        "nicknames": [
+            "扇子",
+            "外国人"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92895"
+    },
+    "103101": {
+        "name_jp": "シノブ",
+        "name_cn": "忍",
+        "nicknames": [
+            "鬼父"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92899"
+    },
+    "103201": {
+        "name_jp": "アキノ",
+        "name_cn": "秋乃",
+        "nicknames": [
+            "哈哈剑"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92871"
+    },
+    "103301": {
+        "name_jp": "マヒル",
+        "name_cn": "真阳",
+        "nicknames": [
+            "奶牛"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92900"
+    },
+    "103401": {
+        "name_jp": "ユカリ",
+        "name_cn": "优花梨",
+        "nicknames": [
+            "黄骑",
+            "奶骑",
+            "酒鬼",
+            "圣骑"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92904"
+    },
+    "103601": {
+        "name_jp": "キョウカ",
+        "name_cn": "镜华",
+        "nicknames": [
+            "xcw",
+            "小仓唯"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94457"
+    },
+    "103701": {
+        "name_jp": "トモ",
+        "name_cn": "智",
+        "nicknames": [
+            "tomo",
+            "卜毛",
+            "脱毛"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94461"
+    },
+    "103801": {
+        "name_jp": "シオリ",
+        "name_cn": "栞",
+        "nicknames": [
+            "tp弓",
+            "白虎弓"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92909"
+    },
+    "104001": {
+        "name_jp": "アオイ",
+        "name_cn": "碧",
+        "nicknames": [
+            "香菜弓",
+            "香菜",
+            "毒弓",
+            "绿帽弓"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92917"
+    },
+    "104201": {
+        "name_jp": "チカ",
+        "name_cn": "千歌",
+        "nicknames": [
+            "绿毛奶",
+            "契卡"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92912"
+    },
+    "104301": {
+        "name_jp": "マコト",
+        "name_cn": "真琴",
+        "nicknames": [
+            "狼",
+            "狼姐",
+            "狼妹",
+            "月月"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92872"
+    },
+    "104401": {
+        "name_jp": "イリヤ",
+        "name_cn": "伊莉雅",
+        "nicknames": [
+            "yly",
+            "伊利亚"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94459"
+    },
+    "104501": {
+        "name_jp": "クウカ",
+        "name_cn": "空花",
+        "nicknames": [
+            "抖m"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92881"
+    },
+    "104601": {
+        "name_jp": "タマキ",
+        "name_cn": "珠希",
+        "nicknames": [
+            "猫剑"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92885"
+    },
+    "104701": {
+        "name_jp": "ジュン",
+        "name_cn": "纯",
+        "nicknames": [
+            "黑骑",
+            "saber"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/93640"
+    },
+    "104801": {
+        "name_jp": "ミフユ",
+        "name_cn": "美冬",
+        "nicknames": [
+            "子龙"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92901"
+    },
+    "104901": {
+        "name_jp": "シズル",
+        "name_cn": "静流",
+        "nicknames": [
+            "姐姐"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92873"
+    },
+    "105001": {
+        "name_jp": "ミサキ",
+        "name_cn": "美咲",
+        "nicknames": [
+            "大眼",
+            "眼球法"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92915"
+    },
+    "105101": {
+        "name_jp": "ミツキ",
+        "name_cn": "深月",
+        "nicknames": [
+            "眼罩",
+            "抖s"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92902"
+    },
+    "105201": {
+        "name_jp": "リマ",
+        "name_cn": "莉玛",
+        "nicknames": [
+            "羊驼",
+            "草泥马"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92888"
+    },
+    "105301": {
+        "name_jp": "モニカ",
+        "name_cn": "莫妮卡",
+        "nicknames": [
+            "毛二力",
+            "莫尼卡"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92896"
+    },
+    "105401": {
+        "name_jp": "ツムギ",
+        "name_cn": "纺希",
+        "nicknames": [
+            "裁缝"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94456"
+    },
+    "105501": {
+        "name_jp": "アユミ",
+        "name_cn": "步未",
+        "nicknames": [
+            "路人",
+            "路人妹",
+            "步美"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94469"
+    },
+    "105601": {
+        "name_jp": "ルカ",
+        "name_cn": "流夏",
+        "nicknames": [
+            "大姐",
+            "露卡",
+            "ruka",
+            "luka",
+            "儿力",
+            "卢卡"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94468"
+    },
+    "105701": {
+        "name_jp": "ジータ",
+        "name_cn": "姬塔",
+        "nicknames": [
+            "吉他",
+            "团长",
+            "qks",
+            "吉塔"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92875"
+    },
+    "105801": {
+        "name_jp": "ペコリーヌ",
+        "name_cn": "贪吃佩可",
+        "nicknames": [
+            "吃货",
+            "公主",
+            "佩可莉姆",
+            "佩可"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92887"
+    },
+    "105901": {
+        "name_jp": "コッコロ",
+        "name_cn": "可可萝",
+        "nicknames": [
+            "妈",
+            "kkr",
+            "白毛",
+            "普白",
+            "可可罗"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92903"
+    },
+    "106001": {
+        "name_jp": "キャル",
+        "name_cn": "凯留",
+        "nicknames": [
+            "黑猫",
+            "臭鼬",
+            "凯露",
+            "普黑"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/92913"
+    },
+    "106101": {
+        "name_jp": "ムイミ",
+        "name_cn": "矛依未",
+        "nicknames": [
+            "511",
+            "夏娜",
+            "无意义"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/142756"
+    },
+    "106301": {
+        "name_jp": "アリサ",
+        "name_cn": "亚里莎",
+        "nicknames": [
+            "瞎子",
+            "鸭梨瞎",
+            "亚莉莎",
+            "亚里沙"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/93551"
+    },
+    "106501": {
+        "name_jp": "カヤ",
+        "name_cn": "卡娅",
+        "nicknames": [
+            "卡雅",
+            "卡亚",
+            "茅",
+            "萱",
+            "不良",
+            "卡姐"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/175800"
+    },
+    "106601": {
+        "name_jp": "イノリ",
+        "name_cn": "祈",
+        "nicknames": [],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/unknown"
+    },
+    "106701": {
+        "name_jp": "ホマレ",
+        "name_cn": "穗希",
+        "nicknames": [
+            "誉"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/unknown"
+    },
+    "106801": {
+        "name_jp": "ラビリスタ",
+        "name_cn": "拉比林斯塔",
+        "nicknames": [
+            "迷宫女王",
+            "晶"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/0"
+    },
+    "106901": {
+        "name_jp": "マナ",
+        "name_cn": "真那",
+        "nicknames": [
+            "霸瞳皇帝",
+            "霸瞳"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/0"
+    },
+    "107001": {
+        "name_jp": "ネネカ",
+        "name_cn": "似似花",
+        "nicknames": [
+            "448",
+            "neneka",
+            "涅涅卡",
+            "奶奶卡",
+            "大妃",
+            "变貌大妃",
+            "变貌",
+            "不不力"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/164532"
+    },
+    "107101": {
+        "name_jp": "クリスティーナ",
+        "name_cn": "克里斯蒂娜",
+        "nicknames": [
+            "克总",
+            "女帝",
+            "克",
+            "克姐"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/94463"
+    },
+    "107301": {
+        "name_jp": "ラジニカーント",
+        "name_cn": "拉基拉基",
+        "nicknames": [
+            "跳跃王"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/0"
+    },
+    "107501": {
+        "name_jp": "ペコリーヌ（サマー）",
+        "name_cn": "夏日贪吃佩可",
+        "nicknames": [
+            "水吃",
+            "水吃货",
+            "泼妇"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/109993"
+    },
+    "107601": {
+        "name_jp": "コッコロ（サマー）",
+        "name_cn": "夏日可可萝",
+        "nicknames": [
+            "水白",
+            "水妈"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/109994"
+    },
+    "107701": {
+        "name_jp": "スズメ（サマー）",
+        "name_cn": "夏日铃莓",
+        "nicknames": [
+            "水女仆"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/112868"
+    },
+    "107801": {
+        "name_jp": "キャル（サマー）",
+        "name_cn": "夏日凯留",
+        "nicknames": [
+            "水黑",
+            "潶",
+            "水黑猫"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/114528"
+    },
+    "107901": {
+        "name_jp": "タマキ（サマー）",
+        "name_cn": "夏日珠希",
+        "nicknames": [
+            "水猫剑",
+            "水猫"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/114502"
+    },
+    "108001": {
+        "name_jp": "ミフユ（サマー）",
+        "name_cn": "夏日美冬",
+        "nicknames": [
+            "水美冬",
+            "水子龙"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/114504"
+    },
+    "108101": {
+        "name_jp": "シノブ（ハロウィン）",
+        "name_cn": "万圣节忍",
+        "nicknames": [
+            "万圣忍",
+            "瓜忍",
+            "鬼忍"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/120761"
+    },
+    "108201": {
+        "name_jp": "ミヤコ（ハロウィン）",
+        "name_cn": "万圣节宫子",
+        "nicknames": [
+            "万圣布丁",
+            "狼布丁",
+            "狼丁"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/120762"
+    },
+    "108301": {
+        "name_jp": "ミサキ（ハロウィン）",
+        "name_cn": "万圣节美咲",
+        "nicknames": [
+            "万圣美咲",
+            "万圣大眼"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/123926"
+    },
+    "108401": {
+        "name_jp": "チカ（クリスマス）",
+        "name_cn": "圣诞节千歌",
+        "nicknames": [
+            "圣诞千歌",
+            "圣千"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/132396"
+    },
+    "108501": {
+        "name_jp": "クルミ（クリスマス）",
+        "name_cn": "圣诞节胡桃",
+        "nicknames": [
+            "圣诞胡桃",
+            "圣诞铃铛"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/132419"
+    },
+    "108601": {
+        "name_jp": "アヤネ（クリスマス）",
+        "name_cn": "圣诞节绫音",
+        "nicknames": [
+            "圣诞熊锤",
+            "圣锤"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/134531"
+    },
+    "108701": {
+        "name_jp": "ヒヨリ（ニューイヤー）",
+        "name_cn": "新年日和",
+        "nicknames": [
+            "春猫",
+            "新年猫拳"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/138812"
+    },
+    "108801": {
+        "name_jp": "ユイ（ニューイヤー）",
+        "name_cn": "新年优衣",
+        "nicknames": [
+            "春田",
+            "新年yui",
+            "春优"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/136547"
+    },
+    "108901": {
+        "name_jp": "レイ（ニューイヤー）",
+        "name_cn": "新年怜",
+        "nicknames": [
+            "春剑",
+            "春怜",
+            "新年剑圣",
+            "新春剑圣"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/136267"
+    },
+    "109001": {
+        "name_jp": "エリコ（バレンタイン）",
+        "name_cn": "情人节惠理子",
+        "nicknames": [
+            "情人节惠理子",
+            "情人节病娇",
+            "恋病",
+            "情病",
+            "情人病"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/141210"
+    },
+    "109101": {
+        "name_jp": "シズル（バレンタイン）",
+        "name_cn": "情人节静流",
+        "nicknames": [
+            "情人节静流",
+            "情人节姐姐",
+            "情姐",
+            "恋姐",
+            "情人姐"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/141208"
+    },
+    "109201": {
+        "name_jp": "アン",
+        "name_cn": "安",
+        "nicknames": [
+            "55kg"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/146934"
+    },
+    "109301": {
+        "name_jp": "ルゥ",
+        "name_cn": "露",
+        "nicknames": [],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/146808"
+    },
+    "109401": {
+        "name_jp": "グレア",
+        "name_cn": "古雷娅",
+        "nicknames": [
+            "龙姬"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/147234"
+    },
+    "109501": {
+        "name_jp": "クウカ（オーエド）",
+        "name_cn": "大江户空花",
+        "nicknames": [
+            "江户空花",
+            "江户抖m",
+            "江户m",
+            "江m",
+            "花m",
+            "大江m",
+            "和服空花"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/149184"
+    },
+    "109601": {
+        "name_jp": "ニノン（オーエド）",
+        "name_cn": "大江户妮诺",
+        "nicknames": [
+            "江户扇子",
+            "忍扇"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/150884"
+    },
+    "109701": {
+        "name_jp": "レム",
+        "name_cn": "蕾姆",
+        "nicknames": [],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/152682"
+    },
+    "109801": {
+        "name_jp": "ラム",
+        "name_cn": "拉姆",
+        "nicknames": [],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/152681"
+    },
+    "109901": {
+        "name_jp": "エミリア",
+        "name_cn": "艾米莉亚",
+        "nicknames": [
+            "emt",
+            "爱蜜莉雅"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/154086"
+    },
+    "110001": {
+        "name_jp": "スズナ（サマー）",
+        "name_cn": "夏日玲奈",
+        "nicknames": [
+            "水暴",
+            "暴击弓",
+            "水暴弓",
+            "瀑"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/156383"
+    },
+    "110101": {
+        "name_jp": "イオ（サマー）",
+        "name_cn": "夏日伊绪",
+        "nicknames": [
+            "水魅魔",
+            "水老师",
+            "泳装魅魔",
+            "泳装老师"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/156384"
+    },
+    "110301": {
+        "name_jp": "サレン（サマー）",
+        "name_cn": "夏日咲恋",
+        "nicknames": [
+            "水充",
+            "水电",
+            "水电站",
+            "泳装充电宝",
+            "泳装咲恋"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/158866"
+    },
+    "110401": {
+        "name_jp": "マコト（サマー）",
+        "name_cn": "夏日真琴",
+        "nicknames": [
+            "水狼",
+            "浪"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/160388"
+    },
+    "110501": {
+        "name_jp": "カオリ（サマー）",
+        "name_cn": "夏日香织",
+        "nicknames": [
+            "水狗"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/160387"
+    },
+    "110601": {
+        "name_jp": "マホ（サマー）",
+        "name_cn": "夏日真步",
+        "nicknames": [
+            "水真步",
+            "水狐狸",
+            "水狐",
+            "水壶",
+            "水噜灵波"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/162001"
+    },
+    "110701": {
+        "name_jp": "アオイ（編入生）",
+        "name_cn": "转校生碧",
+        "nicknames": [
+            "转校香菜",
+            "编入香菜",
+            "新香菜",
+            "转学香菜",
+            "转校弓",
+            "编入弓",
+            "转学弓",
+            "新毒弓",
+            "生菜"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/164701"
+    },
+    "110801": {
+        "name_jp": "クロエ",
+        "name_cn": "黑江",
+        "nicknames": [
+            "华哥",
+            "花子",
+            "花姐"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/166637"
+    },
+    "110901": {
+        "name_jp": "ユニ",
+        "name_cn": "优尼",
+        "nicknames": [],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/0"
+    },
+    "111001": {
+        "name_jp": "チエル",
+        "name_cn": "知惠",
+        "nicknames": [
+            "切噜"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/0"
+    },
+    "111101": {
+        "name_jp": "キョウカ（ハロウィン）",
+        "name_cn": "万圣节镜华",
+        "nicknames": [
+            "万圣xcw",
+            "万圣唯",
+            "猫唯",
+            "猫仓"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/170554"
+    },
+    "111201": {
+        "name_jp": "ミソギ（ハロウィン）",
+        "name_cn": "万圣节禊",
+        "nicknames": [
+            "万圣熊孩",
+            "万圣炸弹人",
+            "万圣未奏希",
+            "圣弹人",
+            "圣蛋人"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/170555"
+    },
+    "111301": {
+        "name_jp": "ミミ（ハロウィン）",
+        "name_cn": "万圣节美美",
+        "nicknames": [
+            "万圣兔",
+            "万圣兔兔",
+            "万圣兔子"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/172697"
+    },
+    "111401": {
+        "name_jp": "ルナ",
+        "name_cn": "露娜",
+        "nicknames": [],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/174166"
+    },
+    "111501": {
+        "name_jp": "クリスティーナ（クリスマス）",
+        "name_cn": "圣诞节克里斯蒂娜",
+        "nicknames": [
+            "圣诞克",
+            "圣诞克姐",
+            "圣诞克总"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/178680"
+    },
+    "111601": {
+        "name_jp": "ノゾミ（クリスマス）",
+        "name_cn": "圣诞节望",
+        "nicknames": [
+            "圣诞偶像",
+            "圣诞望"
+        ],
+        "gw_page": "https://gamewith.jp/pricone-re/article/show/178679"
+    }
+}

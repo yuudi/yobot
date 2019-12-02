@@ -1,6 +1,6 @@
 <?php
 
-//用伪静态将/daily目录解析到此脚本
+//用伪静态将/table目录解析到此脚本
 //代码中的保密部分已被替换为1234567
 $page404 = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>yobot</title></head><body><p>404: file not found</p><p><a href='https://yobot.xyz/'>return to home</a></p></body></html>";
 if (substr($_SERVER["REQUEST_URI"], 0, 6) == "/daily") {
@@ -13,6 +13,7 @@ if (substr($_SERVER["REQUEST_URI"], 0, 6) == "/daily") {
         echo "<!DOCTYPE html><html><head><meta charset='utf-8'><title>yobot</title><style>th{background-color:#A7C942;color:#ffffff;}tr.even td{color:#000000;background-color:#EAF2D3;}table,td,th{border: 1px solid black;}</style></head><body><table border='1'><tbody>";
         $row_type = "th";
         $even_row = false;
+        setlocale(LC_ALL, 'en_US.UTF-8');
         while ($csv_line = fgetcsv($fp)) {
             if ($even_row) {
                 echo "<tr>";

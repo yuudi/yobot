@@ -90,8 +90,18 @@ class Lock():
                         bef % 60,
                         180 - bef))
 
+    def boss_challenged(self):
+        if self.__data.get(self.__groupid, [0])[0] == 0:
+            return
+        else:
+            del self.__data[self.__groupid]
+            self.txt_list.append("boss已解锁")
+            self.__save()
+            return
+
     @staticmethod
     def match(cmd):
+        cmd = cmd.split("//")[0]
         if cmd == "申请boss" or cmd == "锁定boss" or cmd == "申请出刀" or cmd == "申请撞刀" or cmd == "开始撞刀":
             return 1  # 加锁
         elif cmd == "解锁boss" or cmd == "出刀完毕" or cmd == "取消撞刀":

@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
+    <title>yobot设置</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        function Confirm() {
+            var formData = {};
+            var t = $('#setting').serializeArray();
+            $.each(t, function () {
+                formData[this.name] = this.value;
+            });
+            if (formData["super-admin"].search(/^\d{5,10}(?: \d{5,10})*$/)) {
+                alert("请填写正确QQ号");
+                return
+            }
+            formData["super-admin"] = formData["super-admin"].split(" ").map(Number);
+            if (formData["black-list"].search(/^(?:\d{5,10}(?: \d{5,10})*)?$/)) {
+                alert("请填写正确QQ号");
+                return
+            }
+            formData["black-list"] = formData["black-list"].split(" ").map(Number);
+            if (formData["update-time"] == "") {
+                alert("请填写自动更新时间");
+                return
+            }
+            formData["setting-restrict"] = parseInt(formData["setting-restrict"]);
+            formData["auto_update"] = formData["auto_update"] == "on";
+            formData["gacha_on"] = formData["gacha_on"] == "on";
+            formData["preffix_on"] = formData["preffix_on"] == "on";
+            formData["gacha_private_on"] = formData["gacha_private_on"] == "on";
+            formData["zht_in"] = formData["zht_in"] == "on";
+            formData["zht_out"] = formData["zht_out"] == "on";
+            var text = JSON.stringify({ version: 2999, settings: formData });
+            $.post("1234567"/*this is coding-api address*/, { raw: text }, function (data) {
+                $('#pc #setting_code').attr("value", "设置码" + data);
+            });
+        }
+
+        function Copy_code() {
+            let a = document.forms["pc"]["setting_code"];
+            a.select();
+            document.execCommand("Copy");
+            alert("已复制，请在群里粘贴。");
+        }
+
+        $(document).ready(function () {
+            $("#auto_update").change(function () {
+                if ($("#auto_update").is(":checked")) {
+                    $("#update_input").html('<br>时间：每天<input type="time" name="update-time">');
+                } else {
+                    $("#update_input").html('');
+                }
+                $("#restart").html("（重启后生效）")
+            });
+            $("#preffix_on").change(function () {
+                if ($("#preffix_on").is(":checked")) {
+                    $("#preffix_input").html('<br>前缀：<input type="text" name="preffix_string">');
+                } else {
+                    $("#preffix_input").html('');
+                }
+            });
+            $("#zht_out").change(function () {
+                if ($("#zht_out").is(":checked")) {
+                    $("#zht_style_input").html('<br>风格：<select name="zht_out_style"><option value="s2t">标准</option><option value="s2tw">台湾</option><option value="s2hk">香港</option></select>');
+                } else {
+                    $("#zht_style_input").html('');
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <p><a href="https://yobot.xyz/">返回主页</a></p>
+    <h1>设置</h1>
+    <form id="setting">
+        <p>主人QQ：<input type="text" name="super-admin">（多个QQ以空格分隔）</p>
+        <p>黑名单：<input type="text" name="black-list">（多个QQ以空格分隔）</p>
+        <p>设置权限：
+            <select name="setting-restrict">
+                <option value="3">所有人</option>
+                <option value="2">管理员</option>
+                <option value="1">群主</option>
+                <option value="0">仅主人</option>
+            </select>
+        </p>
+        <p><input type="checkbox" name="auto_update" id="auto_update" checked>自动更新
+            <span id="restart"></span>
+            <span id="update_input"><br>时间：每天<input type="time" name="update-time"></span>
+        </p>
+        <p>jjc查询结果显示：
+            <select name="show_jjc_solution">
+                <option value="url">网页</option>
+                <option value="text">文字</option>
+            </select>
+        </p>
+        <p><input type="checkbox" name="gacha_on" id="gacha_on" checked>允许群聊抽卡</p>
+        <p><input type="checkbox" name="gacha_private_on" id="gacha_private_on" checked>允许私聊抽卡</p>
+        <p><input type="checkbox" name="preffix_on" id="preffix_on">使用前缀
+            <span id="preffix_input"></span>
+        </p>
+        <p><input type="checkbox" name="zht_in" id="zht_in">接收繁中输入</p>
+        <p><input type="checkbox" name="zht_out" id="zht_out">输出转化为繁中<span id="zht_style_input"></span></p>
+        <input type="button" value="确定" onclick="Confirm()" />
+    </form>
+    <form id="pc">
+        <input type="text" id="setting_code">
+        <input type="button" value="复制" onclick="Copy_code()">
+    </form>
+</body>
+
+</html>

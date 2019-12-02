@@ -35,9 +35,9 @@ class Message:
         if match_num == 99:
             reply = self.version
         elif match_num == 98:
-            reply = "请查看http://h.yobot.monster/"
+            reply = "请查看http://h3.yobot.monster/"
         else:
-            reply = "此功能已经不再可用，请查看http://h.yobot.monster/"
+            reply = "此功能已经不再可用，请查看http://h3.yobot.monster/"
         return {
             "reply": reply,
             "block": True

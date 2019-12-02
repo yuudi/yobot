@@ -27,6 +27,9 @@ class Report():
     cy_eff = [1.0, 1.0, 1.3, 1.3, 1.5,
               1.4, 1.4, 1.8, 1.8, 2.0,
               2.0, 2.0, 2.5, 2.5, 3.0]
+    cy_eff_2 = [1.2, 1.2, 1.3, 1.4, 1.5,
+                1.6, 1.6, 1.8, 1.9, 2.0,
+                2.0, 2.0, 2.4, 2.4, 2.6]
     txt_list = []
 
     def __init__(self,  groupid):
@@ -122,7 +125,7 @@ class Report():
         else:
             return (total_full * count_tail) / (total_tail * count_full)
 
-    def _score(self, mdata, eff=cy_eff, taileff=False):
+    def _score(self, mdata, eff, taileff=False):
         score = []
         for mem in self.__rpt["mem_list"]:
             s = 0
@@ -242,7 +245,7 @@ class Report():
                                           "report",
                                           self.rpt_name,
                                           self.rpt_name+".zip"),
-                             compression=ZIP_DEFLATED,
+                             compression=zipfile.ZIP_DEFLATED,
                              mode="w",
                              compresslevel=9) as z:
             z.write(os.path.join(self.__path, "data", self.__groupid+".log"),
@@ -402,7 +405,7 @@ class Report():
             self.txt_list.append("101没有尾刀")
             return 101
         self.__rpt["yb_sorce"] = self._score(mem_data, self.yobot_eff, True)
-        self.__rpt["cy_sorce"] = self._score(mem_data, self.cy_eff, False)
+        self.__rpt["cy_sorce"] = self._score(mem_data, self.cy_eff_2, False)
         self.__rpt["proportion"] = self._proportion(
             self.__rpt["yb_sorce"], self.__rpt["cy_sorce"])
         self.__rpt["count"] = self._count(mem_data)
