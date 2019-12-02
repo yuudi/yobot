@@ -3,15 +3,16 @@ import json
 import os
 import sys
 from typing import Union
+from urllib.parse import quote
 
 import requests
 
-from plugins import setting
+from plugins import setting, shorten_url
 
 
 class Switcher:
     code_api = "http://api.yobot.xyz/v3/coding/?code="
-    setting_url = "http://io.yobot.monster/3.0.0-s/settings/"
+    setting_url = "http://io.yobot.monster/3.0.1/settings/"
 
     def __init__(self, glo_setting: dict):
         self.setting = glo_setting
@@ -51,6 +52,15 @@ class Switcher:
             f = 0
         return f
 
+    def dump_url(self) -> str:
+        setting_dict = self.setting.copy()
+        drop_keys = ("host", "port", "run-as", "dirname", "version")
+        for key in drop_keys:
+            del setting_dict[key]
+        query = json.dumps(setting_dict, separators=(',', ':'))
+        full_url = self.setting_url + "?form="+quote(query)
+        return shorten_url.shorten(full_url)
+
     def execute(self, match_num: int, msg: dict) -> dict:
         super_admins = self.setting.get("super-admin", list())
         restrict = self.setting.get("setting-restrict", 3)
@@ -70,7 +80,7 @@ class Switcher:
 
         cmd = msg["raw_message"]
         if match_num == 0x300:
-            reply = self.setting_url + "\n请在此页进行设置，完成后发送设置码即可"
+            reply = self.dump_url() + "\n请在此页进行设置，完成后发送设置码即可"
         elif match_num == 0x400:
             in_code = cmd[3:]
             res = self.get_url_content(self.code_api+in_code)

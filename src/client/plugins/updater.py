@@ -13,6 +13,7 @@ class Updater:
         self.evn = glo_setting["run-as"]
         self.path = glo_setting["dirname"]
         self.ver = glo_setting["version"]
+        self.setting = glo_setting
         self.runable_powershell = self.get_runable_powershell()
 
     def check_ver(self) -> bool:
@@ -146,7 +147,7 @@ class Updater:
                 role = 2
             else:
                 role = 3
-        if role > restrict:
+        if role > restrict and match_num != 0x30:
             reply = "你的权限不足"
             return {"reply": reply, "block": True}
 

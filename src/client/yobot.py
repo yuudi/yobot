@@ -17,8 +17,8 @@ class Yobot:
         dirname = os.getcwd()
         config_f_path = os.path.join(dirname, "yobot_config.json")
         if not os.path.exists(config_f_path):
-            with open(config_f_path, "w", encoding="utf-8") as config_file:
-                config_file.write('{"port":9222,"run-as":"exe"}')
+            self.glo_setting = dict()
+            return
         with open(config_f_path, "r", encoding="utf-8") as config_file:
             try:
                 self.glo_setting = json.load(config_file)
@@ -29,8 +29,8 @@ class Yobot:
         inner_info = {
             "dirname": dirname,
             "version": {
-                "ver_name": "yobot[v3.0.0]",
-                "ver_id": 3000,
+                "ver_name": "yobot[v3.0.1]",
+                "ver_id": 3001,
                 "checktime": 0,
                 "latest": True,
                 "check_url": ["https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
@@ -38,7 +38,7 @@ class Yobot:
                               "http://api.yobot.xyz/v3/version/"]}}
         self.glo_setting.update(inner_info)
 
-        self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style","s2t"))
+        self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))
         self.cct2s = OpenCC("t2s")
 
         self.plugins = [
@@ -88,5 +88,5 @@ class Yobot:
 
     def execute(self, cmd: str):
         if cmd == "update":
-            res = self.plugins[0].execute(0x10)
+            res = self.plugins[0].execute(0x30)
         return res["reply"]
