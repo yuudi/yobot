@@ -10,10 +10,12 @@ import requests
 
 
 class Char_consult:
+    Passive = True
+    Active = False
     Nick_URL = "http://api.yobot.xyz/v2/nicknames/?type=csv"
     Char_URL = "http://api.yobot.xyz/v2/nicknames/?type=charpage"
 
-    def __init__(self, glo_setting: dict):
+    def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
         self.nickname = {}
         self.number = {}

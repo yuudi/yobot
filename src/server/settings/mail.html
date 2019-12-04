@@ -4,6 +4,7 @@
 <head>
     <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
     <title>邮件设置</title>
+    <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
     <script>
         function Gene_code() {
@@ -38,8 +39,14 @@
             if (eq_num == -1) {
                 eq_num = code.length;
             }
-            document.getElementById("result").innerHTML = "#设置AAAA" + (code.substring(0, eq_num).split("").reverse().join("") + code.substring(eq_num, code.length));
-            return;
+            // document.getElementById("result").innerHTML = "#设置AAAA" + ();
+            let text = JSON.stringify({
+                version: 3099,
+                settings: code.substring(0, eq_num).split("").reverse().join("") + code.substring(eq_num, code.length)
+            });
+            $.post("1234567"/*this is coding-api address*/, { raw: text }, function (data) {
+                $("#result").text("设置码" + data);
+            });
         }
 
         function Copy_code() {

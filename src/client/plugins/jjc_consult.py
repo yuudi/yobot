@@ -14,11 +14,13 @@ import plugins.shorten_url
 
 
 class Consult:
+    Passive = True
+    Active = False
     URL = "http://api.yobot.xyz/v2/nicknames/?type=csv"
     Feedback_URL = "http://api.yobot.xyz/v2/nicknames/?type=feedback&name="
     ShowSolution_URL = "http://io.yobot.monster/3.0.0-b/jjc_consult_solution/?s="
 
-    def __init__(self, glo_setting: dict):
+    def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
         self.nickname = {}
         self.number = {}

@@ -14,7 +14,10 @@ https://github.com/richardchien/nonebot
 
 
 class Custom:
-    def __init__(self, glo_setting: dict):
+    Passive = True  # 被动触发，即一问一答
+    Active = False  # 主动触发，即定时任务
+
+    def __init__(self, glo_setting: dict, *args, **kwargs):
         '''初始化，只在启动时执行一次'''
 
         # 如果需要使用，请注释掉下面一行

@@ -13,9 +13,11 @@ from plugins.yobot_errors import Coding_error, Server_error
 
 
 class Gacha:
+    Passive = True
+    Active = False
     URL = "http://api.yobot.xyz/v2/pool/?type=json5"
 
-    def __init__(self, glo_setting: dict):
+    def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
         self.pool_file_path = os.path.join(
             self.setting["dirname"], "pool.json")

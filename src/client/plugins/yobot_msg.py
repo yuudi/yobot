@@ -7,7 +7,10 @@ from typing import Any
 
 
 class Message:
-    def __init__(self, glo_setting: dict):
+    Passive = True
+    Active = False
+    
+    def __init__(self, glo_setting: dict, *args, **kwargs):
         self.version = glo_setting["version"]["ver_name"]
 
     @staticmethod

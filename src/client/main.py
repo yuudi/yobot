@@ -5,18 +5,16 @@ import sys
 
 from aiocqhttp import CQHttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 
 import yobot
-import plugins.updater
 
-conn = CQHttp(access_token='your-token',
+rcnb = CQHttp(access_token='your-token',
               enable_http_post=False)
 
 bot = yobot.Yobot()
 
 
-@conn.on_message
+@rcnb.on_message
 async def handle_msg(context):
     if context["message_type"] == "group" or context["message_type"] == "private":
         reply = bot.proc(context)
@@ -29,9 +27,10 @@ async def handle_msg(context):
         return None
 
 
-def scheduled_update():
-    print("检查更新...")
-    print(bot.execute("update"))
+async def send_it(func):
+    to_sends = func()
+    tasks = [rcnb.send_msg(**kwargs) for kwargs in to_sends]
+    await asyncio.gather(*tasks)
 
 
 def ask_for_input(msg: str, default: str = "",
@@ -70,9 +69,6 @@ if __name__ == "__main__":
             else:
                 host = config.get("host", "127.0.0.1")
                 port = config.get("port", 9222)
-            auto_update = config.get("auto-update", True)
-            update_time = config.get("update-time", "3:30")
-            update_hour, update_minute = update_time.split(":")
     else:
         if input_para:
             host, port = input_host, input_port
@@ -80,9 +76,6 @@ if __name__ == "__main__":
             host = ask_for_input("请输入主机地址（默认为127.0.0.1）：", "127.0.0.1")
             port = ask_for_input("请输入绑定端口（8001~65535，默认为9222）：", "9222",
                                  convert=lambda x: int(x), check=str.isdigit)
-        auto_update = True
-        update_hour = 3
-        update_minute = 30
         default_config = {
             "host": host,
             "port": port,
@@ -102,11 +95,11 @@ if __name__ == "__main__":
         with open("yobot_config.json", "w") as f:
             json.dump(default_config, f)
 
-    if auto_update:
+    jobs = bot.active_jobs()
+    if jobs:
         sche = AsyncIOScheduler()
-        trigger = CronTrigger(hour=update_hour, minute=update_minute)
-        sche.add_job(scheduled_update, trigger)
-
+        for trigger, job in jobs:
+            sche.add_job(send_it, trigger=trigger, args=(job,))
         sche.start()
 
-    conn.run(host=host, port=port)
+    rcnb.run(host=host, port=port)

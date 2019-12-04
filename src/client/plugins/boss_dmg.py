@@ -4,7 +4,9 @@ from plugins import dmg_record, lock_boss, reserve
 
 
 class Boss_dmg:
-    def __init__(self, glo_setting: dict):
+    Passive = True
+    Active = False
+    def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
 
     @staticmethod
@@ -21,7 +23,7 @@ class Boss_dmg:
         return 0
 
     def execute(self, match_num: int, msg: dict) -> dict:
-        if msg["message_type"] == "group":
+        if msg["message_type"] != "group":
             reply = "此功能仅可用于群聊"
             return {"reply": reply, "block": True}
         swit = match_num & 0xf000
