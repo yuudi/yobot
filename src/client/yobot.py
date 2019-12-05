@@ -31,8 +31,8 @@ class Yobot:
         inner_info = {
             "dirname": dirname,
             "version": {
-                "ver_name": "yobot[v3.1.0]",
-                "ver_id": 3010,
+                "ver_name": "yobot[v3.1.1]",
+                "ver_id": 3101,
                 "checktime": 0,
                 "latest": True,
                 "check_url": ["https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
@@ -58,13 +58,6 @@ class Yobot:
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]
         self.plug_active = [p for p in plug_all if p.Active]
-
-        if (platform.system() == "Windows"
-                and not updater_plugin.runable_powershell):
-            print("=================================================\n"
-                  "powershell不可用，无法自动更新，请检查powershell权限\n"
-                  "详情请查看：https://yobot.xyz/p/648/\n"
-                  "=================================================")
 
     def active_jobs(self) -> List[Tuple[Any, Callable[[], Iterable[Dict[str, Any]]]]]:
         jobs = [p.jobs() for p in self.plug_active]

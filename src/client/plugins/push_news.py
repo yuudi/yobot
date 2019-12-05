@@ -4,6 +4,8 @@ from typing import Any, Callable, Dict, Iterable, Tuple, Union
 import feedparser
 from apscheduler.triggers.interval import IntervalTrigger
 
+from . import spider
+
 
 class News:
     Passive = False
@@ -15,11 +17,13 @@ class News:
             "news_jp_twitter": {
                 "name": "日服推特",
                 "source": "https://rsshub.app/twitter/user/priconne_redive",
+                "pattern": "{title}\n链接：{link}",
                 "last_id": None
             },
             "news_jp_official": {
                 "name": "日服官网",
                 "source": "https://priconne-redive.jp/news/feed/",
+                "pattern": "标题：{title}\n链接：{link}\n{summary}",
                 "last_id": None
             }
         }
@@ -41,16 +45,14 @@ class News:
             for item in feed["entries"]:
                 if item["id"] == last_id:
                     break
-                news_list.append(
-                    "标题：{title}\n链接：{link}\n{summary}".format_map(item)
-                )
+                news_list.append(rss_source["pattern"].format_map(item))
             if news_list:
                 yield (rss_source["name"]+"更新：\n=======\n"
                        + "\n-------\n".join(news_list))
 
     def send_news(self) -> Iterable[Dict[str, Any]]:
         sub_groups = self.setting.get("notify_groups", [])
-        sub_users= self.setting.get("notify_privates", [])
+        sub_users = self.setting.get("notify_privates", [])
         if not (sub_groups or sub_users):
             return
         for msg in self.get_news():
@@ -72,6 +74,6 @@ class News:
             return tuple()
         interval = self.setting.get("news_interval_minutes", 30)
         trigger = IntervalTrigger(
-            minutes=interval, start_date=datetime.datetime.now()+datetime.timedelta(seconds=5))
+            minutes=interval, start_date=datetime.datetime.now()+datetime.timedelta(seconds=60))
         job = (trigger, self.send_news)
         return (job,)

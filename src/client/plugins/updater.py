@@ -19,11 +19,8 @@ class Updater:
         self.path = glo_setting["dirname"]
         self.ver = glo_setting["version"]
         self.setting = glo_setting
-        self._runable_powershell = None
 
     def windows_update(self, force: bool = False, test_ver: int = 0):
-        if not self.runable_powershell:
-            return "无法更新，没有powershell权限，帮助页面https://yobot.xyz/p/648/"
         test_version = ["stable", "beta", "alpha"][test_ver]
         if not os.path.exists(os.path.join(self.path, "temp")):
             os.mkdir(os.path.join(self.path, "temp"))
@@ -61,33 +58,32 @@ class Updater:
                     os.path.join(self.path, "yobot.new.exe"))
         cmd = '''
             cd "{}"
-            start-sleep 1
-            Stop-Process -Id {}
-            start-sleep 2
-            Remove-Item "yobot.exe"
-            rename-Item "yobot.new.exe" -NewName "yobot.exe"
-            Start-Process -FilePath "yobot.exe"
+            ping 127.0.0.1 -n 2 >nul
+            taskkill /pid {} /f
+            ping 127.0.0.1 -n 3 >nul
+            del yobot.exe
+            ren yobot.new.exe yobot.exe
+            powershell Start-Process -FilePath "yobot.exe"
             '''.format(self.path, os.getpid())
-        with open(os.path.join(self.path, "update.ps1"), "w") as f:
+        with open(os.path.join(self.path, "update.bat"), "w") as f:
             f.write(cmd)
-        os.system("powershell -file " + os.path.join(self.path, "update.ps1"))
+        os.system('powershell Start-Process -FilePath "{}"'.format(
+            os.path.join(self.path, "update.bat")))
         exit()
 
     def windows_update_git(self, force: bool = False, test_ver: int = 0):
-        if not self.runable_powershell:
-            return "无法更新，没有powershell权限，帮助页面https://yobot.xyz/p/648/"
         git_dir = os.path.dirname(os.path.dirname(self.path))
         cmd = '''
         cd "{}"
+        taskkill /pid {} /f
         git pull
-        Stop-Process -Id {}
-        start-sleep 1
-        Start-Process -FilePath "python.exe" -ArgumentList "{}"
-        '''.format(self.path, os.getpid())
-        with open(os.path.join(git_dir, "update.ps1"), "w") as f:
+        ping 127.0.0.1 -n 3 >nul
+        powershell Start-Process -FilePath "python.exe" -ArgumentList "{}"
+        '''.format(self.path, os.getpid(), os.path.join(self.path, "main.py"))
+        with open(os.path.join(git_dir, "update.bat"), "w") as f:
             f.write(cmd)
-        os.system('powershell -file "'
-                  + os.path.join(git_dir, "update.ps1") + '"')
+        os.system('powershell Start-Process -FilePath "{}"'.format(
+            os.path.join(git_dir, "update.bat")))
         exit()
 
     def linux_update(self, force: bool = False, test_ver: int = 0):
@@ -109,25 +105,24 @@ class Updater:
     def restart(self):
         self_pid = os.getpid()
         if platform.system() == "Windows":
-            if not self.runable_powershell:
-                return "无法更新，没有powershell权限，帮助页面https://yobot.xyz/p/648/"
             if self.evn == "exe":
                 cmd = '''
-                    start-sleep 1
-                    Stop-Process -Id {}
-                    start-sleep 2
-                    Start-Process -FilePath "{}"
+                    ping 127.0.0.1 -n 2 >nul
+                    taskkill /pid {} /f
+                    ping 127.0.0.1 -n 3 >nul
+                    powershell Start-Process -FilePath "{}"
                     '''.format(self_pid, os.path.join(self.path, "yobot.exe"))
             elif self.evn == "py" or self.evn == "python":
                 cmd = '''
-                    Stop-Process -Id {}
-                    start-sleep 1
-                    Start-Process -FilePath "python.exe" -ArgumentList "{}"
+                    ping 127.0.0.1 -n 2 >nul
+                    taskkill /pid {} /f
+                    ping 127.0.0.1 -n 3 >nul
+                    powershell Start-Process -FilePath "python.exe" -ArgumentList "{}"
                     '''.format(self_pid, os.path.join(self.path, "main.py"))
-            with open(os.path.join(self.path, "restart.ps1"), "w") as f:
+            with open(os.path.join(self.path, "restart.bat"), "w") as f:
                 f.write(cmd)
-            os.system("powershell -file "
-                      + os.path.join(self.path, "restart.ps1"))
+            os.system('powershell Start-Process -FilePath "{}"'.format(
+                      os.path.join(self.path, "restart.bat")))
             exit()
         else:
             cmd = '''
@@ -141,19 +136,6 @@ class Updater:
             os.system("chmod u+x {0} && {0}".format(
                 os.path.join(self.path, "restart.sh")))
             exit()
-
-    @property
-    def runable_powershell(self) -> bool:
-        if self._runable_powershell is not None:
-            return self._runable_powershell
-        r = os.popen("powershell Get-ExecutionPolicy")
-        text = r.read()
-        if text == "Bypass\n" or text == "RemoteSigned\n" or text == "Unrestricted\n":
-            self._runable_powershell = True
-            return True
-        else:
-            self._runable_powershell = False
-            return False
 
     @staticmethod
     def match(cmd: str) -> int:
@@ -219,11 +201,11 @@ class Updater:
     def update_auto(self) -> List[Dict[str, Any]]:
         if platform.system() == "Windows":
             if self.evn == "exe":
-                reply = self.windows_update(force, ver)
+                reply = self.windows_update()
             elif self.evn == "py" or self.evn == "python":
-                reply = self.windows_update_git(force, ver)
+                reply = self.windows_update_git()
         else:
-            reply = self.linux_update(force, ver)
+            reply = self.linux_update()
         print(reply)
         return []
 
