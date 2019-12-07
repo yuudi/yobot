@@ -202,7 +202,7 @@ class Gacha:
         try:
             response = requests.post(
                 'http://api.yobot.xyz/v2/reports/', files=files)
-        except expression as identifier:
+        except requests.exceptions.ConnectionError as c:
             print("无法连接到{}，错误信息：{}".format(
                 'http://api.yobot.xyz/v2/reports/', c))
             return

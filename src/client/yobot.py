@@ -1,7 +1,7 @@
 # coding=utf-8
 import json
 import os
-import platform
+import shutil
 import sys
 from functools import reduce
 from typing import Any, Callable, Dict, Iterable, List, Tuple
@@ -13,31 +13,34 @@ from plugins import (boss_dmg, char_consult, custom, gacha, jjc_consult,
 
 
 class Yobot:
+    Version = "v3.1.2"
+    Commit = {"yuudi": 18}
+
     def __init__(self, *args, **kwargs):
         # self.send_msg = send_msg
 
         dirname = os.getcwd()
         config_f_path = os.path.join(dirname, "yobot_config.json")
+        verinfo = updater.get_version(self.Version, self.Commit)
+        inner_info = {
+            "dirname": dirname,
+            "verinfo": verinfo
+        }
+
         if not os.path.exists(config_f_path):
-            self.glo_setting = dict()
-            return
+            if verinfo["run-as"] == "exe":
+                default_config_f_path = os.path.join(
+                    sys._MEIPASS, "default_config.json")
+            else:
+                default_config_f_path = os.path.join(
+                    dirname, "default_config.json")
+            shutil.copyfile(default_config_f_path, config_f_path)
         with open(config_f_path, "r", encoding="utf-8") as config_file:
             try:
                 self.glo_setting = json.load(config_file)
             except:
-                raise yobot_errors.File_error(
-                    config_f_path + " been damaged")
+                raise yobot_errors.File_error(config_f_path + " been damaged")
 
-        inner_info = {
-            "dirname": dirname,
-            "version": {
-                "ver_name": "yobot[v3.1.1]",
-                "ver_id": 3101,
-                "checktime": 0,
-                "latest": True,
-                "check_url": ["https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
-                              "https://yuudi.github.io/yobot/v3/ver.json",
-                              "http://api.yobot.xyz/v3/version/"]}}
         self.glo_setting.update(inner_info)
 
         self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))

@@ -2,7 +2,6 @@ import base64
 import hashlib
 import json
 import os
-import sys
 from typing import Union
 from urllib.parse import quote
 
@@ -19,7 +18,7 @@ class Switcher:
         "global": "http://io.yobot.monster/3.0.1/settings/",
         'pool': 'http://io.yobot.monster/3.1.0/pool/',
         'mail': 'http://io.yobot.monster/3.1.0/mail/',
-        'news': 'http://io.yobot.monster/3.1.0/news/'
+        'news': 'http://io.yobot.monster/3.1.2/news/'
     }
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
@@ -28,7 +27,7 @@ class Switcher:
     def save_settings(self) -> None:
         save_setting = self.setting.copy()
         del save_setting["dirname"]
-        del save_setting["version"]
+        del save_setting["verinfo"]
         config_path = os.path.join(
             self.setting["dirname"], "yobot_config.json")
         with open(config_path, "w", encoding="utf-8") as f:
@@ -62,7 +61,7 @@ class Switcher:
 
     def dump_url(self) -> str:
         setting_dict = self.setting.copy()
-        drop_keys = ("host", "port", "run-as", "dirname", "version")
+        drop_keys = ("host", "port", "dirname", "verinfo")
         for key in drop_keys:
             del setting_dict[key]
         query = json.dumps(setting_dict, separators=(',', ':'))
@@ -149,7 +148,7 @@ class Switcher:
                 reply = self.setting_pool(new_setting["settings"])
             elif version == 3099:
                 reply = self.setting_mail(new_setting["settings"])
-            elif version == 3100:
+            elif version == 3102:
                 self.setting.update(new_setting["settings"])
                 self.save_settings()
                 reply = "设置成功"

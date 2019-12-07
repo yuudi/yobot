@@ -1,6 +1,5 @@
 import asyncio
 import json
-import os
 import sys
 
 from aiocqhttp import CQHttp
@@ -56,44 +55,13 @@ def ask_for_input(msg: str, default: str = "",
 
 if __name__ == "__main__":
     if len(sys.argv) >= 3:
-        input_para = True
-        input_host, input_port = sys.argv[2].split(":")
-        input_port = int(input_port)
+        host, port = sys.argv[2].split(":")
+        port = int(port)
     else:
-        input_para = False
-    if os.path.exists("yobot_config.json"):
         with open("yobot_config.json", "r") as f:
             config = json.load(f)
-            if input_para:
-                host, port = input_host, input_port
-            else:
-                host = config.get("host", "127.0.0.1")
-                port = config.get("port", 9222)
-    else:
-        if input_para:
-            host, port = input_host, input_port
-        else:
-            host = ask_for_input("请输入主机地址（默认为127.0.0.1）：", "127.0.0.1")
-            port = ask_for_input("请输入绑定端口（8001~65535，默认为9222）：", "9222",
-                                 convert=lambda x: int(x), check=str.isdigit)
-        default_config = {
-            "host": host,
-            "port": port,
-            "run-as": "python",
-            "super-admin": [],
-            "black-list": [],
-            "setting-restrict": 3,
-            "auto_update": True,
-            "update-time": "3:30",
-            "show_jjc_solution": "url",
-            "gacha_on": True,
-            "preffix_on": False,
-            "preffix_string": "",
-            "zht_in": False,
-            "zht_out": False
-        }
-        with open("yobot_config.json", "w") as f:
-            json.dump(default_config, f)
+        host = config.get("host", "127.0.0.1")
+        port = config.get("port", 9222)
 
     jobs = bot.active_jobs()
     if jobs:

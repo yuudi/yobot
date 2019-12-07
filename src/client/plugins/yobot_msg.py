@@ -1,9 +1,5 @@
 # coding=utf-8
 
-import json
-import os.path
-import sys
-from typing import Any
 
 
 class Message:
@@ -11,7 +7,7 @@ class Message:
     Active = False
     
     def __init__(self, glo_setting: dict, *args, **kwargs):
-        self.version = glo_setting["version"]["ver_name"]
+        self.version = glo_setting["verinfo"]["ver_name"]
 
     @staticmethod
     def match(cmd: str) -> int:

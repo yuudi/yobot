@@ -1,10 +1,11 @@
 import datetime
-from typing import Any, Callable, Dict, Iterable, Tuple, Union
+import time
+from typing import Any, Callable, Dict, Iterable, Tuple
 
 import feedparser
 from apscheduler.triggers.interval import IntervalTrigger
 
-from . import spider
+from .spider import Spiders
 
 
 class News:
@@ -13,6 +14,7 @@ class News:
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
+        self.spiders = Spiders()
         self.rss = {
             "news_jp_twitter": {
                 "name": "日服推特",
@@ -25,13 +27,31 @@ class News:
                 "source": "https://priconne-redive.jp/news/feed/",
                 "pattern": "标题：{title}\n链接：{link}\n{summary}",
                 "last_id": None
+            },
+            "news_tw_facebook": {
+                "name": "台服FaceBook",
+                "source": "https://rsshub.app/facebook/page/SonetPCR",
+                "pattern": "链接：{link}",
+                "last_id": None
+            },
+            "news_cn_bilibili": {
+                "name": "国服B站动态",
+                "source": "https://rsshub.app/bilibili/user/dynamic/353840826/",
+                "pattern": "{title}\n链接：{link}",
+                "last_id": None
             }
         }
 
-    def get_news(self) -> Iterable[Union[None, str]]:
+    def get_news(self) -> Iterable[str]:
+        '''
+        返回最新消息（迭代器）
+        '''
+        # RSS
         subscripts = [s for s in self.rss.keys() if self.setting.get(s, True)]
         for source in subscripts:
             rss_source = self.rss[source]
+            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                  + "检查RSS源：{}".format(rss_source["name"]))
             feed = feedparser.parse(rss_source["source"])
             if feed["bozo"]:
                 print("rss源错误："+rss_source["name"])
@@ -39,7 +59,7 @@ class News:
             last_id = rss_source["last_id"]
             rss_source["last_id"] = feed["entries"][0]["id"]
             if last_id is None:
-                print("rss初始化"+rss_source["name"])
+                print("rss初始化："+rss_source["name"])
                 continue
             news_list = list()
             for item in feed["entries"]:
@@ -49,6 +69,13 @@ class News:
             if news_list:
                 yield (rss_source["name"]+"更新：\n=======\n"
                        + "\n-------\n".join(news_list))
+        # spider
+        subscripts = [s for s in self.spiders.sources()
+                      if self.setting.get(s, True)]
+        for source in subscripts:
+            news = self.spiders[source].get_news()
+            if news is not None:
+                yield news
 
     def send_news(self) -> Iterable[Dict[str, Any]]:
         sub_groups = self.setting.get("notify_groups", [])
