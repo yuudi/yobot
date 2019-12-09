@@ -550,14 +550,17 @@
             "茅",
             "萱",
             "不良",
-            "卡姐"
+            "卡姐",
+            "嘉夜"
         ],
         "gw_page": "https://gamewith.jp/pricone-re/article/show/175800"
     },
     "106601": {
         "name_jp": "イノリ",
-        "name_cn": "祈",
-        "nicknames": [],
+        "name_cn": "祈梨",
+        "nicknames": [
+            "祈"
+        ],
         "gw_page": "https://gamewith.jp/pricone-re/article/show/unknown"
     },
     "106701": {

@@ -5,12 +5,10 @@ class Spider_oscn(Base_spider):
     def __init__(self):
         super().__init__()
         self.url = "https://api.biligame.com/news/list?gameExtensionId=267&positionId=2&typeId=&pageNum=1&pageSize=5"
+        self.type = "json"
         self.name = "国服官网"
 
-    def get_items(self):
-        content = self.get_json()
-        if content is None:
-            return None
+    def get_items(self, content):
         try:
             items = [
                 Item(idx=n["id"],

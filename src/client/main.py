@@ -7,6 +7,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import yobot
 
+print("正在初始化...")
+
 rcnb = CQHttp(access_token='your-token',
               enable_http_post=False)
 
@@ -27,30 +29,12 @@ async def handle_msg(context):
 
 
 async def send_it(func):
-    to_sends = func()
+    if asyncio.iscoroutinefunction(func):
+        to_sends = await func()
+    else:
+        to_sends = func()
     tasks = [rcnb.send_msg(**kwargs) for kwargs in to_sends]
     await asyncio.gather(*tasks)
-
-
-def ask_for_input(msg: str, default: str = "",
-                  convert: callable = None, check: callable = None):
-    flag = True
-    while flag:
-        print(msg, end="")
-        instr = input()
-        if instr == "":
-            instr = default
-        if check is not None:
-            if check(instr):
-                flag = False
-            else:
-                print("输入无效")
-        else:
-            flag = False
-    if convert is not None:
-        return convert(instr)
-    else:
-        return instr
 
 
 if __name__ == "__main__":
@@ -69,5 +53,7 @@ if __name__ == "__main__":
         for trigger, job in jobs:
             sche.add_job(send_it, trigger=trigger, args=(job,))
         sche.start()
+
+    print("初始化完成，启动服务...")
 
     rcnb.run(host=host, port=port)

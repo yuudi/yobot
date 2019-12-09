@@ -8,29 +8,25 @@ from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 from opencc import OpenCC
 
-from plugins import (boss_dmg, char_consult, custom, gacha, jjc_consult,
-                     push_news, switcher, updater, yobot_errors, yobot_msg)
+from plugins import (boss_dmg, calender, char_consult, custom, gacha,
+                     jjc_consult, push_news, switcher, updater, yobot_errors,
+                     yobot_msg)
 
 
 class Yobot:
-    Version = "v3.1.2"
-    Commit = {"yuudi": 18}
+    Version = "[v3.1.3-beta]"
+    Commit = {"yuudi": 19}
 
     def __init__(self, *args, **kwargs):
         # self.send_msg = send_msg
 
-        dirname = os.getcwd()
+        dirname = kwargs.get("data_dir", os.getcwd())
         config_f_path = os.path.join(dirname, "yobot_config.json")
-        verinfo = updater.get_version(self.Version, self.Commit)
-        inner_info = {
-            "dirname": dirname,
-            "verinfo": verinfo
-        }
 
         if not os.path.exists(config_f_path):
-            if verinfo["run-as"] == "exe":
+            if "_MEIPASS" in dir(sys):
                 default_config_f_path = os.path.join(
-                    sys._MEIPASS, "default_config.json")
+                    sys._MEIPASS, "packedfiles", "default_config.json")
             else:
                 default_config_f_path = os.path.join(
                     dirname, "default_config.json")
@@ -41,7 +37,11 @@ class Yobot:
             except:
                 raise yobot_errors.File_error(config_f_path + " been damaged")
 
-        self.glo_setting.update(inner_info)
+        verinfo = updater.get_version(self.Version, self.Commit)
+        self.glo_setting.update({
+            "dirname": dirname,
+            "verinfo": verinfo
+        })
 
         self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))
         self.cct2s = OpenCC("t2s")
@@ -57,6 +57,7 @@ class Yobot:
             jjc_consult.Consult(self.glo_setting),
             boss_dmg.Boss_dmg(self.glo_setting),
             push_news.News(self.glo_setting),
+            calender.Event(self.glo_setting),
             custom.Custom(self.glo_setting)
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]

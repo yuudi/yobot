@@ -106,7 +106,7 @@ class Updater:
         '''.format(git_dir, os.getpid())
         with open(os.path.join(git_dir, "update.sh"), "w") as f:
             f.write(cmd)
-        os.system("chmod u+x {0} && {0}".format(
+        os.system("chmod u+x {0} && ./{0}".format(
             os.path.join(git_dir, "update.sh")))
         sys.exit()
 
@@ -148,7 +148,7 @@ class Updater:
             '''.format(self_pid, self.path)
             with open(os.path.join(self.path, "restart.sh"), "w") as f:
                 f.write(cmd)
-            os.system("chmod u+x {0} && {0}".format(
+            os.system("chmod u+x {0} && ./{0}".format(
                 os.path.join(self.path, "restart.sh")))
             sys.exit()
 
@@ -236,10 +236,10 @@ class Updater:
 
 
 def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
-    if sys.argv[0].endswith(".exe"):
+    if "_MEIPASS" in dir(sys):
         return {
             "run-as": "exe",
-            "ver_name": base_version,
+            "ver_name": "yobot" + base_version,
             "ver_id": 3000 + sum(base_commit.values()),
             "check_url": [
                 "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
@@ -253,7 +253,7 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
         return {
             "run-as": "python",
             "commited": False,
-            "ver_name": "yobot源码版\n基于{}\n未提交的版本".format(base_version)
+            "ver_name": "yobot源码版{}\n存在未提交的修改".format(base_version)
         }
     with os.popen("git shortlog --numbered --summary") as r:
         summary = r.read()
@@ -266,12 +266,12 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
     for count, usrmail in zip(logs[::2], logs[1::2]):
         usr = usrmail.split("@")[0].split("+")[-1]
         commits[usr] = int(count) + commits.get(usr, 0)
-    vername = "yobot源码版\n{}".format(base_version)
+    vername = "yobot源码版{}".format(base_version)
     extra_commit = ["{}: {}".format(c, commits[c])
                     for c in commits if commits[c] != 0]
     if extra_commit:
         vername += "\n额外的提交：\n" + "\n".join(extra_commit)
-    vername += "\nhash: {}".format(hash_)
+    vername += "\nhash: {}...".format(hash_[:8])
     return {
         "run-as": "python",
         "commited": True,

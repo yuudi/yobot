@@ -19,7 +19,9 @@
                 String(form_num) +
                 '" name="pool-setting"><h3>奖池' +
                 String(form_num) +
-                '</h3><a>名称:</a><input type="text" id="name"/><br><a>概率:</a><input type="number" id="prop"/><br><a>前缀:</a><input type="text" id="pref"/><br><a>内容:</a><br><textarea id="pool" rows="5" cols="40"></textarea><br><br></form>');
+                '</h3><a>名称:</a><input type="text" id="name" value="新卡池' +
+                String(form_num) +
+                '"/><br><a>概率:</a><input type="number" id="prop"/><br><a>前缀:</a><input type="text" id="pref"/><br><a>内容:</a><br><textarea id="pool" rows="5" cols="40"></textarea><br><br></form>');
         }
         function Pool_drop() {
             if (form_num > 0) {

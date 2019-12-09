@@ -7,5 +7,6 @@ src/client/*.json
 !src/client/default_config.json
 src/client/*.csv
 src/client/*.db
+src/client/*.ics
 src/client/*.spec
 src/client/test.py

@@ -1,7 +1,9 @@
+import asyncio
 import datetime
 import time
-from typing import Any, Callable, Dict, Iterable, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 
+import aiohttp
 import feedparser
 from apscheduler.triggers.interval import IntervalTrigger
 
@@ -30,8 +32,8 @@ class News:
             },
             "news_tw_facebook": {
                 "name": "台服FaceBook",
-                "source": "https://rsshub.app/facebook/page/SonetPCR",
-                "pattern": "链接：{link}",
+                "source": "https://rss.app/feeds/HeJCwdyTJA9CmhIf.xml",
+                "pattern": "{title}\n链接：{link}",
                 "last_id": None
             },
             "news_cn_bilibili": {
@@ -42,59 +44,89 @@ class News:
             }
         }
 
-    def get_news(self) -> Iterable[str]:
+    async def from_rss_async(self, source) -> str:
+        rss_source = self.rss[source]
+        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+              + "检查RSS源：{}".format(rss_source["name"]))
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(rss_source["source"]) as response:
+                    code = response.status
+                    if code != 200:
+                        print("rss源错误：{}，返回值：{}".format(
+                            rss_source["name"], code))
+                        return None
+                    res = await response.text()
+        except aiohttp.client_exceptions.ClientConnectionError:
+            print("rss源连接错误："+rss_source["name"])
+            return None
+        feed = feedparser.parse(res)
+        if feed["bozo"]:
+            print("rss源解析错误："+rss_source["name"])
+            return None
+        last_id = rss_source["last_id"]
+        rss_source["last_id"] = feed["entries"][0]["id"]
+        if last_id is None:
+            print("rss初始化："+rss_source["name"])
+            return None
+        news_list = list()
+        for item in feed["entries"]:
+            if item["id"] == last_id:
+                break
+            news_list.append(rss_source["pattern"].format_map(item))
+        if news_list:
+            return (rss_source["name"]+"更新：\n=======\n"
+                    + "\n-------\n".join(news_list))
+        else:
+            return None
+
+    async def from_spider_async(self, rss_source) -> str:...
+
+    async def get_news_async(self) -> List[str]:
         '''
-        返回最新消息（迭代器）
+        返回最新消息
         '''
+        tasks = []
+
         # RSS
         subscripts = [s for s in self.rss.keys() if self.setting.get(s, True)]
         for source in subscripts:
-            rss_source = self.rss[source]
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                  + "检查RSS源：{}".format(rss_source["name"]))
-            feed = feedparser.parse(rss_source["source"])
-            if feed["bozo"]:
-                print("rss源错误："+rss_source["name"])
-                continue
-            last_id = rss_source["last_id"]
-            rss_source["last_id"] = feed["entries"][0]["id"]
-            if last_id is None:
-                print("rss初始化："+rss_source["name"])
-                continue
-            news_list = list()
-            for item in feed["entries"]:
-                if item["id"] == last_id:
-                    break
-                news_list.append(rss_source["pattern"].format_map(item))
-            if news_list:
-                yield (rss_source["name"]+"更新：\n=======\n"
-                       + "\n-------\n".join(news_list))
+            tasks.append(self.from_rss_async(source))
+
         # spider
         subscripts = [s for s in self.spiders.sources()
                       if self.setting.get(s, True)]
         for source in subscripts:
-            news = self.spiders[source].get_news()
-            if news is not None:
-                yield news
+            tasks.append(self.spiders[source].get_news_async())
 
-    def send_news(self) -> Iterable[Dict[str, Any]]:
+        if not tasks:
+            return None
+
+        res = await asyncio.gather(*tasks)
+        news = [n for n in res if n is not None]
+        return news
+
+    async def send_news_async(self) -> List[Dict[str, Any]]:
         sub_groups = self.setting.get("notify_groups", [])
         sub_users = self.setting.get("notify_privates", [])
         if not (sub_groups or sub_users):
-            return
-        for msg in self.get_news():
+            return None
+        news = await self.get_news_async()
+        sends = []
+        for msg in news:
             for group in sub_groups:
-                yield {
+                sends.append({
                     "message_type": "group",
                     "group_id": group,
                     "message": msg
-                }
+                })
             for userid in sub_users:
-                yield {
+                sends.append({
                     "message_type": "private",
                     "user_id": userid,
                     "message": msg
-                }
+                })
+        return sends
 
     def jobs(self) -> Iterable[Tuple[IntervalTrigger, Callable[[], Iterable[Dict[str, Any]]]]]:
         if not any([self.setting.get(s, True) for s in self.rss.keys()]):
@@ -102,5 +134,5 @@ class News:
         interval = self.setting.get("news_interval_minutes", 30)
         trigger = IntervalTrigger(
             minutes=interval, start_date=datetime.datetime.now()+datetime.timedelta(seconds=60))
-        job = (trigger, self.send_news)
+        job = (trigger, self.send_news_async)
         return (job,)

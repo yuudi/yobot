@@ -35,18 +35,14 @@ class Spider_ostw(Base_spider):
     def __init__(self):
         super().__init__()
         self.url = "http://www.princessconnect.so-net.tw/news/" # 地址来源
+        self.type = "html" # 来源的种类，取值：html, json, xml
         self.name = "台服官网" # 可读的名称
 ```
 
 编写分析器
 
 ```python
-    def get_items(self):
-        soup = self.get_soup() # 获取BeautifulSoup对象
-        # 或者获取json转化为字典
-        # response_dict = self.get_json()
-        if soup is None:
-            return None
+    def get_items(self, soup): # 如果self.type是"html"则传入BeautifulSoup对象
         return [
             Item(
                 # 编号，整数或字符串，判断新闻是否相同的依据

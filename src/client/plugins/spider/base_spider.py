@@ -1,10 +1,10 @@
 import json
 import time
 from dataclasses import dataclass
-from typing import Iterator, List, Tuple, Union
+from typing import List, Tuple, Union
 from urllib.parse import urlparse
 
-import requests
+import aiohttp
 from bs4 import BeautifulSoup
 
 
@@ -20,10 +20,11 @@ class Item:
 class Base_spider:
     def __init__(self):
         self.url = None
+        self.type = None
         self.name = None
         self.last_item = None
 
-    def get_content(self) -> Tuple[str, int]:
+    async def get_content_async(self) -> Tuple[str, int]:
         headers = {
             "Host": urlparse(self.url).netloc,
             "Upgrade-Insecure-Requests": "1",
@@ -35,13 +36,16 @@ class Base_spider:
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
               + "检查咨询源：{}".format(self.name))
         try:
-            res = requests.get(self.url, headers=headers)
-        except requests.exceptions.ConnectionError:
+            async with aiohttp.ClientSession(headers=headers) as session:
+                async with session.get(self.url) as response:
+                    code = response.status
+                    res = await response.text()
+        except aiohttp.client_exceptions.ClientConnectionError:
             return ("", -1)
-        return (res.text, res.status_code)
+        return (res, code)
 
-    def get_json(self):
-        text, code = self.get_content()
+    async def get_json_async(self):
+        text, code = await self.get_content_async()
         if code == 200:
             try:
                 return json.loads(text)
@@ -52,33 +56,41 @@ class Base_spider:
             print("咨询获取错误：{}，错误码：{}".format(self.name, code))
             return None
 
-    def get_soup(self) -> Union[BeautifulSoup, None]:
-        text, code = self.get_content()
+    async def get_soup_async(self) -> Union[BeautifulSoup, None]:
+        text, code = await self.get_content_async()
         if code == 200:
             return BeautifulSoup(text, "html.parser")
         else:
             print("咨询获取错误：{}，错误码：{}".format(self.name, code))
             return None
 
-    def get_items(self) -> List[Item]: ...
+    def get_items(self, response: Union[BeautifulSoup, dict]) -> List[Item]:
+        ...
 
-    def get_new_items(self) -> Iterator[Item]:
-        items = self.get_items()
+    async def get_new_items_async(self) -> List[Item]:
+        if self.type == "html":
+            response = await self.get_soup_async()
+        elif self.type == "json":
+            response = await self.get_json_async()
+        if response is None:
+            return []
+        items = self.get_items(response)
         if not items:
-            return
+            return []
         last = self.last_item
         self.last_item = items[0]
         if last is None:
             print("咨询初始化：{}".format(self.name))
-            return
-        for item in items:
-            if item == last:
-                return
-            yield item
+            return []
+        if last in items:
+            idx = items.index(last)
+            items = items[:idx]
+        return items
 
-    def get_news(self) -> str:
-        contents = [item.content for item in self.get_new_items()]
-        if not contents:
+    async def get_news_async(self) -> str:
+        items = await self.get_new_items_async()
+        if not items:
             return None
+        contents = [i.content for i in items]
         return (self.name + "更新\n=======\n"
                 + "\n-------\n".join(contents))

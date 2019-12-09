@@ -211,7 +211,6 @@ class Gacha:
         reply = (nickname + "的仓库：" + p)
         db_conn.close()
         return reply
-        # todo:查数据库得到昵称
 
     def check_ver(self) -> Union[str, None]:
         auto_update = self.__pool.get("settings", {}).get("联网更新卡池", None)

@@ -1,7 +1,6 @@
 {
     "host": "127.0.0.1",
     "port": 9222,
-    "run-as": "python",
     "super-admin": [],
     "black-list": [],
     "setting-restrict": 3,
@@ -17,6 +16,8 @@
     "news_cn_official": true,
     "news_cn_bilibili": true,
     "news_interval_minutes": 30,
+    "calender_on": 1,
+    "calender_time": "08:00",
     "notify_groups": [],
     "notify_privates": [],
     "preffix_on": false,

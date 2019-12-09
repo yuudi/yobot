@@ -18,7 +18,7 @@ class Switcher:
         "global": "http://io.yobot.monster/3.0.1/settings/",
         'pool': 'http://io.yobot.monster/3.1.0/pool/',
         'mail': 'http://io.yobot.monster/3.1.0/mail/',
-        'news': 'http://io.yobot.monster/3.1.2/news/'
+        'news': 'http://io.yobot.monster/3.1.3/news/'
     }
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
@@ -59,13 +59,12 @@ class Switcher:
             f = 0
         return f
 
-    def dump_url(self) -> str:
-        setting_dict = self.setting.copy()
-        drop_keys = ("host", "port", "dirname", "verinfo")
-        for key in drop_keys:
-            del setting_dict[key]
+    def dump_url(self, keys, base) -> str:
+        setting_dict = {}
+        for k in keys:
+            setting_dict[k] = self.setting.get(k, None)
         query = json.dumps(setting_dict, separators=(',', ':'))
-        full_url = self.setting_url["global"] + "?form=" + quote(query)
+        full_url = self.setting_url[base] + "?form=" + quote(query)
         return shorten_url.shorten(full_url)
 
     def setting_pool(self, pool: dict) -> str:
@@ -73,7 +72,7 @@ class Switcher:
         poolfile = os.path.join(self.setting["dirname"], "pool.json")
         with open(poolfile, "w", encoding="utf-8") as f:
             json.dump(pool, f, indent=4, ensure_ascii=False)
-        return "设置成功，重启后生效\n发送“重启”可自动重新启动"
+        return "设置成功，重启后生效\n发送“重启”可重新启动"
 
     def setting_mail(self, code: str) -> str:
         while code.endswith('='):
@@ -126,7 +125,10 @@ class Switcher:
 
         cmd = msg["raw_message"]
         if match_num == 0x300:
-            reply = (self.dump_url() + "\n请在此页进行设置，完成后发送设置码即可\n"
+            keys = ("super-admin", "black-list", "setting-restrict", "auto_update",
+                    "update-time", "show_jjc_solution", "gacha_on", "gacha_private_on",
+                    "preffix_on", "preffix_string", "zht_in", "zht_out", "zht_out_style")
+            reply = (self.dump_url(keys, "global") + "\n请在此页进行设置，完成后发送设置码即可\n"
                      "其他设置请发送“设置卡池”、“设置邮箱”、“设置新闻”")
         elif match_num == 0x400:
             in_code = cmd[3:]
@@ -140,18 +142,18 @@ class Switcher:
                 reply = "服务器返回值异常"
                 return {"reply": reply, "block": True}
             version = new_setting.get("version", 0)
-            if version == 2999:
+            if version == 2999:  # 常规设置
                 self.setting.update(new_setting["settings"])
                 self.save_settings()
                 reply = "设置成功"
-            elif version == 3098:
+            elif version == 3098:  # 卡池设置
                 reply = self.setting_pool(new_setting["settings"])
-            elif version == 3099:
+            elif version == 3099:  # 邮箱设置
                 reply = self.setting_mail(new_setting["settings"])
-            elif version == 3102:
+            elif version == 3103:  # 新闻设置
                 self.setting.update(new_setting["settings"])
                 self.save_settings()
-                reply = "设置成功"
+                reply = "设置成功，重启后生效\n发送“重启”可重新启动"
             else:
                 reply = "设置码版本错误"
         elif match_num == 0x500:
@@ -159,8 +161,12 @@ class Switcher:
                 reply = self.setting_url["pool"]
             elif cmd == "设置邮箱":
                 reply = self.setting_url["mail"]
-            elif cmd == "设置新闻":
-                reply = self.setting_url["news"]
+            elif cmd == "设置新闻" or cmd == "设置日程":
+                keys = ("news_jp_official", "news_jp_twitter", "news_tw_official",
+                        "news_tw_facebook", "news_cn_official", "news_cn_bilibili",
+                        "news_interval_minutes", "notify_groups", "notify_privates",
+                        "calender_on", "calender_time")
+                reply = self.dump_url(keys, "news")
             else:
                 reply = "未知的设置"
 
