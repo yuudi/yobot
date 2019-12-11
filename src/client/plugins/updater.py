@@ -240,7 +240,7 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
         return {
             "run-as": "exe",
             "ver_name": "yobot" + base_version,
-            "ver_id": 3000 + sum(base_commit.values()),
+            "ver_id": 3300 + sum(base_commit.values()),
             "check_url": [
                 "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
                 "https://yuudi.github.io/yobot/v3/ver.json",

@@ -130,6 +130,6 @@ class Event:
             return tuple()
         time = self.setting.get("calender_time", "08:00")
         hour, minute = time.split(":")
-        trigger = CronTrigger(hour=8, minute=0)
-        job = (trigger, )
+        trigger = CronTrigger(hour=hour, minute=minute)
+        job = (trigger, self.send_daily)
         return (job,)

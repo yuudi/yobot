@@ -60,6 +60,9 @@ class News:
         except aiohttp.client_exceptions.ClientConnectionError:
             print("rss源连接错误："+rss_source["name"])
             return None
+        except Exception as e:
+            print("未知错误{} {}".format(type(e).__name__, e))
+            return None
         feed = feedparser.parse(res)
         if feed["bozo"]:
             print("rss源解析错误："+rss_source["name"])
@@ -80,7 +83,7 @@ class News:
         else:
             return None
 
-    async def from_spider_async(self, rss_source) -> str:...
+    async def from_spider_async(self, rss_source) -> str: ...
 
     async def get_news_async(self) -> List[str]:
         '''
@@ -102,8 +105,19 @@ class News:
         if not tasks:
             return None
 
-        res = await asyncio.gather(*tasks)
-        news = [n for n in res if n is not None]
+        res = await asyncio.gather(*tasks, return_exceptions=True)
+        news = []
+        for r in res:
+            if r is None:
+                continue
+            elif isinstance(r, Exception):
+                print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                      + " Exception: " + str(r))
+                continue
+            elif isinstance(r, str):
+                news.append(r)
+            else:
+                print("ValueError")
         return news
 
     async def send_news_async(self) -> List[Dict[str, Any]]:

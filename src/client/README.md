@@ -32,7 +32,9 @@ context = {
 }
 ```
 
-主文件`main.py`是利用`aiocqhttp`的应用
+主文件`main.py`是QQ机器人的实例
+
+文件`chatroom.py`是简单网页聊天的实例
 
 ## 增加功能
 

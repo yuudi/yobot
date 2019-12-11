@@ -115,7 +115,7 @@ class Consult:
             team.append("{}.{}.{}".format(
                 result["up"],
                 result["down"],
-                result["updated"][0:10].replace("-",".")
+                result["updated"][0:10].replace("-", ".")
             ))
             for atker in result["atk"]:
                 char_id = atker["id"]+(
@@ -132,14 +132,18 @@ class Consult:
 
     @staticmethod
     def match(cmd: str) -> int:
-        if cmd.startswith("jjc查询"):
+        if cmd == "jjc查询":
             return 1
+        elif cmd.startswith("jjc查询"):
+            return 2
         else:
             return 0
 
     def execute(self, match_num: int, msg: dict) -> dict:
         if self.setting.get("jjc_consult", True) == False:
             reply = "此功能未启用"
+        elif match_num == 1:
+            reply = "请接5个昵称，空格分隔"
         else:
             anlz = self.user_input(msg["raw_message"][5:])
             if anlz["code"] == 0:

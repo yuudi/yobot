@@ -36,6 +36,24 @@ async def send_it(func):
     tasks = [rcnb.send_msg(**kwargs) for kwargs in to_sends]
     await asyncio.gather(*tasks)
 
+# # 如果要使用WebHook，可以用这个方法
+# # WehHook的端口号与机器人端口号相同
+# app = rcnb.server_app
+
+# from quart import request
+# @app.route("/webhook",  # webhook路径
+#            methods=['POST', 'GET'],  # 允许get和post
+#            host="0.0.0.0")  # 允许所有网络访问
+# async def webhook():
+#     if request.method = "GET":
+#         return("use post!")
+#     data = await request.get_data()  # 如果方式是post，获取post内容
+#     text = data.decode("utf-8")  # 将post解码为字符串
+#     await rcnb.send_msg(message_type="private",  # 私聊发送消息
+#                         user_id=123456789,  # QQ号
+#                         # group_id=123456789, # 如果message_type是"group"则用group_id
+#                         message="text")  # 内容
+
 
 if __name__ == "__main__":
     if len(sys.argv) >= 3:
@@ -51,7 +69,12 @@ if __name__ == "__main__":
     if jobs:
         sche = AsyncIOScheduler()
         for trigger, job in jobs:
-            sche.add_job(send_it, trigger=trigger, args=(job,))
+            sche.add_job(func=send_it,
+                         args=(job,),
+                         trigger=trigger,
+                         coalesce=True,
+                         max_instances=1,
+                         misfire_grace_time=60)
         sche.start()
 
     print("初始化完成，启动服务...")
