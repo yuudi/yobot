@@ -1,3 +1,4 @@
+import json
 import os
 import pickle
 import random
@@ -6,7 +7,6 @@ import sqlite3
 import time
 from typing import List, Union
 
-import json5
 import requests
 
 from plugins.yobot_errors import Coding_error, Server_error
@@ -15,51 +15,56 @@ from plugins.yobot_errors import Coding_error, Server_error
 class Gacha:
     Passive = True
     Active = False
-    URL = "http://api.yobot.xyz/v2/pool/?type=json5"
+    URL = "http://api.yobot.xyz/3.1.4/pool.json"
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
         self.pool_file_path = os.path.join(
-            self.setting["dirname"], "pool.json")
+            self.setting["dirname"], "pool3.json")
         self.pool_checktime = 0
-        self.status = self.load()
-
-    def __del__(self):
-        pass
-
-    def load(self) -> bool:
         if not os.path.exists(self.pool_file_path):
-            res = requests.get(self.URL)
+            try:
+                res = requests.get(self.URL)
+            except requests.exceptions.ConnectionError:
+                raise Server_error("连接服务器失败")
             if res.status_code != 200:
                 raise Server_error(
                     "bad server response. code: "+str(res.status_code))
             with open(self.pool_file_path, "w", encoding="utf-8") as f:
                 f.write(res.text)
-            self.__pool = json5.loads(res.text)
+            self._pool = json.loads(res.text)
         else:
             with open(self.pool_file_path, "r", encoding="utf-8") as f:
                 try:
-                    self.__pool = json5.load(f)
-                except:
-                    self.txt_list.append("卡池文件解析错误，请检查卡池文件语法，或者“重置卡池”")
-                    return False
-        return True
+                    self._pool = json.load(f)
+                except json.JSONDecodeError:
+                    raise Coding_error("卡池文件解析错误，请检查卡池文件语法")
 
     def result(self) -> List[str]:
         prop = 0.
         result_list = []
-        for p in self.__pool["pool"].values():
+        for p in self._pool["pool"].values():
             prop += p["prop"]
-        for i in range(10):
+        for i in range(self._pool["settings"]["combo"] - 1):
             resu = random.random() * prop
-            for p in self.__pool["pool"].values():
+            for p in self._pool["pool"].values():
                 resu -= p["prop"]
                 if resu < 0:
-                    if i == 9 and p.get("guarantee", None) != None:
-                        p = self.__pool["pool"][p["guarantee"]]
                     result_list.append(p.get("prefix", "") +
                                        random.choice(p["pool"]))
                     break
+        for p in self._pool["pool"].values():
+            prop += p["prop_last"]
+        for i in range(self._pool["settings"]["combo"] - 1):
+            resu = random.random() * prop
+            for p in self._pool["pool"].values():
+                resu -= p["prop_last"]
+                if resu < 0:
+                    result_list.append(p.get("prefix", "") +
+                                       random.choice(p["pool"]))
+                    break
+        if self._pool["settings"]["shuffle"]:
+            random.shuffle(result_list)
         return result_list
 
     def gacha(self, qqid: int, nickname: str) -> str:
@@ -87,26 +92,13 @@ class Gacha:
         else:
             info = {}
             times, last_day, day_times = 0, "", 0
-        try:
-            day_limit = self.__pool["settings"].get("每日抽卡次数", None)
-            if day_limit is None:
-                day_limit = self.__pool["settings"]["times"]
-        except KeyError as ke:
-            db_conn.close()
-            raise Coding_error("卡池信息错误，未设置{}".format(ke))
-        if not isinstance(day_limit, int):
-            db_conn.close()
-            raise Coding_error("卡池信息错误，每日抽卡次数应当为整数")
+        day_limit = self._pool["settings"]["day_limit"]
         if today != last_day:
             last_day = today
             day_times = 0
         if day_limit != 0 and day_times >= day_limit:
             return "{}今天已经抽了{}次了，明天再来吧".format(nickname, day_times)
-        try:
-            result = self.result()
-        except KeyError as ke:
-            db_conn.close()
-            raise Coding_error("卡池信息错误，未设置{}".format(ke))
+        result = self.result()
         times += 1
         day_times += 1
         reply = ""
@@ -128,25 +120,6 @@ class Gacha:
         db_conn.commit()
         db_conn.close()
         return reply
-
-    def setting(self) -> str:
-        if os.path.exists(self.pool_file_path):
-            os.system("start notepad " + os.path.join(
-                self.pool_file_path))
-            return "请在本机的运行电脑上修改卡池，修改完毕后发送“重载卡池”"
-        else:
-            return "卡池文件丢失，请发送“重载卡池”"
-
-    # def del_pool(self):
-    #     ld = self.load()
-    #     if ld == 0:
-    #         masters = self.__pool.get("settings", {}).get("master", [])
-    #         if masters != [] and self.__qqid not in masters:
-    #             self.txt_list.append("对不起，你没有权限")
-    #             return
-    #     if os.path.exists(self.pool_file_path):
-    #         os.remove(self.pool_file_path)
-    #     self.txt_list.append("卡池已重置")
 
     def show_colle(self, qqid, nickname, cmd: Union[None, str] = None) -> str:
         if not os.path.exists(os.path.join(self.setting["dirname"], "collections.db")):
@@ -184,12 +157,15 @@ class Gacha:
             f.write("角色,"+nickname)
             for memb in moreqq_list:
                 f.write(",")
-                # 使用老李api
-                res = requests.get(
-                    "http://laoliapi.cn/king/qq.php?qq=" + str(memb))
-                if res.status_code == 200:
-                    f.write(json5.loads(res.text).get("name", str(memb)))
-                else:
+                try:
+                    # 使用老李api
+                    res = requests.get(
+                        "http://laoliapi.cn/king/qq.php?qq=" + str(memb))
+                    if res.status_code == 200:
+                        f.write(json.loads(res.text).get("name", str(memb)))
+                    else:
+                        f.write(str(memb))
+                except requests.exceptions.ConnectionError:
                     f.write(str(memb))
             f.write("\n")
             for char in sorted(showed_colle):
@@ -197,25 +173,22 @@ class Gacha:
                 for item in more_colle:
                     f.write("," + str(item.get(char, 0)))
                 f.write("\n")
-        f = open(colle_file, 'rb')
-        files = {'file': f}
-        try:
-            response = requests.post(
-                'http://api.yobot.xyz/v2/reports/', files=files)
-        except requests.exceptions.ConnectionError as c:
-            print("无法连接到{}，错误信息：{}".format(
-                'http://api.yobot.xyz/v2/reports/', c))
-            return
-        f.close()
+        with open(colle_file, 'rb') as f:
+            files = {'file': f}
+            try:
+                response = requests.post(
+                    'http://api.yobot.xyz/v2/reports/', files=files)
+            except requests.exceptions.ConnectionError as c:
+                error = "无法连接到{}，错误信息：{}".format('api.yobot.xyz', c)
+                print(error)
+                return error
         p = response.text
         reply = (nickname + "的仓库：" + p)
         db_conn.close()
         return reply
 
-    def check_ver(self) -> Union[str, None]:
-        auto_update = self.__pool.get("settings", {}).get("联网更新卡池", None)
-        if auto_update is None:
-            auto_update = self.__pool.get("settings", {}).get("upgrade", False)
+    def check_ver(self) -> None:
+        auto_update = self._pool["settings"]["auto_update"]
         if not auto_update:
             return
         now = int(time.time())
@@ -226,12 +199,12 @@ class Gacha:
                 print("无法连接到{}，错误信息：{}".format(self.URL, c))
                 return
             if res.status_code == 200:
-                online_ver = json5.loads(res.text)
-                if self.__pool["info"]["name"] != online_ver["info"]["name"]:
-                    self.__pool = online_ver
+                online_ver = json.loads(res.text)
+                if self._pool["info"]["name"] != online_ver["info"]["name"]:
+                    self._pool = online_ver
                     with open(self.pool_file_path, "w", encoding="utf-8") as pf:
                         pf.write(res.text)
-                    return "卡池已自动更新，目前卡池：" + self.__pool["info"]["name"]
+                    print("卡池已自动更新，目前卡池：" + self._pool["info"]["name"])
                 self.pool_checktime = now + 80000
 
     @staticmethod

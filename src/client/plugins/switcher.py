@@ -16,7 +16,7 @@ class Switcher:
     code_api = "http://api.yobot.xyz/v3/coding/?code="
     setting_url = {
         "global": "http://io.yobot.monster/3.0.1/settings/",
-        'pool': 'http://io.yobot.monster/3.1.0/pool/',
+        'pool': 'http://io.yobot.monster/3.1.4/pool/',
         'mail': 'http://io.yobot.monster/3.1.0/mail/',
         'news': 'http://io.yobot.monster/3.1.3/news/'
     }
@@ -54,7 +54,10 @@ class Switcher:
         elif cmd.startswith("设置码"):
             f = 0x400
         elif cmd.startswith("设置"):
-            f = 0x500
+            if len(cmd) < 6:            
+                f = 0x500
+            else:
+                f = 0
         else:
             f = 0
         return f
@@ -67,9 +70,16 @@ class Switcher:
         full_url = self.setting_url[base] + "?form=" + quote(query)
         return shorten_url.shorten(full_url)
 
+    def get_setting_pool_url(self) -> str:
+        poolfile = os.path.join(self.setting["dirname"], "pool3.json")
+        with open(poolfile, "r", encoding="utf-8") as f:
+            pool = json.load(f)
+        query = json.dumps(pool, separators=(',', ':'), ensure_ascii=False)
+        full_url = self.setting_url["pool"] + "?pool=" + quote(query)
+        return shorten_url.shorten(full_url)
+
     def setting_pool(self, pool: dict) -> str:
-        pool["info"] = {"name": "自定义卡池"}
-        poolfile = os.path.join(self.setting["dirname"], "pool.json")
+        poolfile = os.path.join(self.setting["dirname"], "pool3.json")
         with open(poolfile, "w", encoding="utf-8") as f:
             json.dump(pool, f, indent=4, ensure_ascii=False)
         return "设置成功，重启后生效\n发送“重启”可重新启动"
@@ -146,7 +156,7 @@ class Switcher:
                 self.setting.update(new_setting["settings"])
                 self.save_settings()
                 reply = "设置成功"
-            elif version == 3098:  # 卡池设置
+            elif version == 3104:  # 卡池设置
                 reply = self.setting_pool(new_setting["settings"])
             elif version == 3099:  # 邮箱设置
                 reply = self.setting_mail(new_setting["settings"])
@@ -158,7 +168,7 @@ class Switcher:
                 reply = "设置码版本错误"
         elif match_num == 0x500:
             if cmd == "设置卡池":
-                reply = self.setting_url["pool"]
+                reply = self.get_setting_pool_url()
             elif cmd == "设置邮箱":
                 reply = self.setting_url["mail"]
             elif cmd == "设置新闻" or cmd == "设置日程":

@@ -128,6 +128,10 @@ class Event:
     def jobs(self):
         if not self.setting.get("calender_on", 1):
             return tuple()
+        sub_groups = self.setting.get("notify_groups", [])
+        sub_users = self.setting.get("notify_privates", [])
+        if not (sub_groups or sub_users):
+            return tuple()
         time = self.setting.get("calender_time", "08:00")
         hour, minute = time.split(":")
         trigger = CronTrigger(hour=hour, minute=minute)

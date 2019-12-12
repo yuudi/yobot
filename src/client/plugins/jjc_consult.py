@@ -40,6 +40,8 @@ class Consult:
     def user_input(self, cmd: str) -> dict:
         def_set = set()
         in_list = cmd.split()
+        if len(in_list) == 1:
+            return {"code": 2, "msg": "请将5个名称以空格分隔"}
         if len(in_list) > 5:
             return {"code": 5, "msg": "防守人数过多"}
         for index in in_list:

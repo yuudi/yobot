@@ -1,6 +1,8 @@
 {
     "host": "127.0.0.1",
     "port": 9222,
+    "access_token": "your-token",
+    "data_path": "",
     "super-admin": [],
     "black-list": [],
     "setting-restrict": 3,

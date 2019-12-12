@@ -145,6 +145,10 @@ class News:
     def jobs(self) -> Iterable[Tuple[IntervalTrigger, Callable[[], Iterable[Dict[str, Any]]]]]:
         if not any([self.setting.get(s, True) for s in self.rss.keys()]):
             return tuple()
+        sub_groups = self.setting.get("notify_groups", [])
+        sub_users = self.setting.get("notify_privates", [])
+        if not (sub_groups or sub_users):
+            return tuple()
         interval = self.setting.get("news_interval_minutes", 30)
         trigger = IntervalTrigger(
             minutes=interval, start_date=datetime.datetime.now()+datetime.timedelta(seconds=60))
