@@ -14,14 +14,13 @@ from plugins import (boss_dmg, calender, char_consult, custom, gacha,
 
 
 class Yobot:
-    Version = "[v3.1.4]"
-    Commit = {"yuudi": 22}
+    Version = "[v3.1.5]"
+    Commit = {"yuudi": 23}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *, data_path=""):
         # self.send_msg = send_msg
 
-        dirname = kwargs.get("data_path", "")
-        dirname = os.path.join(os.getcwd(), dirname)
+        dirname = os.path.join(os.getcwd(), data_path)
         config_f_path = os.path.join(dirname, "yobot_config.json")
 
         if not os.path.exists(config_f_path):

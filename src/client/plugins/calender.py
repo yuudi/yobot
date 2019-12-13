@@ -71,11 +71,11 @@ class Event:
         date = Arrow.now(tzinfo=self.timezone)
         for i in range(7):
             events = self.timeline.on(date)
-            events_str = "\n✔".join(e.name for e in events)
+            events_str = "\n    ".join(e.name for e in events)
             if events_str == "":
                 events_str = "没有记录"
             daystr = date.format("MM月DD日")
-            reply += "\n{}：\n✔{}".format(daystr, self.cct2s.convert(events_str))
+            reply += "\n{}：\n    {}".format(daystr, self.cct2s.convert(events_str))
             date += datetime.timedelta(days=1)
         return reply
 

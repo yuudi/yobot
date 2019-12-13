@@ -1,20 +1,6 @@
 {
     "stable": {
-        "version": 3322,
-        "vername": "yobot[v3.1.4]",
-        "url": "http://ybdown.zimingdh.com/yobot3322.zip",
-        "requiredUpdate": false
-    },
-    "beta": {
-        "version": 3322,
-        "vername": "yobot[v3.1.4]",
-        "url": "http://ybdown.zimingdh.com/yobot3322.zip",
-        "requiredUpdate": false
-    },
-    "alpha": {
-        "version": 3322,
-        "vername": "yobot[v3.1.4]",
-        "url": "http://ybdown.zimingdh.com/yobot3322.zip",
-        "requiredUpdate": false
+        "version": 3323,
+        "url": "http://ybdown.zimingdh.com/yobot3323.zip"
     }
 }

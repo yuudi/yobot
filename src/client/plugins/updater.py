@@ -166,9 +166,9 @@ class Updater:
             return 0
         para = para.replace(" ", "")
         if para == "alpha":
-            ver = 2
+            ver = 0
         elif para == "beta":
-            ver = 1
+            ver = 0
         elif para == "":
             ver = 0
         else:

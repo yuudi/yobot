@@ -53,16 +53,16 @@ class Gacha:
                     result_list.append(p.get("prefix", "") +
                                        random.choice(p["pool"]))
                     break
+        prop = 0.
         for p in self._pool["pool"].values():
             prop += p["prop_last"]
-        for i in range(self._pool["settings"]["combo"] - 1):
-            resu = random.random() * prop
-            for p in self._pool["pool"].values():
-                resu -= p["prop_last"]
-                if resu < 0:
-                    result_list.append(p.get("prefix", "") +
-                                       random.choice(p["pool"]))
-                    break
+        resu = random.random() * prop
+        for p in self._pool["pool"].values():
+            resu -= p["prop_last"]
+            if resu < 0:
+                result_list.append(p.get("prefix", "") +
+                                   random.choice(p["pool"]))
+                break
         if self._pool["settings"]["shuffle"]:
             random.shuffle(result_list)
         return result_list

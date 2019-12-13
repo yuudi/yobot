@@ -1,7 +1,5 @@
 # yobot
 
-`ver 3.1.4`
-
 chatting bot for pcr(mobile game)
 
 公主连接群聊机器人、公主链接、公主连结
