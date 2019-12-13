@@ -53,7 +53,7 @@ class Char_consult:
 
     def execute(self, match_num: int, msg: dict) -> dict:
         cmd = msg["raw_message"]
-        char_id = self.nickname.get(cmd[2:].lower(), None)
+        char_id = self.nickname.get(cmd[2:].strip().lower(), None)
         if char_id == None:
             reply = "没有找到【{}】".format(cmd[2:])
         elif char_id not in self.char_page["page_id"]:

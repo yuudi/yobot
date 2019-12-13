@@ -32,8 +32,8 @@ class News:
             },
             "news_tw_facebook": {
                 "name": "台服FaceBook",
-                "source": "https://rss.app/feeds/HeJCwdyTJA9CmhIf.xml",
-                "pattern": "{title}\n链接：{link}",
+                "source": "https://rsshub.app/facebook/page/SonetPCR",
+                "pattern": "链接：{link}",
                 "last_id": None
             },
             "news_cn_bilibili": {

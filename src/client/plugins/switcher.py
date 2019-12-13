@@ -16,7 +16,7 @@ class Switcher:
     code_api = "http://api.yobot.xyz/v3/coding/?code="
     setting_url = {
         "global": "http://io.yobot.monster/3.0.1/settings/",
-        'pool': 'http://io.yobot.monster/3.1.4/pool/',
+        'pool': 'http://io.yobot.monster/3.1.4-p/pool/',
         'mail': 'http://io.yobot.monster/3.1.0/mail/',
         'news': 'http://io.yobot.monster/3.1.3/news/'
     }
@@ -45,16 +45,12 @@ class Switcher:
 
     @staticmethod
     def match(cmd: str) -> int:
-        # if cmd.startswith("打开"):
-        #     f = 0x100
-        # elif cmd.startswith("关闭"):
-        #     f = 0x200
         if cmd == "设置":
             f = 0x300
         elif cmd.startswith("设置码"):
             f = 0x400
         elif cmd.startswith("设置"):
-            if len(cmd) < 6:            
+            if len(cmd) < 6:
                 f = 0x500
             else:
                 f = 0
@@ -75,8 +71,14 @@ class Switcher:
         with open(poolfile, "r", encoding="utf-8") as f:
             pool = json.load(f)
         query = json.dumps(pool, separators=(',', ':'), ensure_ascii=False)
-        full_url = self.setting_url["pool"] + "?pool=" + quote(query)
-        return shorten_url.shorten(full_url)
+        try:
+            res = requests.post(self.code_api, data={"raw": query})
+        except requests.exceptions.ConnectionError:
+            return "服务器连接错误"
+        if res.status_code != 200:
+            return "异常的服务器返回值：{}".format(res.status_code)
+        full_url = self.setting_url["pool"] + "?code=" + res.text
+        return full_url
 
     def setting_pool(self, pool: dict) -> str:
         poolfile = os.path.join(self.setting["dirname"], "pool3.json")

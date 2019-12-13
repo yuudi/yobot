@@ -10,7 +10,6 @@ function getQueryVariable(variable) {
 
 var pool_num = 0;
 
-
 function pool_content(id, name, prop, prop_last, pref, pool) {
     return '<span class="content" id="'
         + id.toString()
@@ -31,17 +30,14 @@ function pool_content(id, name, prop, prop_last, pref, pool) {
         + '</textarea><br><br></span>';
 }
 
-
-
 $(document).ready(function () {
-    let pool_old = getQueryVariable("pool");
-    if (!pool_old) {
+    if (pool_old == "") {
         alert("卡池丢失");
     } else {
         let old = JSON.parse(decodeURIComponent(pool_old));
         for (p in old["pool"]) {
             pool_num += 1;
-            $("#pools").append(pool_content(pool_num, p, old["pool"][p]["prop"], old["pool"][p]["prop_last"], old["pool"][p]["pref"], old["pool"][p]["pool"].join("\n")));
+            $("#pools").append(pool_content(pool_num, p, old["pool"][p]["prop"], old["pool"][p]["prop_last"], old["pool"][p]["prefix"], old["pool"][p]["pool"].join("\n")));
         }
         $("#combo").val(old["settings"]["combo"]);
         $("#day_limit").val(old["settings"]["day_limit"]);
@@ -78,7 +74,7 @@ $(document).ready(function () {
             pool_setting["pool"][$(c).find("#name").val()] = {
                 prop: parseInt($(c).find("#prop").val()),
                 prop_last: parseInt($(c).find("#prop_last").val()),
-                pref: $(c).find("#pref").val(),
+                prefix: $(c).find("#pref").val(),
                 pool: $(c).find("#pool").val().split("\n")
             }
         }

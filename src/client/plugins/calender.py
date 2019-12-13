@@ -47,7 +47,7 @@ class Event:
             calender = Calendar(res.text)
         self.timeline = calender.timeline
 
-    def get_day_events(self, match_num):
+    def get_day_events(self, match_num) -> tuple:
         if match_num == 2:
             daystr = "今天"
             date = Arrow.now(tzinfo=self.timezone)
@@ -66,6 +66,19 @@ class Event:
         events = self.timeline.on(date)
         return (daystr, events)
 
+    def get_week_events(self) -> str:
+        reply = "一周日程："
+        date = Arrow.now(tzinfo=self.timezone)
+        for i in range(7):
+            events = self.timeline.on(date)
+            events_str = "\n✔".join(e.name for e in events)
+            if events_str == "":
+                events_str = "没有记录"
+            daystr = date.format("MM月DD日")
+            reply += "\n{}：\n✔{}".format(daystr, self.cct2s.convert(events_str))
+            date += datetime.timedelta(days=1)
+        return reply
+
     @staticmethod
     def match(cmd: str) -> int:
         if not cmd.startswith("日程"):
@@ -74,6 +87,8 @@ class Event:
             return 2
         if cmd == "日程明日" or cmd == "日程明天":
             return 3
+        if cmd == "日程表" or cmd == "日程一周"  or cmd == "日程本周":
+            return 4
         match = re.match(r"日程 ?(\d{1,2})月(\d{1,2})[日号]", cmd)
         if match:
             month = int(match.group(1))
@@ -90,6 +105,9 @@ class Event:
     def execute(self, match_num: int, msg: dict) -> dict:
         if match_num == 1:
             reply = "未知的日期，请参考http://h3.yobot.monster/"
+            return {"reply": reply, "block": True}
+        if match_num == 4:
+            reply = self.get_week_events()
             return {"reply": reply, "block": True}
         try:
             daystr, events = self.get_day_events(match_num)

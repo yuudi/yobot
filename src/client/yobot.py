@@ -14,8 +14,8 @@ from plugins import (boss_dmg, calender, char_consult, custom, gacha,
 
 
 class Yobot:
-    Version = "[v3.1.4-beta]"
-    Commit = {"yuudi": 21}
+    Version = "[v3.1.4]"
+    Commit = {"yuudi": 22}
 
     def __init__(self, *args, **kwargs):
         # self.send_msg = send_msg
