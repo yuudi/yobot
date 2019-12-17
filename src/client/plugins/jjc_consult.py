@@ -7,8 +7,8 @@ import os
 
 import requests
 
-from plugins.yobot_errors import Server_error
-import plugins.shorten_url
+from .yobot_errors import Server_error
+from . import shorten_url
 
 
 class Consult:
@@ -129,7 +129,7 @@ class Consult:
                 ))
             solution.append("_".join(team))
         url = self.ShowSolution_URL + "-".join(solution)
-        url = plugins.shorten_url.shorten(url)
+        url = shorten_url.shorten(url)
         return "找到解法：" + url
 
     @staticmethod

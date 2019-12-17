@@ -12,7 +12,9 @@ python最低要求为`python3.6`
 
 ```python
 import yobot
-bot = yobot.Yobot()
+bot = yobot.Yobot(
+    data_path=".", # 存放数据的目录，默认为当前目录
+)
 reply = bot.proc(context)
 ```
 
@@ -32,9 +34,11 @@ context = {
 }
 ```
 
-主文件`main.py`是QQ机器人的实例
+主文件`main.py`是利用aiocqhttp作为QQ机器人的实例
 
 文件`chatroom.py`是简单网页聊天的实例
+
+文件`nonebot_plugin.py`是作为nonebot插件的实例
 
 ## 增加功能
 

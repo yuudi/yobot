@@ -15,12 +15,13 @@ from plugins import (boss_dmg, calender, char_consult, custom, gacha,
 
 class Yobot:
     Version = "[v3.1.5]"
-    Commit = {"yuudi": 23}
+    Commit = {"yuudi": 24}
 
     def __init__(self, *, data_path=""):
-        # self.send_msg = send_msg
 
-        dirname = os.path.join(os.getcwd(), data_path)
+        dirname = os.path.abspath(os.path.join(os.getcwd(), data_path))
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
         config_f_path = os.path.join(dirname, "yobot_config.json")
 
         if not os.path.exists(config_f_path):
@@ -29,7 +30,7 @@ class Yobot:
                     sys._MEIPASS, "packedfiles", "default_config.json")
             else:
                 default_config_f_path = os.path.join(
-                    os.getcwd(), "default_config.json")
+                    os.path.dirname(__file__), "default_config.json")
             shutil.copyfile(default_config_f_path, config_f_path)
         with open(config_f_path, "r", encoding="utf-8") as config_file:
             try:

@@ -9,7 +9,7 @@ from typing import List, Union
 
 import requests
 
-from plugins.yobot_errors import Coding_error, Server_error
+from .yobot_errors import Coding_error, Server_error
 
 
 class Gacha:

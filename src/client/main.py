@@ -1,3 +1,7 @@
+"""
+实例1：利用aiocqhttp作为httpapi的服务端
+"""
+
 import asyncio
 import json
 

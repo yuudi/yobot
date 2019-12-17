@@ -11,7 +11,7 @@ import re
 import sys
 import time
 
-from plugins.dmg_report import Report
+from .dmg_report import Report
 
 
 class Record():

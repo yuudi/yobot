@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 import requests
 
-from plugins import shorten_url
+from . import shorten_url
 
 
 class Switcher:

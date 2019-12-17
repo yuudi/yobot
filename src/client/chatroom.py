@@ -1,3 +1,8 @@
+"""
+实例2：利用flask作为网页聊天室
+（过于简陋，仅用作测试与参考）
+"""
+
 import asyncio
 import time
 
@@ -8,7 +13,6 @@ from yobot import Yobot
 
 
 class Borad:
-    # 过于简陋，仅作测试用
     head = '<!DOCTYPE html><html><head><style>.guest{color:blue}.admin{color:red}</style><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script>$(document).ready(function(){$("#send").click(function(){let send=$("#text").val();window.location.href=send})})</script></head><body><input type="text"id="text"><input type="button"value="发送"id="send">'
     foot = "</body></html>"
 

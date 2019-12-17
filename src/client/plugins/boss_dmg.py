@@ -1,6 +1,6 @@
 # 把不想改的祖传代码封装一下
 
-from plugins import dmg_record, lock_boss, reserve
+from . import dmg_record, lock_boss, reserve
 
 
 class Boss_dmg:
