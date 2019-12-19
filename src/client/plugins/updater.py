@@ -176,6 +176,9 @@ class Updater:
         return match | ver
 
     def execute(self, match_num: int, msg: dict = {}) -> dict:
+        if self.evn=="nonebot-plugin":
+            return "作为插件无法这么做"
+
         super_admins = self.setting.get("super-admin", list())
         restrict = self.setting.get("setting-restrict", 3)
         if msg["sender"]["user_id"] in super_admins:

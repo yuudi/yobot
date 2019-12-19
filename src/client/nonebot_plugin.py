@@ -1,14 +1,12 @@
 """
-# 实例3：作为nonebot的插件
+实例3：作为nonebot的插件
 
-## 加载方法：
+加载方法：
 
-### 将这个项目整个文件夹放在nonebot插件目录下
+1.将这个项目整个文件夹放在nonebot插件目录下
 
-### 将这个项目转化为插件
-
+2.将这个项目转化为插件
 运行`python nonebot_plugin.py make_plugin`
-
 如果使用git，记得`git commit -a`
 """
 
@@ -31,22 +29,6 @@ if __name__ == "__main__":
     filepath = os.path.abspath(os.path.join(os.getcwd(), "../../__init__.py"))
     makefile(filepath, "from .src.client import nonebot_plugin")
 
-    filepath = os.path.abspath(os.path.join(os.getcwd(), "yobot.py"))
-    with open(filepath, "r+") as f:
-        codes = f.read()
-        codes = codes.replace("from plugins import", "from .plugins import")
-        f.seek(0)
-        f.truncate()
-        f.write(codes)
-
-    filepath = os.path.abspath(os.path.join(os.getcwd(), "plugins", "updater.py"))
-    with open(filepath, "r+") as f:
-        codes = f.read()
-        codes = codes.replace("yobot源码版", "yobot源码(插件)版")
-        f.seek(0)
-        f.truncate()
-        f.write(codes)
-
     sys.exit()
 
 
@@ -54,9 +36,13 @@ from nonebot import get_bot, scheduler
 
 from .yobot import Yobot
 
+verinfo = {
+    "run-as": "nonebot-plugin",
+    "ver_name": "yobot{}插件版".format(Yobot.Version),
+}
 
 rcnb = get_bot()
-bot = Yobot(data_path="./yobot_data")
+bot = Yobot(data_path="./yobot_data", verinfo=verinfo)
 
 
 @rcnb.on_message

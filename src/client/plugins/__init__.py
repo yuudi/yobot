@@ -7,8 +7,7 @@ __all__ = [
     'updater',
     'yobot_errors',
     'char_consult',
+    'push_news',
+    'calender',
     'custom'
 ]
-
-from . import (boss_dmg, char_consult, custom, gacha, jjc_consult, switcher,
-               updater, yobot_errors, yobot_msg)

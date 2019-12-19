@@ -8,16 +8,17 @@ from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 from opencc import OpenCC
 
-from plugins import (boss_dmg, calender, char_consult, custom, gacha,
-                     jjc_consult, push_news, switcher, updater, yobot_errors,
-                     yobot_msg)
+if __package__:
+    from .plugins import *
+else:
+    from plugins import *
 
 
 class Yobot:
     Version = "[v3.1.5]"
-    Commit = {"yuudi": 24}
+    Commit = {"yuudi": 25}
 
-    def __init__(self, *, data_path=""):
+    def __init__(self, *, data_path="", verinfo=None):
 
         dirname = os.path.abspath(os.path.join(os.getcwd(), data_path))
         if not os.path.exists(dirname):
@@ -38,7 +39,8 @@ class Yobot:
             except:
                 raise yobot_errors.File_error(config_f_path + " been damaged")
 
-        verinfo = updater.get_version(self.Version, self.Commit)
+        if verinfo is None:
+            verinfo = updater.get_version(self.Version, self.Commit)
         self.glo_setting.update({
             "dirname": dirname,
             "verinfo": verinfo
