@@ -20,7 +20,7 @@ def main():
         config = json.load(f)
     host = config.get("host", "127.0.0.1")
     port = config.get("port", 9222)
-    token = config.get("access_token", "your-token")
+    token = config.get("access_token", None)
 
     rcnb = CQHttp(access_token=token,
                   enable_http_post=False)

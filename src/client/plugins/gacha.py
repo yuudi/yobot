@@ -201,6 +201,7 @@ class Gacha:
             if res.status_code == 200:
                 online_ver = json.loads(res.text)
                 if self._pool["info"]["name"] != online_ver["info"]["name"]:
+                    online_ver["settings"] = self._pool["settings"]
                     self._pool = online_ver
                     with open(self.pool_file_path, "w", encoding="utf-8") as pf:
                         pf.write(res.text)

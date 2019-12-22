@@ -15,18 +15,24 @@ else:
 
 
 class Yobot:
-    Version = "[v3.1.5]"
-    Commit = {"yuudi": 25}
+    Version = "[v3.1.6]"
+    Commit = {"yuudi": 26}
 
     def __init__(self, *, data_path="", verinfo=None):
 
-        dirname = os.path.abspath(os.path.join(os.getcwd(), data_path))
+        is_packaged = "_MEIPASS" in dir(sys)
+        if is_packaged:
+            basepath = os.path.dirname(sys.argv[0])
+        else:
+            basepath = os.path.dirname(__file__)
+
+        dirname = os.path.abspath(os.path.join(basepath, data_path))
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         config_f_path = os.path.join(dirname, "yobot_config.json")
 
         if not os.path.exists(config_f_path):
-            if "_MEIPASS" in dir(sys):
+            if is_packaged:
                 default_config_f_path = os.path.join(
                     sys._MEIPASS, "packedfiles", "default_config.json")
             else:
