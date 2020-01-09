@@ -137,7 +137,8 @@ class Report():
         return score
 
     def _proportion(self, list1, list2):
-        return ["{:.2%}".format(k1/k2) for k1, k2 in zip(list1, list2)]
+        return [("{:.2%}".format(k1/k2) if k2 else "0")
+                for k1, k2 in zip(list1, list2)]
 
     def _count(self, mdata):
         t = []

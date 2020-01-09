@@ -5,3 +5,4 @@ opencc-python-reimplemented>=0.1.5
 feedparser>=5.2.1
 beautifulsoup4>=4.8.1
 ics>=0.6
+pillow>=6.2.1

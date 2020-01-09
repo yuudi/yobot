@@ -8,7 +8,7 @@ import os
 import requests
 
 from .yobot_errors import Server_error
-from . import shorten_url
+from . import gen_pic, shorten_url
 
 
 class Consult:
@@ -36,6 +36,14 @@ class Consult:
                 for col in row[1:]:
                     self.nickname[col] = row[0]
                 self.number[int(row[0])] = row[1]
+        if glo_setting["show_jjc_solution"] == "image":
+            photopath = os.path.join(glo_setting["dirname"], "static", "pics")
+            if not os.path.exists(photopath):
+                os.makedirs(photopath)
+                char_list = [charid + offset
+                             for charid in self.number.keys()
+                             for offset in (10, 30)]
+                gen_pic.download_pics(char_list, photopath)
 
     def user_input(self, cmd: str) -> dict:
         def_set = set()
@@ -72,10 +80,13 @@ class Consult:
             return "无法连接服务器"
         res = json.loads(data.text)
         if(res["code"] == 0):
-            if self.setting.get("show_jjc_solution", "url") == "url":
+            show_jjc_solution = self.setting.get("show_jjc_solution", "url")
+            if show_jjc_solution == "url":
                 reply += self.dump_url(res)
-            else:
+            elif show_jjc_solution == "text":
                 reply += self.dump_text(res)
+            elif show_jjc_solution == "image":
+                reply += self.dump_photo(res)
         else:
             raise Server_error("error code: {}, message : {}".format(
                 res["code"], res["message"]))
@@ -131,6 +142,12 @@ class Consult:
         url = self.ShowSolution_URL + "-".join(solution)
         url = shorten_url.shorten(url)
         return "找到解法：" + url
+
+    def dump_photo(self, res: dict) -> str:
+        if len(res["data"]["result"]) == 0:
+            return "从pcrdfans.com没有找到解法"
+        pic_file = gen_pic.teams_pic(res["data"]["result"])
+        return "[CQ:image,file=file:///{}]".format(pic_file)
 
     @staticmethod
     def match(cmd: str) -> int:

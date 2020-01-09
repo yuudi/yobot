@@ -15,7 +15,7 @@ class Switcher:
     Active = False
     code_api = "http://api.yobot.xyz/v3/coding/?code="
     setting_url = {
-        "global": "http://io.yobot.monster/3.0.1/settings/",
+        "global": "http://io.yobot.monster/3.1.7/settings/",
         'pool': 'http://io.yobot.monster/3.1.4-p/pool/',
         'mail': 'http://io.yobot.monster/3.1.0/mail/',
         'news': 'http://io.yobot.monster/3.1.3/news/'
@@ -139,7 +139,8 @@ class Switcher:
         if match_num == 0x300:
             keys = ("super-admin", "black-list", "setting-restrict", "auto_update",
                     "update-time", "show_jjc_solution", "gacha_on", "gacha_private_on",
-                    "preffix_on", "preffix_string", "zht_in", "zht_out", "zht_out_style")
+                    "preffix_on", "preffix_string", "zht_in", "zht_out", "zht_out_style",
+                    "calender_region")
             reply = (self.dump_url(keys, "global") + "\n请在此页进行设置，完成后发送设置码即可\n"
                      "其他设置请发送“设置卡池”、“设置邮箱”、“设置新闻”")
         elif match_num == 0x400:
@@ -154,7 +155,7 @@ class Switcher:
                 reply = "服务器返回值异常"
                 return {"reply": reply, "block": True}
             version = new_setting.get("version", 0)
-            if version == 2999:  # 常规设置
+            if version == 3107:  # 常规设置
                 self.setting.update(new_setting["settings"])
                 self.save_settings()
                 reply = "设置成功"

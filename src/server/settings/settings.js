@@ -25,7 +25,7 @@ function Confirm() {
     formData["gacha_private_on"] = formData["gacha_private_on"] == "on";
     formData["zht_in"] = formData["zht_in"] == "on";
     formData["zht_out"] = formData["zht_out"] == "on";
-    var text = JSON.stringify({ version: 2999, settings: formData });
+    var text = JSON.stringify({ version: 3107, settings: formData });
     $.post("1234567"/*this is coding-api address*/, { raw: text }, function (data) {
         $('#pc #setting_code').attr("value", "设置码" + data);
     });
@@ -84,6 +84,7 @@ $(document).ready(function () {
         $("[name=show_jjc_solution]").val(form["show_jjc_solution"]);
         $("[name=gacha_on]").prop("checked", form["gacha_on"]);
         $("[name=gacha_private_on]").prop("checked", form["gacha_private_on"]);
+        $("[name=calender_region]").val(form["calender_region"]);
         $("[name=preffix_on]").prop("checked", form["preffix_on"]);
         $("[name=preffix_string]").val(form["preffix_string"]);
         $("[name=zht_in]").prop("checked", form["zht_in"]);

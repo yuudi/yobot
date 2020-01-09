@@ -31,10 +31,20 @@
             <select name="show_jjc_solution">
                 <option value="url">网页</option>
                 <option value="text">文字</option>
+                <option value="image" disabled>图片(暂无)</option>
             </select>
         </p>
         <p><input type="checkbox" name="gacha_on" id="gacha_on" checked>允许群聊抽卡</p>
         <p><input type="checkbox" name="gacha_private_on" id="gacha_private_on" checked>允许私聊抽卡</p>
+        <p>
+            日程：
+            <select name="calender_region" id="calender_region">
+                <option value="jp">日服</option>
+                <option value="tw">台服</option>
+                <option value="cn" disabled>国服(暂无)</option>
+                <option value="kr" disabled>韩服(暂无)</option>
+            </select>
+        </p>
         <p><input type="checkbox" name="preffix_on" id="preffix_on">使用前缀
             <br>前缀：<input type="text" name="preffix_string" id="preffix_input" value="/" disabled>
         </p>
