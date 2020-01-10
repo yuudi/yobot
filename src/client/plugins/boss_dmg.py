@@ -1,7 +1,7 @@
 # 把不想改的祖传代码封装一下
 
 from . import dmg_record, lock_boss, reserve
-
+import re
 
 class Boss_dmg:
     Passive = True
