@@ -4,14 +4,15 @@ function Confirm() {
     $.each(t, function () {
         formData[this.name] = this.value;
     });
-    if (formData["super-admin"].search(/^\d{5,10}(?: \d{5,10})*$/)) {
-        alert("请填写正确QQ号");
-        return
+    if (formData["super-admin"].search(/^(?:\d{5,10}(?: \d{5,10})*)?$/)) {
+        alert("请填写正确主人QQ号");
     }
     formData["super-admin"] = formData["super-admin"].split(" ").map(Number);
     if (formData["black-list"].search(/^(?:\d{5,10}(?: \d{5,10})*)?$/)) {
-        alert("请填写正确QQ号");
-        return
+        if (formData["black-list"] != "0") {
+            alert("请填写正确黑名单QQ号");
+            return
+        }
     }
     formData["black-list"] = formData["black-list"].split(" ").map(Number);
     if (formData["update-time"] == "") {

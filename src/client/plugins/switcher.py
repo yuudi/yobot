@@ -18,7 +18,7 @@ class Switcher:
         "global": "http://io.yobot.monster/3.1.7/settings/",
         'pool': 'http://io.yobot.monster/3.1.4-p/pool/',
         'mail': 'http://io.yobot.monster/3.1.0/mail/',
-        'news': 'http://io.yobot.monster/3.1.3/news/'
+        'news': 'http://io.yobot.monster/3.1.8/news/'
     }
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
@@ -163,7 +163,7 @@ class Switcher:
                 reply = self.setting_pool(new_setting["settings"])
             elif version == 3099:  # 邮箱设置
                 reply = self.setting_mail(new_setting["settings"])
-            elif version == 3103:  # 新闻设置
+            elif version == 3108:  # 新闻设置
                 self.setting.update(new_setting["settings"])
                 self.save_settings()
                 reply = "设置成功，重启后生效\n发送“重启”可重新启动"
@@ -178,7 +178,7 @@ class Switcher:
                 keys = ("news_jp_official", "news_jp_twitter", "news_tw_official",
                         "news_tw_facebook", "news_cn_official", "news_cn_bilibili",
                         "news_interval_minutes", "notify_groups", "notify_privates",
-                        "calender_on", "calender_time")
+                        "calender_on", "calender_time", "calender_region")
                 reply = self.dump_url(keys, "news")
             else:
                 reply = "未知的设置"

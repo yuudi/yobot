@@ -222,7 +222,7 @@ class Event:
             }
 
     def jobs(self):
-        if not self.setting.get("calender_on", 1):
+        if not self.setting.get("calender_on", False):
             return tuple()
         sub_groups = self.setting.get("notify_groups", [])
         sub_users = self.setting.get("notify_privates", [])

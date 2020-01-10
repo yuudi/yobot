@@ -10,7 +10,7 @@ function Confirm() {
     formData["news_tw_facebook"] = formData["news_tw_facebook"] == "on";
     formData["news_cn_official"] = formData["news_cn_official"] == "on";
     formData["news_cn_bilibili"] = formData["news_cn_bilibili"] == "on";
-    formData["calender_on"] = parseInt(formData["calender_on"]);
+    formData["calender_on"] = formData["calender_on"] == "on";
     if (!/^\d+$/.test(formData["news_interval_minutes"])) {
         alert("请填写正确的间隔");
         return
@@ -38,7 +38,7 @@ function Confirm() {
         }
         formData["notify_privates"] = formData["notify_privates"].split("\r\n").map(function (x) { return parseInt(x); });
     }
-    var text = JSON.stringify({ version: 3103, settings: formData });
+    var text = JSON.stringify({ version: 3108, settings: formData });
     $.post("1234567"/*this is coding-api address*/, { raw: text }, function (data) {
         $('#pc #setting_code').attr("value", "设置码" + data);
     });
@@ -75,9 +75,26 @@ $(document).ready(function () {
         $("[name=news_cn_official]").prop("checked", form["news_cn_official"]);
         $("[name=news_cn_bilibili]").prop("checked", form["news_cn_bilibili"]);
         $("[name=news_interval_minutes]").val(form["news_interval_minutes"]);
-        $("[name=calender_on]").val(form["calender_on"].toString());
+        $("[name=calender_on]").prop("checked", form["calender_on"]);
+        $("[name=calender_region]").val(form["calender_region"]);
         $("[name=calender_time]").val(form["calender_time"]);
         $("[name=notify_groups]").val(form["notify_groups"].join("\n"));
         $("[name=notify_privates]").val(form["notify_privates"].join("\n"));
+        if ($("[name=calender_on]").is(":checked")) {
+            $("[name=calender_region]").prop("disabled", false);
+            $("[name=calender_time]").prop("disabled", false);
+        } else {
+            $("[name=calender_region]").prop("disabled", true);
+            $("[name=calender_time]").prop("disabled", true);
+        }
     }
+    $("[name=calender_on]").change(function () {
+        if ($("[name=calender_on]").is(":checked")) {
+            $("[name=calender_region]").prop("disabled", false);
+            $("[name=calender_time]").prop("disabled", false);
+        } else {
+            $("[name=calender_region]").prop("disabled", true);
+            $("[name=calender_time]").prop("disabled", true);
+        }
+    });
 });

@@ -9,14 +9,16 @@ from typing import Any, Callable, Dict, Iterable, List, Tuple
 from opencc import OpenCC
 
 if __package__:
-    from .plugins import *
+    from .plugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
+                          updater, yobot_errors, char_consult, push_news, calender, custom)
 else:
-    from plugins import *
+    from plugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
+                         updater, yobot_errors, char_consult, push_news, calender, custom)
 
 
 class Yobot:
-    Version = "[v3.1.7]"
-    Commit = {"yuudi": 27}
+    Version = "[v3.1.8]"
+    Commit = {"yuudi": 28, "sunyubo": 1}
 
     def __init__(self, *, data_path="", verinfo=None):
 

@@ -19,7 +19,7 @@
     "news_cn_bilibili": true,
     "news_interval_minutes": 30,
     "calender_region": "default",
-    "calender_on": 1,
+    "calender_on": true,
     "calender_time": "08:00",
     "notify_groups": [],
     "notify_privates": [],

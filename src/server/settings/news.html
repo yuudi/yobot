@@ -22,12 +22,14 @@
         <p><input type="checkbox" name="news_cn_bilibili" checked>国服B站动态</p>
         <p>检测间隔<input type="number" name="news_interval_minutes" min="10">分钟</p>
         <h2>日程</h2>
-        <p>提醒日程：
-            <select name="calender_on">
-                <option value="0">关闭</option>
-                <option value="1">仅日服</option>
-                <option value="2" disabled>(暂无数据)仅台服</option>
-                <option value="3" disabled>(暂无数据)日服、台服</option>
+        <p>
+            <input type="checkbox" name="calender_on" checked>
+            提醒日程：
+            <select name="calender_region">
+                <option value="jp">日服</option>
+                <option value="tw">台服</option>
+                <option value="cn" disabled>国服(暂无)</option>
+                <option value="kr" disabled>韩服(暂无)</option>
             </select>
             <br>时间：每天<input type="time" name="calender_time">
         </p>
