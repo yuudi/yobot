@@ -63,7 +63,7 @@ class Boss_dmg:
             report = dmg_record.Record(cmd_list[:3])
             report.rep(cmd, func)
             txt_list.extend(report.txt_list)
-            if re.match(r"^(\[CQ:at,qq=\d{5,10}\])|(@.+[:：]) ?(尾刀|收尾|收掉|击败)$", cmd):
+            if re.match(r"^((\[CQ:at,qq=\d{5,10}\])|(@.+[:：]))? ?(尾刀|收尾|收掉|击败)$", cmd):
                 rsv = reserve.Reserve(cmd_list[:3])
                 rsv.rsv(cmd, 0x20)
                 txt_list.extend(rsv.txt_list)

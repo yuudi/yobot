@@ -44,8 +44,11 @@ class Event:
         self.setting = glo_setting
         self.cct2s = OpenCC("t2s")
 
-        # 时区：东8区
-        self.timezone = datetime.timezone(datetime.timedelta(hours=8))
+        # # 时区：东8区
+        # self.timezone = datetime.timezone(datetime.timedelta(hours=8))
+
+        # 。。。屁东8区，ics这个库解析的时候把时区略了，加东8区会有bug，导致每天早上8点前获取的calendar会延后一天
+        self.timezone = datetime.timezone(datetime.timedelta(hours=0))
 
         self.load_timeline(glo_setting.get("calender_region", "default"))
         self.last_check = time.time()

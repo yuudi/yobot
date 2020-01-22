@@ -1,6 +1,3 @@
-#coding: utf-8
-
-
 import csv
 import json
 import os
@@ -18,12 +15,12 @@ class Consult:
     Feedback_URL = "http://api.yobot.xyz/v2/nicknames/?type=feedback&name="
     ShowSolution_URL = "http://io.yobot.monster/3.0.0-b/jjc_consult_solution/?s="
 
-    def __init__(self, glo_setting: dict, *args, **kwargs):
+    def __init__(self, glo_setting: dict, *args, refresh_nickfile=False,  **kwargs):
         self.setting = glo_setting
         self.nickname = {}
         self.number = {}
         nickfile = os.path.join(glo_setting["dirname"], "nickname.csv")
-        if not os.path.exists(nickfile):
+        if refresh_nickfile or not os.path.exists(nickfile):
             res = requests.get(self.URL)
             if res.status_code != 200:
                 raise Server_error(
@@ -36,7 +33,7 @@ class Consult:
                 for col in row[1:]:
                     self.nickname[col] = row[0]
                 self.number[int(row[0])] = row[1]
-        if glo_setting["show_jjc_solution"] == "image":
+        if glo_setting.get("show_jjc_solution", None) == "image":
             photopath = os.path.join(glo_setting["dirname"], "static", "pics")
             if not os.path.exists(photopath):
                 os.makedirs(photopath)
@@ -45,7 +42,7 @@ class Consult:
                              for offset in (10, 30)]
                 gen_pic.download_pics(char_list, photopath)
 
-    def user_input(self, cmd: str) -> dict:
+    def user_input(self, cmd: str, is_retry=False) -> dict:
         def_set = set()
         in_list = cmd.split()
         if len(in_list) == 1:
@@ -53,17 +50,21 @@ class Consult:
         if len(in_list) > 5:
             return {"code": 5, "msg": "防守人数过多"}
         for index in in_list:
-            item = self.nickname.get(index.lower(), "error")
-            if item == "error":
-                try:
-                    requests.get(self.Feedback_URL+index)
-                except requests.exceptions.ConnectionError:
-                    msg = "没有找到【{}】，自动反馈失败，目前昵称表：{}".format(index, self.URL)
+            item = self.nickname.get(index.lower(), None)
+            if item is None:
+                if is_retry:
+                    try:
+                        requests.get(self.Feedback_URL+index)
+                    except requests.exceptions.ConnectionError:
+                        msg = "没有找到【{}】，自动反馈失败，目前昵称表：{}".format(index, self.URL)
+                    else:
+                        msg = "没有找到【{}】，已自动反馈，目前昵称表：{}".format(index, self.URL)
+                    return {
+                        "code": 1,
+                        "msg": msg}
                 else:
-                    msg = "没有找到【{}】，已自动反馈，目前昵称表：{}".format(index, self.URL)
-                return {
-                    "code": 1,
-                    "msg": msg}
+                    self.__init__(self.setting, refresh_nickfile=True)
+                    return self.user_input(cmd, True)
             def_set.add(item)
             def_lst = list(def_set)
         if len(def_lst) < 3:

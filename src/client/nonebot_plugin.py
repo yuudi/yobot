@@ -10,9 +10,9 @@
 如果使用git，记得`git commit -a`
 """
 
+import sys
 
 if __name__ == "__main__":
-    import sys
     import os
 
     if len(sys.argv) < 2 or sys.argv[1] != "make_plugin":
@@ -31,10 +31,16 @@ if __name__ == "__main__":
 
     sys.exit()
 
-
-from nonebot import get_bot, scheduler
+import asyncio
 
 from .yobot import Yobot
+
+if "pachpm" in sys.modules:
+    from pachpm import get_bot, scheduler
+elif "nonebot" in sys.modules:
+    from nonebot import get_bot, scheduler
+else:
+    raise ValueError("plugin imported before initialized")
 
 verinfo = {
     "run-as": "nonebot-plugin",
