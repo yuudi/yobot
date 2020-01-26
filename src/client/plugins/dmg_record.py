@@ -11,8 +11,24 @@ import re
 import sys
 import time
 
+import json5
+
 from .dmg_report import Report
 
+
+class Re_cache:
+    def __init__(self):
+        self.prog = {}
+
+    def get(self, pattern):
+        cache = self.prog.get(pattern)
+        if cache is None:
+            cache = re.compile(pattern)
+            self.prog[pattern] = cache
+        return cache
+
+recache = Re_cache()
+boss_health_cache = None
 
 class Record():
     """
@@ -23,7 +39,7 @@ class Record():
         "jp": [
             [6000000, 8000000, 10000000, 12000000, 15000000],
             [6000000, 8000000, 10000000, 12000000, 15000000],
-            [7000000, 9000000, 12000000, 14000000, 17000000]
+            [7000000, 9000000, 13000000, 14000000, 17000000]
         ],
         "tw": [
             [6000000, 8000000, 10000000, 12000000, 15000000],
@@ -43,6 +59,28 @@ class Record():
         self.__data = []
         self.__comment = ""
         self.txt_list = []
+        global boss_health_cache
+        if boss_health_cache is None:
+            if not os.path.exists(os.path.join(self.__path, "boss.json")):
+                with open(os.path.join(self.__path, "boss.json"), "w") as f:
+                        f.write(
+                    """{
+    "jp": [
+        [6000000, 8000000, 10000000, 12000000, 15000000],
+        [6000000, 8000000, 10000000, 12000000, 15000000],
+        [7000000, 9000000, 13000000, 15000000, 20000000]
+    ],
+    "tw": [
+        [6000000, 8000000, 10000000, 12000000, 15000000],
+        [6000000, 8000000, 10000000, 12000000, 15000000],
+        [6000000, 8000000, 10000000, 12000000, 15000000]
+    ]
+}""")
+            with open(os.path.join(self.__path, "boss.json")) as f:
+                self.Boss_health=json5.load(f)
+                boss_health_cache = self.Boss_health
+        else:
+            self.Boss_health = boss_health_cache
         # self._time_offset = time.timezone + 28800  # GMT+8
         if os.path.exists(os.path.join(self.__path, "conf.json")):
             with open(os.path.join(self.__path, "conf.json"), "r", encoding="utf-8") as f:
@@ -284,7 +322,7 @@ class Record():
                 self._boss_status()
 
     def __mod(self, cmd):
-        match = re.match(r"修[改正](.{1,4})=(\d+[wWkK万]?)$", cmd)
+        match = re.match(recache.get(r"修[改正](.{1,4})=(\d+[wWkK万]?)$"), cmd)
         if match == None:
             self.__comment += "未修正"
             self.txt_list.append("400参数错误")
@@ -373,7 +411,7 @@ class Record():
         with open(os.path.join(self.__path, "mailconf.json"), "r", encoding="utf-8") as f:
             mailcfg = json.load(f)
         if opt == "add":
-            if re.match(r"\w+@\w+\.\w+", addr):
+            if re.match(recache.get(r"\w+@\w+\.\w+"), addr):
                 if addr in mailcfg["subscriber"][self.__groupid]:
                     self.__comment += "已存在"
                     self.txt_list.append("你已经订阅过了")
@@ -386,7 +424,7 @@ class Record():
             else:
                 self.txt_list.append("500邮件格式错误")
         elif opt == "del":
-            if re.match(r"\w+@\w+\.\w+", addr):
+            if re.match(recache.get(r"\w+@\w+\.\w+"), addr):
                 if addr in mailcfg["subscriber"][self.__groupid]:
                     mailcfg["subscriber"][self.__groupid].remove(addr)
                     with open(os.path.join(self.__path, "mailconf.json"), "w") as f:
@@ -422,7 +460,7 @@ class Record():
         elif cmd == "昨日"or cmd == "昨天":
             date = "yesterday"
         else:
-            match = re.match("(\d{1,2})[月/\-](\d{1,2})[日号]?", cmd)
+            match = re.match(recache.get(r"(\d{1,2})[月/\-](\d{1,2})[日号]?"), cmd)
             if match:
                 date = "{:02d}/{:02d}".format(int(match.group(1)),
                                               int(match.group(2)))
@@ -440,13 +478,13 @@ class Record():
         匹配命令，返回触发功能的序号
         """
         cmd = incmd.replace(" ", "")
-        if re.match(r"^报刀\d+[wWkK万]?$", cmd):
+        if re.match(recache.get(r"^报刀\d+[wWkK万]?$"), cmd):
             return 2
         elif (cmd == "尾刀" or cmd == "收尾" or cmd == "收掉" or cmd == "击败"):
             return 3
-        elif re.match(r"^\[CQ:at,qq=\d{5,10}\] ?(\d+[wWkK万]?|尾刀|收尾|收掉|击败)$", cmd):
+        elif re.match(recache.get(r"^\[CQ:at,qq=\d{5,10}\] ?(\d+[wWkK万]?|尾刀|收尾|收掉|击败)$"), cmd):
             return 400
-        elif re.match(r"^@.+[:：].+", cmd):
+        elif re.match(recache.get(r"^@.+[:：].+"), cmd):
             return 401
         elif cmd == "撤销":
             return 5
@@ -513,13 +551,13 @@ class Record():
         elif func_num == 400 or func_num == 401:
             self.__comment += "由{}代报,".format(self.__qqid)
             if func_num == 400:
-                match = re.match(r"\[CQ:at,qq=(\d{5,10})\] *(.+)", cmd)
+                match = re.match(recache.get(r"\[CQ:at,qq=(\d{5,10})\] *(.+)"), cmd)
             else:
-                match = re.match(r"@(.+)[:：] *(.+)", cmd)
+                match = re.match(recache.get(r"@(.+)[:：] *(.+)"), cmd)
             self.__qqid = match.group(1)
             self.__nickname = self.__qqid
             cmd = match.group(2)
-            if re.match(r"\d+[wWkK万]?$", cmd):
+            if re.match(recache.get(r"\d+[wWkK万]?$"), cmd):
                 self.__damage(cmd, comment)
             elif (cmd == "尾刀" or cmd == "收尾" or cmd == "收掉" or cmd == "击败"):
                 self.__eliminate(comment)
