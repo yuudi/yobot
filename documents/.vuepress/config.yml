@@ -1,0 +1,30 @@
+base: /yobot/
+dest: ../docs
+title: yobot
+description: 公主链接群聊机器人
+head:
+  - [link, { rel: "icon", href: "/logo/logo.ico" }]
+  - [link, { rel: "apple-touch-icon", href: "/logo/logo.ico" }]
+themeConfig:
+  logo: /logo/logo.png
+  search: false
+  smoothScroll: true
+  nav:
+    - text: 首页
+      link: /
+    - text: 安装方法
+      link: /install/
+    - text: 功能列表
+      link: /features.md
+    - text: 工具
+      items:
+        - text: 十连抽
+          link: https://yobot.xyz/p/411/
+        - text: 随机图片
+          link: https://api.v3.yobot.xyz/setu/
+    - text: 源码
+      items:
+        - text: GitHub
+          link: https://github.com/yuudi/yobot
+        - text: Gitee
+          link: https://gitee.com/yobot/yobot

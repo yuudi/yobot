@@ -1,0 +1,7 @@
+<script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    $.get("ver.json", function (data) {
+        latest = data["stable"]["url"];
+        window.location.href = latest;
+    });
+</script>

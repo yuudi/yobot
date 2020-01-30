@@ -35,6 +35,8 @@ class Message:
             reply = self.version
         elif match_num == 98:
             reply = "请查看http://h3.yobot.monster/"
+        elif match_num == 2:
+            reply = "boss被击败后我会提醒下树"
         else:
             reply = "此功能已经不再可用，请查看http://h3.yobot.monster/"
         return {

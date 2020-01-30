@@ -8,7 +8,7 @@ class Boss_dmg:
     Active = False
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
-        self.prog = re.compile(r"^((\[CQ:at,qq=\d{5,10}\])|(@.+[:：]))? ?(尾刀|收尾|收掉|击败)$")
+        self.prog = re.compile(r"((^\[CQ:at,qq=\d{5,10}\])|(^@.+[:：])|^) ?(尾刀|收尾|收掉|击败)$")
 
     @staticmethod
     def match(cmd: str) -> int:
