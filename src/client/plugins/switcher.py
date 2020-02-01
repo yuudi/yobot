@@ -142,7 +142,7 @@ class Switcher:
                     "preffix_on", "preffix_string", "zht_in", "zht_out", "zht_out_style",
                     "calender_region")
             reply = (self.dump_url(keys, "global") + "\n请在此页进行设置，完成后发送设置码即可\n"
-                     "其他设置请发送“设置卡池”、“设置邮箱”、“设置新闻”")
+                     "其他设置请发送“设置卡池”、“设置邮箱”、“设置新闻”、“设置boss”")
         elif match_num == 0x400:
             in_code = cmd[3:]
             res = self.get_url_content(self.code_api+in_code)
@@ -180,6 +180,8 @@ class Switcher:
                         "news_interval_minutes", "notify_groups", "notify_privates",
                         "calender_on", "calender_time", "calender_region")
                 reply = self.dump_url(keys, "news")
+            elif cmd == "设置boss" or cmd == "设置血量":
+                reply = "请直接修改运行目录下“boss.json”文件（懒得写网页了）"
             else:
                 reply = "未知的设置"
 

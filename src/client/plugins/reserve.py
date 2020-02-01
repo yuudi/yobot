@@ -122,7 +122,8 @@ class Reserve():
         match = re.match(recache.get(r"^我?[挂上]树上?了?$"), cmd)
         if match:
             return 0x10
-        if (cmd.endswith("尾刀") or cmd.endswith("收尾") or cmd.endswith("收掉") or cmd.endswith("击败")):
+        match = re.match(recache.get(r"^((\[CQ:at,qq=\d{5,10}\])|(@.+[:：]))? ?(尾刀|收尾|收掉|击败)$"), cmd)
+        if match:
             return 0x20
         match = re.match(recache.get(r"^[到打该]?[ABCabc老]?([一二三四五12345])[号王]?了$"), cmd)
         if match:
