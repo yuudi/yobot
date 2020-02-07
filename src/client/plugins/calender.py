@@ -1,21 +1,16 @@
 import datetime
 import json
-import os
 import re
 import time
 
+import aiohttp
 import requests
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 from arrow.arrow import Arrow
-from ics import Calendar
-from opencc import OpenCC
+from bs4 import BeautifulSoup
 
 from .yobot_errors import Input_error, Server_error
-
-
-class NamedItem:
-    def __init__(self, name=""):
-        self.name = name
 
 
 class Event_timeline:
@@ -28,7 +23,7 @@ class Event_timeline:
             daystr = t.format(fmt="YYYYMMDD", locale="zh_cn")
             if daystr not in self._tineline:
                 self._tineline[daystr] = list()
-            self._tineline[daystr].append(NamedItem(name))
+            self._tineline[daystr].append(name)
             t += datetime.timedelta(days=1)
 
     def at(self, day: Arrow):
@@ -42,16 +37,16 @@ class Event:
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
-        self.cct2s = OpenCC("t2s")
 
         # # 时区：东8区
         # self.timezone = datetime.timezone(datetime.timedelta(hours=8))
 
-        # 。。。屁东8区，ics这个库解析的时候把时区略了，加东8区会有bug，导致每天早上8点前获取的calendar会延后一天
+        # 。。。屁东8区，Arrow这个库解析的时候把时区略了，加东8区会有bug，导致每天早上8点前获取的calendar会延后一天
         self.timezone = datetime.timezone(datetime.timedelta(hours=0))
 
-        self.load_timeline(glo_setting.get("calender_region", "default"))
-        self.last_check = time.time()
+        # self.load_timeline(glo_setting.get("calender_region", "default"))
+        # self.last_check = time.time()
+        self.timeline = None
 
     def load_timeline(self, rg):
         if rg == "default":
@@ -67,30 +62,74 @@ class Event:
         else:
             raise ValueError(f"unknown region: {rg}")
 
-    def load_timeline_jp(self):
-        # 代理地址：
-        calender_source = "http://api.yobot.xyz/3.1.3/calender/"
-        # 直连地址：
-        # calender_source = r"https://calendar.google.com/calendar/ical/obeb9cdv0osjuau8e7dbgmnhts%40group.calendar.google.com/public/basic.ics"
+    async def load_timeline_async(self, rg=None):
+        if rg is None:
+            rg = self.setting.get("calender_region", "default")
+        if rg == "default":
+            self.timeline = None
+        elif rg == "jp":
+            self.timeline = await self.load_timeline_jp_async()
+        elif rg == "tw":
+            self.timeline = await self.load_timeline_tw_async()
+        elif rg == "cn":
+            self.timeline = None
+        elif rg == "kr":
+            self.timeline = None
+        else:
+            raise ValueError(f"unknown region: {rg}")
+        return []
 
-        calender = None
-        cachefile = os.path.join(self.setting["dirname"], "calender_cache.ics")
-        if os.path.exists(cachefile):
-            cached_time = time.time() - os.stat(cachefile).st_mtime
-            if cached_time < 50000:  # 缓存50000秒
-                with open(cachefile, encoding="utf-8") as f:
-                    calender = Calendar(f.read())
-        if calender is None:
-            try:
-                res = requests.get(calender_source)
-            except requests.exceptions.ConnectionError:
-                raise Server_error("无法连接服务器")
-            if res.status_code != 200:
-                raise Server_error(f"服务器状态错误：{res.status_code}")
-            with open(cachefile, "w", encoding="utf-8") as f:
-                f.write(res.text)
-            calender = Calendar(res.text)
-        return calender.timeline
+    def load_time_jp(self, timestamp) -> Arrow:
+        tz = datetime.timezone(datetime.timedelta(hours=8))
+        d_time = datetime.datetime.fromtimestamp(timestamp, tz)
+        a_time = Arrow.fromdatetime(d_time)
+        if a_time.hour < 4:
+            a_time -= datetime.timedelta(hours=4)
+        return a_time
+
+    def load_timeline_jp(self):
+        event_source = "https://gamewith.jp/pricone-re/article/show/93857"
+        try:
+            res = requests.get(event_source)
+        except requests.exceptions.ConnectionError:
+            raise Server_error("无法连接服务器")
+        if res.status_code != 200:
+            raise Server_error(f"服务器状态错误：{res.status_code}")
+        soup = BeautifulSoup(res.text, features="html.parser")
+        events_ids = set()
+        timeline = Event_timeline()
+        for event in soup.select("[data-calendar]"):
+            e = json.loads(event["data-calendar"])
+            if e["id"] in events_ids:
+                continue
+            events_ids.add(e["id"])
+            timeline.add_event(
+                self.load_time_jp(e["start_time"]),
+                self.load_time_jp(e["end_time"]),
+                e["event_name"],
+            )
+        return timeline
+
+    async def load_timeline_jp_async(self):
+        event_source = "https://gamewith.jp/pricone-re/article/show/93857"
+        async with aiohttp.request("GET", url=event_source) as response:
+            if response.status != 200:
+                raise Server_error(f"服务器状态错误：{response.status}")
+            res = await response.text()
+        soup = BeautifulSoup(res, features="html.parser")
+        events_ids = set()
+        timeline = Event_timeline()
+        for event in soup.select("[data-calendar]"):
+            e = json.loads(event["data-calendar"])
+            if e["id"] in events_ids:
+                continue
+            events_ids.add(e["id"])
+            timeline.add_event(
+                self.load_time_jp(e["start_time"]),
+                self.load_time_jp(e["end_time"]),
+                e["event_name"],
+            )
+        return timeline
 
     def load_time_tw(self, timestr) -> Arrow:
         d_time = datetime.datetime.strptime(timestr, r"%Y/%m/%d %H:%M")
@@ -108,6 +147,22 @@ class Event:
         if res.status_code != 200:
             raise Server_error(f"服务器状态错误：{res.status_code}")
         events = json.loads(res.text)
+        timeline = Event_timeline()
+        for e in events:
+            timeline.add_event(
+                self.load_time_tw(e["start_time"]),
+                self.load_time_tw(e["end_time"]),
+                e["campaign_name"],
+            )
+        return timeline
+
+    async def load_timeline_tw_async(self):
+        event_source = "https://pcredivewiki.tw/static/data/event.json"
+        async with aiohttp.request("GET", url=event_source) as response:
+            if response.status != 200:
+                raise Server_error(f"服务器状态错误：{response.status}")
+            res = await response.text()
+        events = json.loads(res)
         timeline = Event_timeline()
         for e in events:
             timeline.add_event(
@@ -146,12 +201,11 @@ class Event:
         date = Arrow.now(tzinfo=self.timezone)
         for i in range(7):
             events = self.timeline.at(date)
-            events_str = "\n    ".join(e.name for e in events)
+            events_str = "\n    ".join(events)
             if events_str == "":
                 events_str = "没有记录"
             daystr = date.format("MM月DD日")
-            reply += "\n{}：\n    {}".format(daystr,
-                                            self.cct2s.convert(events_str))
+            reply += "\n{}：\n    {}".format(daystr, events_str)
             date += datetime.timedelta(days=1)
         return reply
 
@@ -180,13 +234,16 @@ class Event:
 
     def execute(self, match_num: int, msg: dict) -> dict:
         if self.timeline is None:
-            reply = "未设置区服，请发送“{}设置”".format(
-                self.setting.get("preffix_string", ""))
+            if self.setting.get("calender_region", "default") == "default":
+                reply = "未设置区服，请发送“{}设置”".format(
+                    self.setting.get("preffix_string", ""))
+            else:
+                reply = "日程表未初始化"
             return {"reply": reply, "block": True}
         if match_num == 1:
             reply = "未知的日期，请参考http://h3.yobot.monster/"
             return {"reply": reply, "block": True}
-        self.check_and_update()
+        # self.check_and_update()
         if match_num == 4:
             reply = self.get_week_events()
             return {"reply": reply, "block": True}
@@ -195,44 +252,50 @@ class Event:
         except Input_error as e:
             return {"reply": str(e), "block": True}
 
-        events_str = "\n".join(e.name for e in events)
+        events_str = "\n".join(events)
         if events_str == "":
             events_str = "没有记录"
-        reply = "{}活动：\n{}".format(daystr, self.cct2s.convert(events_str))
+        reply = "{}活动：\n{}".format(daystr, events_str)
         return {"reply": reply, "block": True}
 
-    def send_daily(self):
+    async def send_daily_async(self):
+        print("正在刷新日程表")
+        try:
+            await self.load_timeline_async()
+        except Exception as e:
+            print("刷新日程表失败，失败原因："+str(e))
         sub_groups = self.setting.get("notify_groups", [])
         sub_users = self.setting.get("notify_privates", [])
         if not (sub_groups or sub_users):
             return
         _, events = self.get_day_events(2)
-        events_str = "\n".join(e.name for e in events)
+        events_str = "\n".join(events)
         if events_str is None:
             return
-        msg = "今日活动：\n{}".format(self.cct2s.convert(events_str))
+        msg = "今日活动：\n{}".format(events_str)
+        sends = []
         for group in sub_groups:
-            yield {
+            sends.append({
                 "message_type": "group",
                 "group_id": group,
                 "message": msg
-            }
+            })
         for userid in sub_users:
-            yield {
+            sends.append({
                 "message_type": "private",
                 "user_id": userid,
                 "message": msg
-            }
+            })
+        return sends
 
     def jobs(self):
-        if not self.setting.get("calender_on", False):
-            return tuple()
-        sub_groups = self.setting.get("notify_groups", [])
-        sub_users = self.setting.get("notify_privates", [])
-        if not (sub_groups or sub_users):
-            return tuple()
         time = self.setting.get("calender_time", "08:00")
         hour, minute = time.split(":")
         trigger = CronTrigger(hour=hour, minute=minute)
-        job = (trigger, self.send_daily)
-        return (job,)
+        job = (trigger, self.send_daily_async)
+        init_trigger = DateTrigger(
+            datetime.datetime.now() +
+            datetime.timedelta(seconds=5)
+        )  # 启动5秒后初始化
+        init_job = (init_trigger, self.load_timeline_async)
+        return (job, init_job)
