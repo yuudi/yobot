@@ -23,13 +23,6 @@ class Report():
     """
     这个类用于发送出刀报告
     """
-
-    cy_eff = [1.0, 1.0, 1.3, 1.3, 1.5,
-              1.4, 1.4, 1.8, 1.8, 2.0,
-              2.0, 2.0, 2.5, 2.5, 3.0]
-    cy_eff_2 = [1.2, 1.2, 1.3, 1.4, 1.5,
-                1.6, 1.6, 1.8, 1.9, 2.0,
-                2.0, 2.0, 2.4, 2.4, 2.6]
     txt_list = []
 
     def __init__(self,  groupid):
@@ -45,6 +38,9 @@ class Report():
             os.mkdir(os.path.join(self.__path, "report"))
         if not os.path.exists(os.path.join(self.__path, "report", "daily")):
             os.mkdir(os.path.join(self.__path, "report", "daily"))
+        with open(os.path.join(self.__path, "boss.json")) as f:
+            boss_health = json.load(f)
+            self.cy_eff = sum(boss_health["eff"], [])
 
     def __del__(self):
         pass
@@ -406,7 +402,7 @@ class Report():
             self.txt_list.append("101没有尾刀")
             return 101
         self.__rpt["yb_sorce"] = self._score(mem_data, self.yobot_eff, True)
-        self.__rpt["cy_sorce"] = self._score(mem_data, self.cy_eff_2, False)
+        self.__rpt["cy_sorce"] = self._score(mem_data, self.cy_eff, False)
         self.__rpt["proportion"] = self._proportion(
             self.__rpt["yb_sorce"], self.__rpt["cy_sorce"])
         self.__rpt["count"] = self._count(mem_data)

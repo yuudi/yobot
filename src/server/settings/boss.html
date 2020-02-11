@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
+    <title>boss设置</title>
+    <script src="https://cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
+    <script src="https://cdn.staticfile.org/clipboard.js/2.0.4/clipboard.min.js"></script>
+</head>
+
+<body>
+    <div id="boss">
+        <h2>boss血量：</h2>
+        <div v-for="area_health,area in boss_health">
+            <h4>{{key_name[area]}}</h4>
+            <table>
+                <tr>
+                    <th></th>
+                    <th v-for="k in 5">{{k}}号boss</th>
+                </tr>
+                <tr v-for="level,k in area_health">
+                    <td>{{k+1}}阶段</td>
+                    <td v-for="health,b in level"><input v-model.number="area_health[k][b]" placeholder="boss血量"
+                            type="number" v-bind="{step: (area=='eff')?0.1:1000000}" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br /><br /><br />
+        <button @click="confirm">确定</button>
+        <input id="setting_code" v-model="setting_code.code" placeholder="设置码">
+        <button class="btn" data-clipboard-target="#setting_code">复制</button>
+    </div>
+    <script src="boss.js"></script>
+</body>
+
+</html>

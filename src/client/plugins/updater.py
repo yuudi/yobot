@@ -76,6 +76,20 @@ class Updater:
             pullcheck = self.check_commit()
             if pullcheck is not None:
                 return pullcheck
+        for url in self.ver["check_url"]:
+            try:
+                response = requests.get(url)
+            except requests.ConnectionError:
+                continue
+            if response.status_code == 200:
+                server_available = True
+                break
+        if not server_available:
+            return "无法连接服务器"
+        verinfo = json.loads(response.text)
+        verinfo = verinfo[test_version]
+        if not (force or verinfo["version"] > self.ver["ver_id"]):
+            return "已经是最新版本"
         git_dir = os.path.dirname(os.path.dirname(self.path))
         cmd = '''
         cd "{}"
@@ -95,6 +109,20 @@ class Updater:
             pullcheck = self.check_commit()
             if pullcheck is not None:
                 return pullcheck
+        for url in self.ver["check_url"]:
+            try:
+                response = requests.get(url)
+            except requests.ConnectionError:
+                continue
+            if response.status_code == 200:
+                server_available = True
+                break
+        if not server_available:
+            return "无法连接服务器"
+        verinfo = json.loads(response.text)
+        verinfo = verinfo[test_version]
+        if not (force or verinfo["version"] > self.ver["ver_id"]):
+            return "已经是最新版本"
         git_dir = os.path.dirname(os.path.dirname(self.path))
         cmd = '''
         cd "{}"

@@ -61,21 +61,6 @@ class Record():
         self.txt_list = []
         global boss_health_cache
         if boss_health_cache is None:
-            if not os.path.exists(os.path.join(self.__path, "boss.json")):
-                with open(os.path.join(self.__path, "boss.json"), "w") as f:
-                        f.write(
-                    """{
-    "jp": [
-        [6000000, 8000000, 10000000, 12000000, 15000000],
-        [6000000, 8000000, 10000000, 12000000, 15000000],
-        [7000000, 9000000, 13000000, 15000000, 20000000]
-    ],
-    "tw": [
-        [6000000, 8000000, 10000000, 12000000, 15000000],
-        [6000000, 8000000, 10000000, 12000000, 15000000],
-        [6000000, 8000000, 10000000, 12000000, 15000000]
-    ]
-}""")
             with open(os.path.join(self.__path, "boss.json")) as f:
                 self.Boss_health=json5.load(f)
                 boss_health_cache = self.Boss_health

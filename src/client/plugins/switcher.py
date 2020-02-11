@@ -18,7 +18,8 @@ class Switcher:
         "global": "http://io.yobot.monster/3.1.7/settings/",
         'pool': 'http://io.yobot.monster/3.1.4-p/pool/',
         'mail': 'http://io.yobot.monster/3.1.0/mail/',
-        'news': 'http://io.yobot.monster/3.1.8/news/'
+        'news': 'http://io.yobot.monster/3.1.8/news/',
+        'boss': 'http://io.yobot.monster/3.1.15/boss/',
     }
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
@@ -50,7 +51,7 @@ class Switcher:
         elif cmd.startswith("设置码"):
             f = 0x400
         elif cmd.startswith("设置"):
-            if len(cmd) < 6:
+            if len(cmd) < 7:
                 f = 0x500
             else:
                 f = 0
@@ -118,6 +119,11 @@ class Switcher:
             json.dump(mailconf, f, indent=4)
         return '设置成功'
 
+    def setting_boss(self, new_boss_info: dict) -> str:
+        with open(os.path.join(self.setting["dirname"], "boss.json"), "w", encoding="utf-8") as f:
+            json.dump(new_boss_info, f, indent=4)
+        return '设置成功'
+
     def execute(self, match_num: int, msg: dict) -> dict:
         super_admins = self.setting.get("super-admin", list())
         restrict = self.setting.get("setting-restrict", 3)
@@ -167,6 +173,8 @@ class Switcher:
                 self.setting.update(new_setting["settings"])
                 self.save_settings()
                 reply = "设置成功，重启后生效\n发送“重启”可重新启动"
+            elif version == 3115:  # 邮箱设置
+                reply = self.setting_boss(new_setting["settings"])
             else:
                 reply = "设置码版本错误"
         elif match_num == 0x500:
@@ -180,8 +188,12 @@ class Switcher:
                         "news_interval_minutes", "notify_groups", "notify_privates",
                         "calender_on", "calender_time", "calender_region")
                 reply = self.dump_url(keys, "news")
-            elif cmd == "设置boss" or cmd == "设置血量":
-                reply = "请直接修改运行目录下“boss.json”文件（懒得写网页了）"
+            elif cmd == "设置boss":
+                with open(os.path.join(self.setting["dirname"], "boss.json")) as f:
+                    content = json.load(f)
+                query = json.dumps(content, separators=(',', ':'))
+                full_url = self.setting_url['boss'] + "?form=" + quote(query)
+                reply = shorten_url.shorten(full_url)
             else:
                 reply = "未知的设置"
 

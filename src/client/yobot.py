@@ -17,8 +17,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.1.14]"
-    Commit = {"yuudi": 34, "sunyubo": 1}
+    Version = "[v3.1.15]"
+    Commit = {"yuudi": 35, "sunyubo": 1}
 
     def __init__(self, *, data_path="", verinfo=None):
 
@@ -32,7 +32,6 @@ class Yobot:
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         config_f_path = os.path.join(dirname, "yobot_config.json")
-
         if not os.path.exists(config_f_path):
             if is_packaged:
                 default_config_f_path = os.path.join(
@@ -41,6 +40,15 @@ class Yobot:
                 default_config_f_path = os.path.join(
                     os.path.dirname(__file__), "default_config.json")
             shutil.copyfile(default_config_f_path, config_f_path)
+        boss_filepath = os.path.join(dirname, "boss.json")
+        if not os.path.exists(boss_filepath):
+            if is_packaged:
+                default_boss_filepath = os.path.join(
+                    sys._MEIPASS, "packedfiles", "default_boss.json")
+            else:
+                default_boss_filepath = os.path.join(
+                    os.path.dirname(__file__), "default_boss.json")
+            shutil.copyfile(default_boss_filepath, boss_filepath)
         with open(config_f_path, "r", encoding="utf-8") as config_file:
             try:
                 self.glo_setting = json.load(config_file)

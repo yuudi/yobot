@@ -79,6 +79,8 @@ class Consult:
                 "http://api.v3.yobot.xyz/jjc-search/?def=" + query)
         except requests.exceptions.ConnectionError:
             return "无法连接服务器"
+        if data.status_code >= 400:
+            return "无法处理的服务器状态码：{}".format(data.status_code)
         res = json.loads(data.text)
         if(res["code"] == 0):
             show_jjc_solution = self.setting.get("show_jjc_solution", "url")
@@ -89,7 +91,7 @@ class Consult:
             elif show_jjc_solution == "image":
                 reply += self.dump_photo(res)
         else:
-            raise Server_error("error code: {}, message : {}".format(
+            return ("error code: {}, message : {}".format(
                 res["code"], res["message"]))
         return reply
 

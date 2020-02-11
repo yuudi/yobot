@@ -4,7 +4,7 @@ src/client/*.bat
 src/client/*/
 !src/client/plugins/
 src/client/*.json
-!src/client/default_config.json
+!src/client/default_*
 src/client/*.csv
 src/client/*.db
 src/client/*.ics

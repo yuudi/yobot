@@ -65,19 +65,15 @@ class Event:
     async def load_timeline_async(self, rg=None):
         if rg is None:
             rg = self.setting.get("calender_region", "default")
-        if rg == "default":
-            self.timeline = None
-        elif rg == "jp":
+        if rg == "jp":
             self.timeline = await self.load_timeline_jp_async()
+            print("刷新日服日程表成功")
         elif rg == "tw":
             self.timeline = await self.load_timeline_tw_async()
-        elif rg == "cn":
-            self.timeline = None
-        elif rg == "kr":
-            self.timeline = None
+            print("刷新台服日程表成功")
         else:
-            raise ValueError(f"unknown region: {rg}")
-        return []
+            self.timeline = None
+            print(f"{rg}区域无日程表")
 
     def load_time_jp(self, timestamp) -> Arrow:
         tz = datetime.timezone(datetime.timedelta(hours=8))
@@ -201,11 +197,11 @@ class Event:
         date = Arrow.now(tzinfo=self.timezone)
         for i in range(7):
             events = self.timeline.at(date)
-            events_str = "\n    ".join(events)
+            events_str = "\n⨠".join(events)
             if events_str == "":
                 events_str = "没有记录"
             daystr = date.format("MM月DD日")
-            reply += "\n{}：\n    {}".format(daystr, events_str)
+            reply += "\n======{}======\n⨠{}".format(daystr, events_str)
             date += datetime.timedelta(days=1)
         return reply
 

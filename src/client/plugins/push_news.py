@@ -26,8 +26,8 @@ class News:
             },
             "news_jp_official": {
                 "name": "日服官网",
-                "source": "https://priconne-redive.jp/news/feed/",
-                "pattern": "标题：{title}\n链接：{link}\n{summary}",
+                "source": "https://rsshub.app/pcr/news",
+                "pattern": "{title}\n{link}",
                 "last_id": None
             },
             "news_tw_facebook": {
@@ -39,7 +39,7 @@ class News:
             "news_cn_bilibili": {
                 "name": "国服B站动态",
                 "source": "https://rsshub.app/bilibili/user/dynamic/353840826/",
-                "pattern": "{title}\n链接：{link}",
+                "pattern": "{title}\n{link}",
                 "last_id": None
             }
         }
