@@ -1,6 +1,10 @@
 {
     "host": "127.0.0.1",
     "port": 9222,
+    "public_host": null,
+    "public_basepath": "/",
+    "database_type": "sqlite",
+    "database_info": null,
     "access_token": null,
     "data_path": ".",
     "super-admin": [],
@@ -9,6 +13,7 @@
     "auto_update": true,
     "update-time": "03:30",
     "show_jjc_solution": "url",
+    "jjc_auth_key": "",
     "gacha_on": true,
     "gacha_private_on": true,
     "news_jp_official": true,

@@ -35,9 +35,7 @@ import asyncio
 
 from .yobot import Yobot
 
-if "pachpm" in sys.modules:
-    from pachpm import get_bot, scheduler
-elif "nonebot" in sys.modules:
+if "nonebot" in sys.modules:
     from nonebot import get_bot, scheduler
 else:
     raise ValueError("plugin imported before initialized")

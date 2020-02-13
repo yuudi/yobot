@@ -44,12 +44,12 @@ context = {
 
 ### 被动回复
 
-在![custom.py](https://github.com/yuudi/yobot/tree/master/src/client/plugins/custom.py)文件中可以增加简单的功能，详见文件内描述
+在![custom.py](./plugins/custom.py)文件中可以增加简单的功能，详见文件内描述
 
 ### 主动推送
 
-在![custom_push.py](https://github.com/yuudi/yobot/tree/master/src/client/plugins/custom_push.py)文件中可以增加简单的推送功能，详见文件内描述
+在![custom_push.py](./plugins/custom_push.py)文件中可以增加简单的推送功能，详见文件内描述
 
 ### RSS订阅与网页抓取
 
-见![custom_push.py](https://github.com/yuudi/yobot/tree/master/src/client/plugins/spider/README.md)
+见![custom_push.py](./plugins/spider/README.md)

@@ -77,5 +77,5 @@ class Boss_dmg:
             rsv.rsv(cmd, func)
             txt_list.extend(rsv.txt_list)
         return {
-            "reply": "\n".join(txt_list),
+            "reply": "\n-------\n".join(txt_list),
             "block": True}

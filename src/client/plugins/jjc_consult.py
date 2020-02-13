@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import time
 
 import requests
 
@@ -31,7 +32,7 @@ class Consult:
             f_csv = csv.reader(f)
             for row in f_csv:
                 for col in row[1:]:
-                    self.nickname[col] = row[0]
+                    self.nickname[col] = int(row[0])
                 self.number[int(row[0])] = row[1]
         if glo_setting.get("show_jjc_solution", None) == "image":
             photopath = os.path.join(glo_setting["dirname"], "static", "pics")
@@ -72,11 +73,21 @@ class Consult:
         return {"code": 0, "def_lst": def_lst}
 
     def jjcsearch(self, def_lst: list) -> str:
-        reply = ""
-        query = ".".join(def_lst)
+        key = self.setting.get('jjc_auth_key', None)
+        if not key:
+            return "此功能已失效"
+        header = {
+            'user-agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                           'AppleWebKit/537.36 (KHTML, like Gecko) '
+                           'Chrome/78.0.3904.87 Safari/537.36'),
+            'authorization': key,
+        }
+        payload = {"_sign": "a", "def": def_lst, "nonce": "a",
+                   "page": 1, "sort": 1, "ts": int(time.time()), "region": 1}
         try:
-            data = requests.get(
-                "http://api.v3.yobot.xyz/jjc-search/?def=" + query)
+            data = requests.post('https://api.pcrdfans.com/x/v1/search',
+                                 headers=header,
+                                 data=json.dumps(payload))
         except requests.exceptions.ConnectionError:
             return "无法连接服务器"
         if data.status_code >= 400:
@@ -85,11 +96,11 @@ class Consult:
         if(res["code"] == 0):
             show_jjc_solution = self.setting.get("show_jjc_solution", "url")
             if show_jjc_solution == "url":
-                reply += self.dump_url(res)
+                reply = self.dump_url(res)
             elif show_jjc_solution == "text":
-                reply += self.dump_text(res)
+                reply = self.dump_text(res)
             elif show_jjc_solution == "image":
-                reply += self.dump_photo(res)
+                reply = self.dump_photo(res)
         else:
             return ("error code: {}, message : {}".format(
                 res["code"], res["message"]))

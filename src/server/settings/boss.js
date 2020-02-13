@@ -22,6 +22,7 @@ var boss_health = {
         [6000000, 8000000, 10000000, 12000000, 15000000],
         [6000000, 8000000, 10000000, 12000000, 15000000],
         [7000000, 9000000, 13000000, 14000000, 17000000],
+        [7000000, 9000000, 13000000, 15000000, 20000000],
     ],
     tw: [
         [6000000, 8000000, 10000000, 12000000, 15000000],
@@ -56,7 +57,7 @@ var vm = new Vue({
         setting_code: { code: "设置码" },
     },
     methods: {
-        confirm: function (enevt) {
+        confirm: function () {
             let thisvue = this;
             let text = JSON.stringify({ version: 3115, settings: this.boss_health });
             let bodyFormData = new FormData();
@@ -69,6 +70,13 @@ var vm = new Vue({
             ).then(function (res) {
                 thisvue.setting_code.code = "设置码" + res.data;
             })
+        },
+        switch_levels: function (area) {
+            if (this.boss_health[area].length == 3) {
+                this.boss_health[area].push([0, 0, 0, 0, 0]);
+            } else {
+                this.boss_health[area].pop();
+            }
         }
     },
 });

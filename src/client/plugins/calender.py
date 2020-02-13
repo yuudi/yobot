@@ -28,7 +28,7 @@ class Event_timeline:
 
     def at(self, day: Arrow):
         daystr = day.format(fmt="YYYYMMDD", locale="zh_cn")
-        return self._tineline[daystr]
+        return self._tineline.get(daystr, ())
 
 
 class Event:

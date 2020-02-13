@@ -2,6 +2,8 @@
 
 # 祖传代码，写得稀烂，不想改了
 
+# 屎山改不动了，放弃了😫
+
 import csv
 import json
 import os
@@ -26,21 +28,26 @@ class Report():
     txt_list = []
 
     def __init__(self,  groupid):
-        self.__groupid = groupid
-        self.__path = os.path.dirname(sys.argv[0])
+        self._groupid = groupid
+        self._path = os.path.dirname(sys.argv[0])
         self.yobot_eff = [0]*15
         self.tailing_eff = 0.0
-        self.rpt_name = self.__groupid + \
+        self.rpt_name = self._groupid + \
             time.strftime("_%Y%m%d_%H%M%S", time.localtime())
-        self.__rpt = {}
+        self._rpt = {}
         self.txt_list = []
-        if not os.path.exists(os.path.join(self.__path, "report")):
-            os.mkdir(os.path.join(self.__path, "report"))
-        if not os.path.exists(os.path.join(self.__path, "report", "daily")):
-            os.mkdir(os.path.join(self.__path, "report", "daily"))
-        with open(os.path.join(self.__path, "boss.json")) as f:
+        if not os.path.exists(os.path.join(self._path, "report")):
+            os.mkdir(os.path.join(self._path, "report"))
+        if not os.path.exists(os.path.join(self._path, "report", "daily")):
+            os.mkdir(os.path.join(self._path, "report", "daily"))
+        with open(os.path.join(self._path, "boss.json")) as f:
             boss_health = json.load(f)
-            self.cy_eff = sum(boss_health["eff"], [])
+            if "eff" in boss_health:
+                self.cy_eff = sum(boss_health["eff"], [])
+            else:
+                self.cy_eff = (1.2, 1.2, 1.3, 1.4, 1.5,
+                               1.6, 1.6, 1.8, 1.9, 2.0,
+                               2.0, 2.0, 2.4, 2.4, 2.6)
 
     def __del__(self):
         pass
@@ -58,13 +65,13 @@ class Report():
                 else:
                     mdata[opt[2]] = [(opt[1], lv, opt[5], opt[6])]
                 bdata[lv].append((opt[1], opt[2], opt[5], opt[6]))
-        # self.__rpt["period"] = (data[0][0][1],
+        # self._rpt["period"] = (data[0][0][1],
         #                         data[0][-1][1])
         return mdata, bdata
 
     def _get_nick(self, data):
         nicks = []
-        for m in self.__rpt["mem_list"]:
+        for m in self._rpt["mem_list"]:
             if data[1][m][0] == m and m.isdigit():
                 # 使用老李api
                 res = requests.get("http://laoliapi.cn/king/qq.php?qq=" + m)
@@ -123,7 +130,7 @@ class Report():
 
     def _score(self, mdata, eff, taileff=False):
         score = []
-        for mem in self.__rpt["mem_list"]:
+        for mem in self._rpt["mem_list"]:
             s = 0
             for dmg in mdata[mem]:
                 s += int(dmg[2] * eff[dmg[1]] * (
@@ -138,7 +145,7 @@ class Report():
 
     def _count(self, mdata):
         t = []
-        for mem in self.__rpt["mem_list"]:
+        for mem in self._rpt["mem_list"]:
             c = [0, 0, 0, 0, 0]
             for dmg in mdata[mem]:
                 c[dmg[3]] += 1
@@ -147,23 +154,23 @@ class Report():
         return t
 
     def _gen_table(self, mdata):
-        with open(os.path.join(self.__path, "conf.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(self._path, "conf.json"), "r", encoding="utf-8") as f:
             conf = json.load(f)
-        time_offset = 14400 if conf[self.__groupid]["area"] == "jp" \
+        time_offset = 14400 if conf[self._groupid]["area"] == "jp" \
             else 10800  # GMT偏移：日服+4小时，台服+3小时
         date_set = set()
-        for m in self.__rpt["mem_list"]:
+        for m in self._rpt["mem_list"]:
             for d in mdata[m]:
                 date_set.add(time.strftime(
                     "%m/%d",
                     time.gmtime(d[0]+time_offset)))
         date_list = list(date_set)
         date_list.sort()
-        row, col = len(self.__rpt["mem_list"]), len(date_list)
+        row, col = len(self._rpt["mem_list"]), len(date_list)
         table_dict_list = []
         table_mem_height = []
         table_mem_count = []
-        for m in self.__rpt["mem_list"]:
+        for m in self._rpt["mem_list"]:
             m_dmg_dict = dict(zip(date_list, [[] for _ in range(col)]))
             m_height_dict = dict(zip(date_list, [0 for _ in range(col)]))
             m_count_dict = dict(zip(date_list, [0 for _ in range(col)]))
@@ -174,7 +181,7 @@ class Report():
                 dmg_time = time.strftime(
                     "(%d)%H:%M:%S",
                     time.gmtime(d[0]+28800))  # 北京时间
-                dmg_boss = "{}{}".format(["A", "B", "C"][d[1]//5], d[1] % 5+1)
+                dmg_boss = "{}-{}".format(d[1]//5, d[1] % 5+1)
                 dmg_type = ["完整刀", "尾刀", "余刀", "余尾刀"][d[3]]
                 dmg_score = int(d[2]*self.yobot_eff[d[1]] *
                                 (1. if d[3] == 0 else self.tailing_eff))
@@ -191,8 +198,8 @@ class Report():
                      [(d if i == 0 else None)for d in date_list for i in range(5)])
         table.append(["QQ号", "群名片"] +
                      ["时间", "boss", "伤害", "类型", "yobot积分"] * col)
-        itr = zip(self.__rpt["mem_list"],
-                  self.__rpt["nicknames"],
+        itr = zip(self._rpt["mem_list"],
+                  self._rpt["nicknames"],
                   table_dict_list,
                   table_mem_height)
         for qq, nickname, dmglist, height in itr:
@@ -204,8 +211,8 @@ class Report():
                 table.append(line)
         table_count = []
         table_count.append(["QQ号", "群名片"] + date_list)
-        itr = zip(self.__rpt["mem_list"],
-                  self.__rpt["nicknames"],
+        itr = zip(self._rpt["mem_list"],
+                  self._rpt["nicknames"],
                   table_mem_count)
         for qq, nickname, table_mem_count in itr:
             line = [qq, nickname]
@@ -214,16 +221,16 @@ class Report():
             table_count.append(line)
         return table, table_count
 
-    def _gen_report(self, table, count):
-        rpt_path = os.path.join(self.__path, "report", self.rpt_name)
+    def _gen_report(self, table, count, raw_data):
+        rpt_path = os.path.join(self._path, "report", self.rpt_name)
         if not os.path.exists(rpt_path):
             os.mkdir(rpt_path)
-        overview = [self.__rpt["mem_list"],
-                    self.__rpt["nicknames"],
-                    self.__rpt["yb_sorce"],
-                    self.__rpt["cy_sorce"],
-                    self.__rpt["proportion"]
-                    ]+list(map(list, zip(*self.__rpt["count"])))
+        overview = [self._rpt["mem_list"],
+                    self._rpt["nicknames"],
+                    self._rpt["yb_sorce"],
+                    self._rpt["cy_sorce"],
+                    self._rpt["proportion"]
+                    ]+list(map(list, zip(*self._rpt["count"])))
         overview_header = ["QQ号", "群名片", "yobot公式得分", "cy公式得分",
                            "yobot/cy比例", "完整刀数", "尾刀数", "余刀数", "尾余刀数", "总刀数"]
         with open(os.path.join(rpt_path, "stat.csv"), "w", newline="", encoding="utf-8-sig") as f:
@@ -236,29 +243,37 @@ class Report():
         with open(os.path.join(rpt_path, "count.csv"), "w", newline="", encoding="utf-8-sig") as f:
             wt = csv.writer(f)
             wt.writerows(count)
+        with open(os.path.join(rpt_path, "raw_data.csv"), "w", newline="", encoding="utf-8-sig") as f:
+            wt = csv.writer(f)
+            wt.writerow(("时间戳", "QQ号", "群名片", "周目数", "boss号", "伤害量", "boss剩余血量", "备注"))
+            for opt in data[0]:
+                if opt[0]:
+                    wt.writerow((opt[1], opt[2], opt[6], opt[3], opt[4], opt[5], opt[7], opt[8]))
 
     def _zip_report(self):
-        with zipfile.ZipFile(os.path.join(self.__path,
+        with zipfile.ZipFile(os.path.join(self._path,
                                           "report",
                                           self.rpt_name,
                                           self.rpt_name+".zip"),
                              compression=zipfile.ZIP_DEFLATED,
                              mode="w",
                              compresslevel=9) as z:
-            z.write(os.path.join(self.__path, "data", self.__groupid+".log"),
+            z.write(os.path.join(self._path, "data", self._groupid+".log"),
                     arcname="日志.log")
-            z.write(os.path.join(self.__path, "report", self.rpt_name, "stat.csv"),
+            z.write(os.path.join(self._path, "report", self.rpt_name, "stat.csv"),
                     arcname="数据统计.csv")
-            z.write(os.path.join(self.__path, "report", self.rpt_name, "table.csv"),
+            z.write(os.path.join(self._path, "report", self.rpt_name, "table.csv"),
                     arcname="出刀表.csv")
-            z.write(os.path.join(self.__path, "report", self.rpt_name, "count.csv"),
+            z.write(os.path.join(self._path, "report", self.rpt_name, "count.csv"),
                     arcname="每日出刀数.csv")
+            z.write(os.path.join(self._path, "report", self.rpt_name, "raw_data.csv"),
+                    arcname="原始数据.csv")
 
     def _sendmail(self):
         mailconfig = None
-        with open(os.path.join(self.__path, "mailconf.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(self._path, "mailconf.json"), "r", encoding="utf-8") as f:
             mailconfig = json.load(f)
-        if not mailconfig["subscriber"][self.__groupid]:
+        if not mailconfig["subscriber"][self._groupid]:
             self.txt_list.append("没有订阅者")
             return
         mail_host = mailconfig["sender"]["host"]
@@ -266,21 +281,20 @@ class Report():
         mail_pass = mailconfig["sender"]["pswd"]
         if mail_user == "unknown" or mail_pass == "unknown":
             self.txt_list.append("没有设置发件人，请在{}里填写发件人信息".format(
-                os.path.join(self.__path, "mailconf.json")))
+                os.path.join(self._path, "mailconf.json")))
             return
         sender = mailconfig["sender"]["sender"]
-        receivers = mailconfig["subscriber"][self.__groupid]
-        receivers.append(self.mailaddr)
+        receivers = mailconfig["subscriber"][self._groupid]
         message = MIMEMultipart()
         mail_text = MIMEText("公会战的统计报告已生成，详见附件", "plain", "utf-8")
         message.attach(mail_text)
-        with open(os.path.join(self.__path, "report", self.rpt_name, self.rpt_name+".zip"), "rb") as attach:
+        with open(os.path.join(self._path, "report", self.rpt_name, self.rpt_name+".zip"), "rb") as attach:
             mail_attach = MIMEBase("application", "octet-stream")
             mail_attach.set_payload(attach.read())
         encode_base64(mail_attach)
         mail_attach.add_header("Content-Disposition",
                                "attachment",
-                               filename=self.__groupid+"_battle_report.zip")
+                               filename=self._groupid+"_battle_report.zip")
         message.attach(mail_attach)
         message["From"] = mailconfig["sender"]["sender"]
         message["To"] = "客户"
@@ -314,7 +328,7 @@ class Report():
 
     def _uploadfile(self):
         url = 'http://api.yobot.xyz/v2/reports/'
-        f = open(os.path.join(self.__path, "report",
+        f = open(os.path.join(self._path, "report",
                               self.rpt_name, self.rpt_name+".zip"), 'rb')
         files = {'file': f}
         response = requests.post(url, files=files)
@@ -323,9 +337,9 @@ class Report():
         self.txt_list.append("公会战报告已上传，" + p)
 
     def _gen_daily(self, mdata, date=None):
-        with open(os.path.join(self.__path, "conf.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(self._path, "conf.json"), "r", encoding="utf-8") as f:
             conf = json.load(f)
-        time_offset = 14400 if conf[self.__groupid]["area"] == "jp" \
+        time_offset = 14400 if conf[self._groupid]["area"] == "jp" \
             else 10800  # GMT偏移：日服+4小时，台服+3小时
         if date == None or date == "today":
             date = time.strftime(
@@ -337,7 +351,7 @@ class Report():
                 time.gmtime(time.time()+time_offset-86400))  # pcr日
         daily = []
         daily_all = 0
-        for qq, nik in zip(self.__rpt["mem_list"], self.__rpt["nicknames"]):
+        for qq, nik in zip(self._rpt["mem_list"], self._rpt["nicknames"]):
             mem_daily = [qq, nik, 0]
             for d in mdata[qq]:
                 d_date = time.strftime(
@@ -359,19 +373,19 @@ class Report():
         daily.sort()  # 按QQ号升序排序
         daily_header = ["QQ号", "群名片", "出刀数", "出刀详情"]
         filename = os.path.join(
-            self.__path, "report", "daily", self.rpt_name+".csv")
+            self._path, "report", "daily", self.rpt_name+".csv")
         with open(filename, "w", newline="", encoding="utf-8-sig") as f:
             wt = csv.writer(f)
             wt.writerow(daily_header)
             wt.writerows(daily)
-            wt.writerow(["共{}人".format(len(self.__rpt["mem_list"])),
+            wt.writerow(["共{}人".format(len(self._rpt["mem_list"])),
                          None,
                          "共{}刀".format(daily_all)])
 
     def _upload_daily(self):
         url = 'http://api.yobot.xyz/v2/reports/'
         f = open(os.path.join(
-            self.__path, "report", "daily", self.rpt_name+".csv"), 'rb')
+            self._path, "report", "daily", self.rpt_name+".csv"), 'rb')
         files = {'file': f}
         response = requests.post(url, files=files)
         f.close()
@@ -382,11 +396,11 @@ class Report():
         """
         生成报告然后发送邮件/上传文件
         """
-        with open(os.path.join(self.__path, "data", self.__groupid+".dat"), "rb") as f:
+        with open(os.path.join(self._path, "data", self._groupid+".dat"), "rb") as f:
             raw_data = pickle.load(f)
         mem_data, boss_data = self._filt(raw_data)  # 取出成员伤害表与boss伤害表
-        self.__rpt["mem_list"] = list(mem_data)
-        self.__rpt["nicknames"] = self._get_nick(raw_data)
+        self._rpt["mem_list"] = list(mem_data)
+        self._rpt["nicknames"] = self._get_nick(raw_data)
         if mathod == "uploaddaily":
             self._gen_daily(mem_data, date)
             self._upload_daily()
@@ -401,14 +415,13 @@ class Report():
         if self.tailing_eff == None:
             self.txt_list.append("101没有尾刀")
             return 101
-        self.__rpt["yb_sorce"] = self._score(mem_data, self.yobot_eff, True)
-        self.__rpt["cy_sorce"] = self._score(mem_data, self.cy_eff, False)
-        self.__rpt["proportion"] = self._proportion(
-            self.__rpt["yb_sorce"], self.__rpt["cy_sorce"])
-        self.__rpt["count"] = self._count(mem_data)
-        self.mailaddr = "yu@yobot.xyz"
+        self._rpt["yb_sorce"] = self._score(mem_data, self.yobot_eff, True)
+        self._rpt["cy_sorce"] = self._score(mem_data, self.cy_eff, False)
+        self._rpt["proportion"] = self._proportion(
+            self._rpt["yb_sorce"], self._rpt["cy_sorce"])
+        self._rpt["count"] = self._count(mem_data)
         table, count = self._gen_table(mem_data)
-        self._gen_report(table=table, count=count)
+        self._gen_report(table=table, count=count, raw_data=raw_data)
         self._zip_report()
         if mathod == "sendmail":
             self._sendmail()
