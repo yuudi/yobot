@@ -12,6 +12,7 @@ import requests
 class Char_consult:
     Passive = True
     Active = False
+    Request = False
     Nick_URL = "http://api.yobot.xyz/v2/nicknames/?type=csv"
     Char_URL = "http://api.yobot.xyz/v2/nicknames/?type=charpage"
 

@@ -3,9 +3,12 @@
 from . import dmg_record, lock_boss, reserve
 import re
 
+
 class Boss_dmg:
     Passive = True
     Active = False
+    Request = False
+
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
         self.prog = re.compile(r"^((\[CQ:at,qq=\d{5,10}\])|(@.+[:：]))? ?(尾刀|收尾|收掉|击败)$")
@@ -45,7 +48,7 @@ class Boss_dmg:
             if msg["sender"]["user_id"] in super_admins:
                 role = 0
             else:
-                role_str = msg["sender"].get("role",None)
+                role_str = msg["sender"].get("role", None)
                 if role_str == "owner":
                     role = 1
                 elif role_str == "admin":
@@ -56,24 +59,25 @@ class Boss_dmg:
                 reply = "你的权限不足"
                 return {"reply": reply, "block": True}
         txt_list = []
+        basepath = self.setting["dirname"]
         if swit == 0x1000:
-            lockboss = lock_boss.Lock(cmd_list[:3])
+            lockboss = lock_boss.Lock(cmd_list[:3], basepath)
             lockboss.lockboss(cmd, func, comment=cmt)
             txt_list.extend(lockboss.txt_list)
         if swit == 0x2000:
-            report = dmg_record.Record(cmd_list[:3])
+            report = dmg_record.Record(cmd_list[:3], basepath)
             report.rep(cmd, func)
             txt_list.extend(report.txt_list)
             if re.match(self.prog, cmd):
-                rsv = reserve.Reserve(cmd_list[:3])
+                rsv = reserve.Reserve(cmd_list[:3], basepath)
                 rsv.rsv(cmd, 0x20)
                 txt_list.extend(rsv.txt_list)
             if func == 2 or func == 3 or func == 400 or func == 401:
-                lockboss = lock_boss.Lock(cmd_list[:3])
+                lockboss = lock_boss.Lock(cmd_list[:3], basepath)
                 lockboss.boss_challenged()
                 txt_list.extend(lockboss.txt_list)
         if swit == 0x3000:
-            rsv = reserve.Reserve(cmd_list[:3])
+            rsv = reserve.Reserve(cmd_list[:3], basepath)
             rsv.rsv(cmd, func)
             txt_list.extend(rsv.txt_list)
         return {

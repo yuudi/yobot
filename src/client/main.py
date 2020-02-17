@@ -4,6 +4,7 @@
 
 import asyncio
 import json
+import os
 
 from aiocqhttp import CQHttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -12,23 +13,40 @@ import yobot
 
 
 def main():
+    print("""==============================
+              _           _
+             | |         | |
+  _   _  ___ | |__   ___ | |_
+ | | | |/ _ \| '_ \ / _ \| __|
+ | |_| | (_) | |_) | (_) | |_
+  \__, |\___/|_.__/ \___/ \__|
+   __/ |
+  |___/
+==============================""")
     print("正在初始化...")
 
-    bot = yobot.Yobot()
+    if os.path.exists("yobot_config.json"):
+        with open("yobot_config.json", "r") as f:
+            config = json.load(f)
+        token = config.get("access_token", None)
+        if token is None:
+            print("警告：没有设置access_token，这可能会带来安全隐患")
+    else:
+        token = None
 
-    with open("yobot_config.json", "r") as f:
-        config = json.load(f)
-    host = config.get("host", "127.0.0.1")
-    port = config.get("port", 9222)
-    token = config.get("access_token", None)
+    cqbot = CQHttp(access_token=token,
+                   enable_http_post=False)
+    bot = yobot.Yobot(data_path=".",
+                      quart_app=cqbot.server_app,
+                      send_msg_func=cqbot.send_msg,
+                      )
+    host = bot.glo_setting.get("host", "0.0.0.0")
+    port = bot.glo_setting.get("port", 9222)
 
-    rcnb = CQHttp(access_token=token,
-                  enable_http_post=False)
-
-    @rcnb.on_message
+    @cqbot.on_message
     async def handle_msg(context):
         if context["message_type"] == "group" or context["message_type"] == "private":
-            reply = bot.proc(context)
+            reply = await bot.proc_async(context)
         else:
             reply = None
         if reply != "" and reply is not None:
@@ -44,26 +62,8 @@ def main():
             to_sends = func()
         if to_sends is None:
             return
-        tasks = [rcnb.send_msg(**kwargs) for kwargs in to_sends]
+        tasks = [cqbot.send_msg(**kwargs) for kwargs in to_sends]
         await asyncio.gather(*tasks)
-
-    # # 如果要使用WebHook，可以用如下方法
-    # # WehHook的端口号与机器人端口号相同
-    # app = rcnb.server_app
-
-    # from quart import request
-    # @app.route("/webhook",  # webhook路径
-    #            methods=['POST', 'GET'],  # 允许get和post
-    #            host="0.0.0.0")  # 允许所有网络访问
-    # async def webhook():
-    #     if request.method = "GET":
-    #         return("use post!")
-    #     data = await request.get_data()  # 如果方式是post，获取post内容
-    #     text = data.decode("utf-8")  # 将post解码为字符串
-    #     await rcnb.send_msg(message_type="private",  # 私聊发送消息
-    #                         user_id=123456789,  # QQ号
-    #                         # group_id=123456789, # 如果message_type是"group"则用group_id
-    #                         message="text")  # 内容
 
     jobs = bot.active_jobs()
     if jobs:
@@ -79,7 +79,7 @@ def main():
 
     print("初始化完成，启动服务...")
 
-    rcnb.run(host=host, port=port)
+    cqbot.run(host=host, port=port, debug=False, use_reloader=False)
 
 
 if __name__ == "__main__":

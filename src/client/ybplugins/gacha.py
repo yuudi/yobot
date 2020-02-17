@@ -9,12 +9,13 @@ from typing import List, Union
 
 import requests
 
-from .yobot_errors import Coding_error, Server_error
+from .yobot_exceptions import CodingError, ServerError
 
 
 class Gacha:
     Passive = True
     Active = False
+    Request = False
     URL = "http://api.yobot.xyz/3.1.4/pool.json"
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
@@ -26,9 +27,9 @@ class Gacha:
             try:
                 res = requests.get(self.URL)
             except requests.exceptions.ConnectionError:
-                raise Server_error("连接服务器失败")
+                raise ServerError("连接服务器失败")
             if res.status_code != 200:
-                raise Server_error(
+                raise ServerError(
                     "bad server response. code: "+str(res.status_code))
             with open(self.pool_file_path, "w", encoding="utf-8") as f:
                 f.write(res.text)
@@ -38,7 +39,7 @@ class Gacha:
                 try:
                     self._pool = json.load(f)
                 except json.JSONDecodeError:
-                    raise Coding_error("卡池文件解析错误，请检查卡池文件语法")
+                    raise CodingError("卡池文件解析错误，请检查卡池文件语法")
 
     def result(self) -> List[str]:
         prop = 0.

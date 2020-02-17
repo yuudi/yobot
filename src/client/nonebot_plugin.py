@@ -10,6 +10,8 @@
 如果使用git，记得`git commit -a`
 """
 
+from .yobot import Yobot
+import asyncio
 import sys
 
 if __name__ == "__main__":
@@ -31,28 +33,29 @@ if __name__ == "__main__":
 
     sys.exit()
 
-import asyncio
-
-from .yobot import Yobot
 
 if "nonebot" in sys.modules:
     from nonebot import get_bot, scheduler
 else:
-    raise ValueError("plugin imported before initialized")
+    raise ValueError("plugin imported before noenbot imported")
 
 verinfo = {
     "run-as": "nonebot-plugin",
     "ver_name": "yobot{}插件版".format(Yobot.Version),
 }
 
-rcnb = get_bot()
-bot = Yobot(data_path="./yobot_data", verinfo=verinfo)
+cqbot = get_bot()
+bot = Yobot(data_path="./yobot_data",
+            verinfo=verinfo,
+            quart_app=cqbot.server_app,
+            send_msg_func=cqbot.send_msg,
+            )
 
 
-@rcnb.on_message
+@cqbot.on_message
 async def handle_msg(context):
     if context["message_type"] == "group" or context["message_type"] == "private":
-        reply = bot.proc(context)
+        reply = await bot.proc_async(context)
     else:
         reply = None
     if reply != "" and reply is not None:
@@ -69,7 +72,7 @@ async def send_it(func):
         to_sends = func()
     if to_sends is None:
         return
-    tasks = [rcnb.send_msg(**kwargs) for kwargs in to_sends]
+    tasks = [cqbot.send_msg(**kwargs) for kwargs in to_sends]
     await asyncio.gather(*tasks)
 
 jobs = bot.active_jobs()

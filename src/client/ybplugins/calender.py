@@ -10,7 +10,7 @@ from apscheduler.triggers.date import DateTrigger
 from arrow.arrow import Arrow
 from bs4 import BeautifulSoup
 
-from .yobot_errors import Input_error, Server_error
+from .yobot_exceptions import InputError, ServerError
 
 
 class Event_timeline:
@@ -34,6 +34,7 @@ class Event_timeline:
 class Event:
     Passive = True
     Active = True
+    Request = False
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
@@ -88,9 +89,9 @@ class Event:
         try:
             res = requests.get(event_source)
         except requests.exceptions.ConnectionError:
-            raise Server_error("无法连接服务器")
+            raise ServerError("无法连接服务器")
         if res.status_code != 200:
-            raise Server_error(f"服务器状态错误：{res.status_code}")
+            raise ServerError(f"服务器状态错误：{res.status_code}")
         soup = BeautifulSoup(res.text, features="html.parser")
         events_ids = set()
         timeline = Event_timeline()
@@ -110,7 +111,7 @@ class Event:
         event_source = "https://gamewith.jp/pricone-re/article/show/93857"
         async with aiohttp.request("GET", url=event_source) as response:
             if response.status != 200:
-                raise Server_error(f"服务器状态错误：{response.status}")
+                raise ServerError(f"服务器状态错误：{response.status}")
             res = await response.text()
         soup = BeautifulSoup(res, features="html.parser")
         events_ids = set()
@@ -139,9 +140,9 @@ class Event:
         try:
             res = requests.get(event_source)
         except requests.exceptions.ConnectionError:
-            raise Server_error("无法连接服务器")
+            raise ServerError("无法连接服务器")
         if res.status_code != 200:
-            raise Server_error(f"服务器状态错误：{res.status_code}")
+            raise ServerError(f"服务器状态错误：{res.status_code}")
         events = json.loads(res.text)
         timeline = Event_timeline()
         for e in events:
@@ -156,7 +157,7 @@ class Event:
         event_source = "https://pcredivewiki.tw/static/data/event.json"
         async with aiohttp.request("GET", url=event_source) as response:
             if response.status != 200:
-                raise Server_error(f"服务器状态错误：{response.status}")
+                raise ServerError(f"服务器状态错误：{response.status}")
             res = await response.text()
         events = json.loads(res)
         timeline = Event_timeline()
@@ -188,7 +189,7 @@ class Event:
             try:
                 date = Arrow(2000+year, month, day)
             except ValueError as v:
-                raise Input_error("日期错误：{}".format(v))
+                raise InputError("日期错误：{}".format(v))
         events = self.timeline.at(date)
         return (daystr, events)
 
@@ -245,7 +246,7 @@ class Event:
             return {"reply": reply, "block": True}
         try:
             daystr, events = self.get_day_events(match_num)
-        except Input_error as e:
+        except InputError as e:
             return {"reply": str(e), "block": True}
 
         events_str = "\n".join(events)

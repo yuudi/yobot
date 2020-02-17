@@ -17,8 +17,9 @@ from typing import Any, Callable, Dict, Iterable, Tuple
 
 
 class Custom_push:
-    Passive = False  # 被动触发，即一问一答
-    Active = True  # 主动触发，即定时任务
+    Passive = False  # 被动任务，由消息触发
+    Active = True  # 主动任务，定时触发
+    Request = False  # 请求任务，由网络请求触发
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         '''初始化，只在启动时执行一次'''

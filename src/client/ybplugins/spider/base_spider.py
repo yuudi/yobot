@@ -1,3 +1,4 @@
+import abc
 import json
 import time
 from dataclasses import dataclass
@@ -64,6 +65,7 @@ class Base_spider:
             print("咨询获取错误：{}，错误码：{}".format(self.name, code))
             return None
 
+    @abc.abstractmethod
     def get_items(self, response: Union[BeautifulSoup, dict]) -> List[Item]:
         ...
 

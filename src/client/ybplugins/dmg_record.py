@@ -2,13 +2,13 @@
 
 # 祖传代码，写得稀烂，不想改了
 
+# 屎山改不动了，放弃了😫
 
 import json
 import os
 import pickle
 import random
 import re
-import sys
 import time
 
 from .dmg_report import Report
@@ -46,14 +46,14 @@ class Record():
     }
     txt_list = []
 
-    def __init__(self, baseinfo):
+    def __init__(self, baseinfo, basepath):
         """
         baseinfo=[群号, QQ号, 群名片]（字符串）
         """
         self._groupid = baseinfo[0]
         self._qqid = baseinfo[1]
         self._nickname = baseinfo[2]
-        self._path = os.path.dirname(sys.argv[0])
+        self._path = basepath
         self._show_status = True
         self._data = []
         self._comment = ""
@@ -432,12 +432,12 @@ class Record():
             self._comment += "查询成功"
 
     def _sendmail(self):
-        r = Report(self._groupid)
+        r = Report(self._groupid, self._path)
         r.report(mathod="sendmail")
         self.txt_list.extend(r.txt_list)
 
     def _uploadfile(self):
-        r = Report(self._groupid)
+        r = Report(self._groupid, self._path)
         r.report(mathod="uploadfile")
         self.txt_list.extend(r.txt_list)
 
@@ -455,7 +455,7 @@ class Record():
                 self._comment += "参数错误"
                 self.txt_list.append("600参数错误")
                 return
-        r = Report(self._groupid)
+        r = Report(self._groupid, self._path)
         r.report(mathod="uploaddaily", date=date)
         self.txt_list.extend(r.txt_list)
 

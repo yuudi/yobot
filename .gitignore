@@ -2,7 +2,8 @@
 .vscode/
 src/client/*.bat
 src/client/*/
-!src/client/plugins/
+!src/client/ybplugins/
+!src/client/public/
 src/client/*.json
 !src/client/default_*
 src/client/*.csv

@@ -1,12 +1,13 @@
-# coding=utf-8
-
+from urllib.parse import urljoin
 
 
 class Message:
     Passive = True
     Active = False
-    
+    Request = False
+
     def __init__(self, glo_setting: dict, *args, **kwargs):
+        self.public_addr = glo_setting["public_addr"]
         self.version = glo_setting["verinfo"]["ver_name"]
 
     @staticmethod
@@ -34,7 +35,8 @@ class Message:
         if match_num == 99:
             reply = self.version
         elif match_num == 98:
-            reply = "请查看http://h3.yobot.monster/"
+            reply = "功能表：http://h3.yobot.monster/\n\n新版功能表（测试中）：{}".format(
+                urljoin(self.public_addr, "help"))
         elif match_num == 2:
             reply = "boss被击败后我会提醒下树"
         else:

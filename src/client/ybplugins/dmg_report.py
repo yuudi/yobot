@@ -9,7 +9,6 @@ import json
 import os
 import pickle
 import smtplib
-import sys
 import time
 import zipfile
 from email.encoders import encode_base64
@@ -27,9 +26,9 @@ class Report():
     """
     txt_list = []
 
-    def __init__(self,  groupid):
+    def __init__(self, groupid, basepath):
         self._groupid = groupid
-        self._path = os.path.dirname(sys.argv[0])
+        self._path = basepath
         self.yobot_eff = [0]*15
         self.tailing_eff = 0.0
         self.rpt_name = self._groupid + \
@@ -246,9 +245,9 @@ class Report():
         with open(os.path.join(rpt_path, "raw_data.csv"), "w", newline="", encoding="utf-8-sig") as f:
             wt = csv.writer(f)
             wt.writerow(("时间戳", "QQ号", "群名片", "周目数", "boss号", "伤害量", "boss剩余血量", "备注"))
-            for opt in data[0]:
+            for opt in raw_data[0]:
                 if opt[0]:
-                    wt.writerow((opt[1], opt[2], opt[6], opt[3], opt[4], opt[5], opt[7], opt[8]))
+                    wt.writerow((opt[1], opt[2], raw_data[1][opt[2]][0], opt[3], opt[4], opt[5], opt[7], opt[8]))
 
     def _zip_report(self):
         with zipfile.ZipFile(os.path.join(self._path,

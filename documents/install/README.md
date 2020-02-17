@@ -8,6 +8,8 @@
 
 直接运行 yobot.exe
 
+[快速使用](/install/Windows-quick-start.md)☚最简单
+
 [详细说明](/install/Windows-package.md)
 
 ## Windows 源码运行

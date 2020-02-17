@@ -2,10 +2,11 @@
 
 # todo:这个文件还没有为3.0修改过
 
+# 屎山改不动了，放弃了😫
+
 import json
 import os.path
 import re
-import sys
 
 
 class Re_cache:
@@ -25,89 +26,89 @@ class Reserve():
 
     txt_list = []
 
-    def __init__(self, baseinfo):
+    def __init__(self, baseinfo, basepath):
         """
         baseinfo=[群号，QQ号, 群名片]（字符串）
         """
-        self.__groupid = baseinfo[0]
-        self.__qqid = baseinfo[1]
-        self.__nickname = baseinfo[2]
-        self.__path = os.path.dirname(sys.argv[0])
-        if os.path.exists(os.path.join(self.__path, "reservation.json")):
-            with open(os.path.join(self.__path, "reservation.json"), "r", encoding="utf-8") as f:
-                self.__data = json.load(f)
+        self._groupid = baseinfo[0]
+        self._qqid = baseinfo[1]
+        self._nickname = baseinfo[2]
+        self._path = basepath
+        if os.path.exists(os.path.join(self._path, "reservation.json")):
+            with open(os.path.join(self._path, "reservation.json"), "r", encoding="utf-8") as f:
+                self._data = json.load(f)
         else:
-            self.__data = {}
+            self._data = {}
         self.txt_list = []
 
     def __del__(self):
         pass
 
-    def __save(self):
-        with open(os.path.join(self.__path, "reservation.json"), "w", encoding="utf-8") as f:
-            json.dump(self.__data, f, ensure_ascii=False, indent=2)
+    def _save(self):
+        with open(os.path.join(self._path, "reservation.json"), "w", encoding="utf-8") as f:
+            json.dump(self._data, f, ensure_ascii=False, indent=2)
 
-    def __res_boss(self, boss):
-        if not self.__groupid in self.__data:
-            self.__data[self.__groupid] = {}
-        if not boss in self.__data[self.__groupid]:
-            self.__data[self.__groupid][boss] = {}
-        if self.__qqid in self.__data[self.__groupid][boss]:
+    def _res_boss(self, boss):
+        if not self._groupid in self._data:
+            self._data[self._groupid] = {}
+        if not boss in self._data[self._groupid]:
+            self._data[self._groupid][boss] = {}
+        if self._qqid in self._data[self._groupid][boss]:
             self.txt_list.append(
-                self.__nickname +
+                self._nickname +
                 ("已经在树上了" if boss == "0" else "已经预约过了"))
         else:
-            self.__data[self.__groupid][boss][self.__qqid] = self.__nickname
+            self._data[self._groupid][boss][self._qqid] = self._nickname
             self.txt_list.append(
-                self.__nickname +
+                self._nickname +
                 ("挂树了，目前挂树人数：" if boss == "0" else "预约成功，目前预约人数：") +
-                str(len(self.__data[self.__groupid][boss])))
-            self.__save()
+                str(len(self._data[self._groupid][boss])))
+            self._save()
 
-    def __notify(self, boss):
+    def _notify(self, boss):
         trig = (boss == "0")  # 被动触发
         if trig:  # 查找boss号
-            with open(os.path.join(self.__path, "conf.json"), "r", encoding="utf-8") as f:
+            with open(os.path.join(self._path, "conf.json"), "r", encoding="utf-8") as f:
                 conf = json.load(f)
-            if not self.__groupid in conf:
+            if not self._groupid in conf:
                 return  # 被动触发且没有数据
-            boss = str(conf[self.__groupid]["boss"])
-        output = self.__data.get(self.__groupid, {}).get(boss, {})
-        tree = self.__data.get(self.__groupid, {}).get("0", {})
+            boss = str(conf[self._groupid]["boss"])
+        output = self._data.get(self._groupid, {}).get(boss, {})
+        tree = self._data.get(self._groupid, {}).get("0", {})
         if tree != {}:  # 如果树上有人
             self.txt_list.append("boss已被击败")
             ats = ["[CQ:at,qq="+qq+"]" for qq in tree]
             self.txt_list.append(" ".join(ats))
-            del self.__data[self.__groupid]["0"]
-            self.__save()
+            del self._data[self._groupid]["0"]
+            self._save()
         if output == {} and trig:
             return  # 被动触发且没有数据
         self.txt_list.append(boss+"号boss已出现")
         if output != {}:
             ats = ["[CQ:at,qq="+qq+"]" for qq in output]
             self.txt_list.append(" ".join(ats))
-            del self.__data[self.__groupid][boss]
-            self.__save()
+            del self._data[self._groupid][boss]
+            self._save()
 
-    def __canc_res(self, boss):
-        if self.__groupid in self.__data:
-            if boss in self.__data[self.__groupid]:
-                if self.__qqid in self.__data[self.__groupid][boss]:
-                    del self.__data[self.__groupid][boss][self.__qqid]
+    def _canc_res(self, boss):
+        if self._groupid in self._data:
+            if boss in self._data[self._groupid]:
+                if self._qqid in self._data[self._groupid][boss]:
+                    del self._data[self._groupid][boss][self._qqid]
                     self.txt_list.append(
-                        self.__nickname +
+                        self._nickname +
                         "已取消预约")
-                    self.__save()
+                    self._save()
                     return
-        self.txt_list.append(self.__nickname + "没有预约")
+        self.txt_list.append(self._nickname + "没有预约")
 
-    def __list_res(self, boss):
-        if self.__groupid in self.__data:
-            if boss in self.__data[self.__groupid]:
+    def _list_res(self, boss):
+        if self._groupid in self._data:
+            if boss in self._data[self._groupid]:
                 self.txt_list.append(
                     ("挂树人数：" if boss =="0" else "预约人数：")
-                    +str(len(self.__data[self.__groupid][boss])))
-                for name in self.__data[self.__groupid][boss].values():
+                    +str(len(self._data[self._groupid][boss])))
+                for name in self._data[self._groupid][boss].values():
                     self.txt_list.append(name)
                 return
         self.txt_list.append("挂树人数：0" if boss =="0" else "预约人数：0")
@@ -147,13 +148,13 @@ class Reserve():
         func = func_num & 0xF0
         para = str(func_num & 0x0F)
         if func == 0x10:
-            self.__res_boss(para)
+            self._res_boss(para)
         elif func == 0x20:
-            self.__notify(para)
+            self._notify(para)
         elif func == 0x30:
-            self.__canc_res(para)
+            self._canc_res(para)
         elif func == 0x40:
-            self.__list_res(para)
+            self._list_res(para)
         elif func == 0:
             self.txt_list.append("rev参数错误")
 

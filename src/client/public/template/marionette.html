@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--为什么界面这么丑，因为我不会写css。。。-->
+
+<head>
+    <title>yobot</title>
+    <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+    <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="sending">
+        <h1>Marionette</h1>
+        发送类型：
+        <select v-model="message_type">
+            <option value="private">私聊</option>
+            <option value="group">群组</option>
+        </select>
+        <div v-if="message_type=='private'">
+            QQ号：<input v-model.number="user_id" />
+        </div>
+        <div v-else>
+            群号：<input v-model.number="group_id" />
+        </div>
+        消息：<input v-model="message" />
+        <button @click="send_msg">发送</button>
+        <script>var api_path = "{{ api_path }}";</script>
+        <script src="{{ jsfile }}"></script>
+    </div>
+</body>

@@ -13,6 +13,7 @@ from apscheduler.triggers.cron import CronTrigger
 class Updater:
     Passive = True
     Active = True
+    Request = False
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.evn = glo_setting["verinfo"]["run-as"]
@@ -72,6 +73,7 @@ class Updater:
         sys.exit()
 
     def windows_update_git(self, force: bool = False, test_ver: int = 0):
+        test_version = ["stable", "beta", "alpha"][test_ver]
         if not force:
             pullcheck = self.check_commit()
             if pullcheck is not None:
@@ -105,6 +107,7 @@ class Updater:
         sys.exit()
 
     def linux_update(self, force: bool = False, test_ver: int = 0):
+        test_version = ["stable", "beta", "alpha"][test_ver]
         if not force:
             pullcheck = self.check_commit()
             if pullcheck is not None:

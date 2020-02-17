@@ -2,26 +2,38 @@
 import json
 import os
 import shutil
+import socket
 import sys
 from functools import reduce
 from typing import Any, Callable, Dict, Iterable, List, Tuple
+from urllib.parse import urljoin
 
+import jinja2
+import peewee
 from opencc import OpenCC
+from quart import Quart, send_file
 
 if __package__:
-    from .plugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
-                          updater, yobot_errors, char_consult, push_news, calender, custom)
+    from .ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
+                            updater,  char_consult, push_news, calender, custom,
+                            homepage, marionette)
 else:
-    from plugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
-                         updater, yobot_errors, char_consult, push_news, calender, custom)
+    from ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
+                           updater,  char_consult, push_news, calender, custom,
+                           homepage, marionette)
 
 
 class Yobot:
-    Version = "[v3.1.16]"
-    Commit = {"yuudi": 36, "sunyubo": 1}
+    Version = "[v3.2.0]"
+    Commit = {"yuudi": 37, "sunyubo": 1}
 
-    def __init__(self, *, data_path="", verinfo=None):
+    def __init__(self, *,
+                 data_path: str,
+                 quart_app: Quart,
+                 send_msg_func: Callable,
+                 verinfo: str = None):
 
+        # initialize config
         is_packaged = "_MEIPASS" in dir(sys)
         if is_packaged:
             basepath = os.path.dirname(sys.argv[0])
@@ -32,13 +44,15 @@ class Yobot:
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         config_f_path = os.path.join(dirname, "yobot_config.json")
+        if is_packaged:
+            default_config_f_path = os.path.join(
+                sys._MEIPASS, "packedfiles", "default_config.json")
+        else:
+            default_config_f_path = os.path.join(
+                os.path.dirname(__file__), "default_config.json")
+        with open(default_config_f_path, "r", encoding="utf-8") as config_file:
+            self.glo_setting = json.load(config_file)
         if not os.path.exists(config_f_path):
-            if is_packaged:
-                default_config_f_path = os.path.join(
-                    sys._MEIPASS, "packedfiles", "default_config.json")
-            else:
-                default_config_f_path = os.path.join(
-                    os.path.dirname(__file__), "default_config.json")
             shutil.copyfile(default_config_f_path, config_f_path)
         boss_filepath = os.path.join(dirname, "boss.json")
         if not os.path.exists(boss_filepath):
@@ -49,38 +63,87 @@ class Yobot:
                 default_boss_filepath = os.path.join(
                     os.path.dirname(__file__), "default_boss.json")
             shutil.copyfile(default_boss_filepath, boss_filepath)
-        with open(config_f_path, "r", encoding="utf-8") as config_file:
-            try:
-                self.glo_setting = json.load(config_file)
-            except:
-                raise yobot_errors.File_error(config_f_path + " been damaged")
+        with open(config_f_path, "r+", encoding="utf-8") as config_file:
+            self.glo_setting.update(json.load(config_file))
+            config_file.seek(0)
+            config_file.truncate()
+            json.dump(self.glo_setting, config_file,
+                      ensure_ascii=False, indent=4)
 
         if verinfo is None:
             verinfo = updater.get_version(self.Version, self.Commit)
+
+        # initialize database
+        self.database = peewee.SqliteDatabase(os.path.join(dirname, 'data.db'))
+
+        class database_model(peewee.Model):
+            class Meta:
+                database = self.database
+
+        # initialize web path
+        modified = False
+        if self.glo_setting.get("public_addr") is None:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                s.connect(("8.8.8.8", 53))
+                ipaddr = s.getsockname()[0]
+            self.glo_setting["public_addr"] = "http://{}:{}/{}/".format(
+                ipaddr,
+                self.glo_setting["port"],
+                self.glo_setting["public_basepath"].strip("/")
+            )
+            modified = True
+        if not self.glo_setting["public_addr"].endswith("/"):
+            self.glo_setting["public_addr"] += "/"
+            modified = True
+        if modified:
+            with open(config_f_path, "w", encoding="utf-8") as config_file:
+                json.dump(self.glo_setting, config_file,
+                          ensure_ascii=False, indent=4)
+
+        # add route for static files
+        @quart_app.route(
+            urljoin(self.glo_setting["public_basepath"], "assets/<filename>"),
+            methods=["GET"])
+        async def yobot_static(filename):
+            return await send_file(
+                os.path.join(os.path.dirname(__file__), "public/static", filename))
+
+        # openCC
+        self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))
+        self.cct2s = OpenCC("t2s")
+
+        # update runtime variables
         self.glo_setting.update({
             "dirname": dirname,
             "verinfo": verinfo
         })
+        kwargs = {
+            "glo_setting": self.glo_setting,
+            "database_model": database_model,
+            "send_msg_func": send_msg_func,
+        }
 
-        self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))
-        self.cct2s = OpenCC("t2s")
-
-        updater_plugin = updater.Updater(self.glo_setting)
-
+        # load plugins
         plug_all = [
-            updater_plugin,
-            switcher.Switcher(self.glo_setting),
-            yobot_msg.Message(self.glo_setting),
-            gacha.Gacha(self.glo_setting),
-            char_consult.Char_consult(self.glo_setting),
-            jjc_consult.Consult(self.glo_setting),
-            boss_dmg.Boss_dmg(self.glo_setting),
-            push_news.News(self.glo_setting),
-            calender.Event(self.glo_setting),
-            custom.Custom(self.glo_setting)
+            updater.Updater(**kwargs),
+            switcher.Switcher(**kwargs),
+            yobot_msg.Message(**kwargs),
+            gacha.Gacha(**kwargs),
+            char_consult.Char_consult(**kwargs),
+            jjc_consult.Consult(**kwargs),
+            boss_dmg.Boss_dmg(**kwargs),
+            push_news.News(**kwargs),
+            calender.Event(**kwargs),
+            homepage.Index(**kwargs),
+            marionette.Marionette(**kwargs),
+            custom.Custom(**kwargs),
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]
         self.plug_active = [p for p in plug_all if p.Active]
+
+        for p in plug_all:
+            if p.Request:
+                p.register_routes(quart_app)
 
     def active_jobs(self) -> List[Tuple[Any, Callable[[], Iterable[Dict[str, Any]]]]]:
         jobs = [p.jobs() for p in self.plug_active]
@@ -115,6 +178,49 @@ class Yobot:
             func_num = pitem.match(msg["raw_message"])
             if func_num:
                 res = pitem.execute(func_num, msg)
+                replys.append(res["reply"])
+                if res["block"]:
+                    break
+        reply_msg = "\n".join(replys)
+
+        # zhs-zht convertion
+        if self.glo_setting.get("zht_out", False):
+            reply_msg = self.ccs2t.convert(reply_msg)
+
+        return reply_msg
+
+    async def proc_async(self, msg: dict, *args, **kwargs) -> str:
+        '''
+        receive a message and return a reply
+        '''
+        # prefix
+        if self.glo_setting.get("preffix_on", False):
+            preffix = self.glo_setting.get("preffix_string", "")
+            if not msg["raw_message"].startswith(preffix):
+                return None
+            else:
+                msg["raw_message"] = (
+                    msg["raw_message"][len(preffix):])
+
+        # black-list
+        if msg["sender"]["user_id"] in self.glo_setting.get("black-list", list()):
+            return None
+
+        # zht-zhs convertion
+        if self.glo_setting.get("zht_in", False):
+            msg["raw_message"] = self.cct2s.convert(msg["raw_message"])
+        if msg["sender"].get("card", "") == "":
+            msg["sender"]["card"] = msg["sender"]["nickname"]
+
+        # run
+        replys = []
+        for pitem in self.plug_passive:
+            func_num = pitem.match(msg["raw_message"])
+            if func_num:
+                if hasattr(pitem, "execute_async"):
+                    res = await pitem.execute_async(func_num, msg)
+                else:
+                    res = pitem.execute(func_num, msg)
                 replys.append(res["reply"])
                 if res["block"]:
                     break

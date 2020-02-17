@@ -1,11 +1,5 @@
 # Windows 运行包（新手推荐）
 
-在 windows 下使用运行包安装可以参考[演示视频](../videos/Tutorial.mp4)
-
-## 前言
-
-如果按照此教程部署机器人，需要中等水平的电脑知识和经验。如果连用记事本打开一个 .json 文件都不会，建议在淘宝网直接搜索[QQ 机器人](https://s.taobao.com/search?q=QQ机器人)。
-
 ## 准备服务器
 
 选项 1：租一个服务器，[服务器选择参考](https://yobot.xyz/p/9/)
@@ -19,7 +13,7 @@
 #### Windows 使用
 
 yobot 三代基于酷Q机器人和 httpapi 插件实现
-如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](https://ybdown.zimingdh.com/Packed_CoolQ_httpapi.7z)
+如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](https://ybdown.zimingdh.com/CoolQ_With_Httpapi.7z)
 
 如果你已经使用过酷Q机器人，可以下载[httpapi 插件](https://ybdown.zimingdh.com/Packed_httpapi.7z)
 
@@ -39,7 +33,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 配置文件位于：`<酷Q运行目录>data\app\io.github.richardchien.coolqhttpapi\config\general.json`或 *QQ号.json* ，将其修改为[这个链接](../files/general.json)中的配置。
 
-配置正确后，启动 httpapi 插件后会反复出现如下都提示
+配置正确后，启动 httpapi 插件后会反复出现如下的提示
 
 ![配置正确图片](../imgs/8ba6b840bab3ac25.jpg)
 

@@ -13,6 +13,7 @@ from . import shorten_url
 class Switcher:
     Passive = True
     Active = False
+    Request = False
     code_api = "http://api.yobot.xyz/v3/coding/?code="
     setting_url = {
         "global": "http://io.yobot.monster/3.1.7/settings/",

@@ -2,9 +2,10 @@
 
 # todo:这个文件还没有为3.0修改过
 
+# 屎山改不动了，放弃了😫
+
 import json
 import os.path
-import sys
 import time
 
 
@@ -12,60 +13,60 @@ class Lock():
 
     txt_list = []
 
-    def __init__(self, baseinfo):
+    def __init__(self, baseinfo, basepath):
         """
         baseinfo=[群号，QQ号, 群名片]（字符串）
         """
-        self.__groupid = baseinfo[0]
-        self.__qqid = baseinfo[1]
-        self.__nickname = baseinfo[2]
-        self.__path = os.path.dirname(sys.argv[0])
-        if os.path.exists(os.path.join(self.__path, "bosslock.json")):
-            with open(os.path.join(self.__path, "bosslock.json"), "r", encoding="utf-8") as f:
-                self.__data = json.load(f)
+        self._groupid = baseinfo[0]
+        self._qqid = baseinfo[1]
+        self._nickname = baseinfo[2]
+        self._path = basepath
+        if os.path.exists(os.path.join(self._path, "bosslock.json")):
+            with open(os.path.join(self._path, "bosslock.json"), "r", encoding="utf-8") as f:
+                self._data = json.load(f)
         else:
-            self.__data = {}
+            self._data = {}
         self.txt_list = []
 
     def __del__(self):
         pass
 
-    def __save(self):
-        with open(os.path.join(self.__path, "bosslock.json"), "w", encoding="utf-8") as f:
-            json.dump(self.__data, f, ensure_ascii=False, indent=2)
+    def _save(self):
+        with open(os.path.join(self._path, "bosslock.json"), "w", encoding="utf-8") as f:
+            json.dump(self._data, f, ensure_ascii=False, indent=2)
 
-    def __apply_lock(self, comment=None):
+    def _apply_lock(self, comment=None):
         now = int(time.time())
-        if self.__data.get(self.__groupid, [0])[0] == 0:
-            self.__data[self.__groupid] = [
+        if self._data.get(self._groupid, [0])[0] == 0:
+            self._data[self._groupid] = [
                 1,  # 0无锁，1有锁
-                self.__qqid,
-                self.__nickname,
+                self._qqid,
+                self._nickname,
                 now,
                 comment]
-            self.txt_list.append(self.__nickname+"已锁定boss")
-            self.__save()
+            self.txt_list.append(self._nickname+"已锁定boss")
+            self._save()
         else:
-            bef = now - self.__data[self.__groupid][3]
+            bef = now - self._data[self._groupid][3]
             self.txt_list.append("申请失败，{}在{}分{}秒前锁定了boss".format(
-                self.__data[self.__groupid][2],
+                self._data[self._groupid][2],
                 bef // 60,
                 bef % 60))
-            if len(self.__data[self.__groupid]) == 5 and self.__data[self.__groupid][4] != None:
-                self.txt_list.append("留言："+self.__data[self.__groupid][4])
+            if len(self._data[self._groupid]) == 5 and self._data[self._groupid][4] != None:
+                self.txt_list.append("留言："+self._data[self._groupid][4])
 
-    def __cancel_lock(self):
-        if self.__data.get(self.__groupid, [0])[0] == 0:
+    def _cancel_lock(self):
+        if self._data.get(self._groupid, [0])[0] == 0:
             self.txt_list.append("boss没有被锁定")
         else:
-            if self.__data[self.__groupid][1] == self.__qqid:
-                del self.__data[self.__groupid]
+            if self._data[self._groupid][1] == self._qqid:
+                del self._data[self._groupid]
                 self.txt_list.append("boss已解锁")
-                self.__save()
+                self._save()
             else:
-                bef = int(time.time()) - self.__data[self.__groupid][3]
+                bef = int(time.time()) - self._data[self._groupid][3]
                 self.txt_list.append("{}在{}分{}秒前锁定了boss".format(
-                    self.__data[self.__groupid][2],
+                    self._data[self._groupid][2],
                     bef // 60,
                     bef % 60))
                 if bef > 180:
@@ -73,30 +74,30 @@ class Lock():
                 else:
                     self.txt_list.append("{}秒后你可以将其踢出".format(180-bef))
 
-    def __delete_lock(self):
-        if self.__data.get(self.__groupid, [0])[0] == 0:
+    def _delete_lock(self):
+        if self._data.get(self._groupid, [0])[0] == 0:
             self.txt_list.append("boss没有被锁定")
         else:
-            bef = int(time.time()) - self.__data[self.__groupid][3]
+            bef = int(time.time()) - self._data[self._groupid][3]
             if bef > 180:
-                del self.__data[self.__groupid]
+                del self._data[self._groupid]
                 self.txt_list.append("boss已解锁")
-                self.__save()
+                self._save()
             else:
                 self.txt_list.append(
                     "{}在{}分{}秒前锁定了boss，{}秒后你才可以将其踢出".format(
-                        self.__data[self.__groupid][2],
+                        self._data[self._groupid][2],
                         bef // 60,
                         bef % 60,
                         180 - bef))
 
     def boss_challenged(self):
-        if self.__data.get(self.__groupid, [0])[0] == 0:
+        if self._data.get(self._groupid, [0])[0] == 0:
             return
         else:
-            del self.__data[self.__groupid]
+            del self._data[self._groupid]
             self.txt_list.append("boss已解锁")
-            self.__save()
+            self._save()
             return
 
     @staticmethod
@@ -114,11 +115,11 @@ class Lock():
         if func_num == None:
             func_num = self.match(cmd)
         if func_num == 1:
-            self.__apply_lock(comment)
+            self._apply_lock(comment)
         elif func_num == 2:
-            self.__cancel_lock()
+            self._cancel_lock()
         elif func_num == 3:
-            self.__delete_lock()
+            self._delete_lock()
         elif func_num == 0:
             self.txt_list.append("lok参数错误")
 

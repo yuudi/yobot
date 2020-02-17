@@ -13,6 +13,7 @@ from .spider import Spiders
 class News:
     Passive = False
     Active = True
+    Request = False
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
