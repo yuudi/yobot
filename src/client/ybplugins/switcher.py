@@ -121,7 +121,7 @@ class Switcher:
         return '设置成功'
 
     def setting_boss(self, new_boss_info: dict) -> str:
-        with open(os.path.join(self.setting["dirname"], "boss.json"), "w", encoding="utf-8") as f:
+        with open(os.path.join(self.setting["dirname"], "boss3.json"), "w", encoding="utf-8") as f:
             json.dump(new_boss_info, f, indent=4)
         return '设置成功'
 
@@ -190,7 +190,7 @@ class Switcher:
                         "calender_on", "calender_time", "calender_region")
                 reply = self.dump_url(keys, "news")
             elif cmd == "设置boss":
-                with open(os.path.join(self.setting["dirname"], "boss.json")) as f:
+                with open(os.path.join(self.setting["dirname"], "boss3.json")) as f:
                     content = json.load(f)
                 query = json.dumps(content, separators=(',', ':'))
                 full_url = self.setting_url['boss'] + "?form=" + quote(query)

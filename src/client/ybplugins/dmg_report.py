@@ -39,7 +39,7 @@ class Report():
             os.mkdir(os.path.join(self._path, "report"))
         if not os.path.exists(os.path.join(self._path, "report", "daily")):
             os.mkdir(os.path.join(self._path, "report", "daily"))
-        with open(os.path.join(self._path, "boss.json")) as f:
+        with open(os.path.join(self._path, "boss3.json")) as f:
             boss_health = json.load(f)
             if "eff" in boss_health:
                 self.cy_eff = sum(boss_health["eff"], [])
@@ -75,7 +75,10 @@ class Report():
                 # 使用老李api
                 res = requests.get("http://laoliapi.cn/king/qq.php?qq=" + m)
                 if res.status_code == 200:
-                    nicks.append(json.loads(res.text).get("name", m))
+                    try:
+                        nicks.append(json.loads(res.text).get("name", m))
+                    except:
+                        nicks.append(data[1][m][0])
                 else:
                     nicks.append(data[1][m][0])
             else:

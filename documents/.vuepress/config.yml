@@ -16,6 +16,12 @@ themeConfig:
       link: /install/
     - text: 功能列表
       link: /features.md
+    - text: 高级
+      items:
+      - text: 配置文件说明
+        link: /usage/configuration.md
+      - text: Web模式
+        link: /usage/web-mode.md
     - text: 工具
       items:
         - text: 十连抽

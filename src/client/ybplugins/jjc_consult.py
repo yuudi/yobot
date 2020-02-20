@@ -78,7 +78,9 @@ class Consult:
     def jjcsearch(self, def_lst: list) -> str:
         key = self.setting.get('jjc_auth_key', None)
         if not key:
-            return "此功能已失效"
+            return ("查询网站：\n"
+                    "https://nomae.net/arenadb/（日文）\n"
+                    "https://www.pcrdfans.com/battle（中文）")
         header = {
             'user-agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                            'AppleWebKit/537.36 (KHTML, like Gecko) '

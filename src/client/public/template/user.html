@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<!--为什么界面这么丑，因为我不会写css。。。-->
+
+<head>
+    <title>yobot用户面板</title>
+</head>
+
+<body>
+    <h1>yobot用户面板</h1>
+    <div class="greeting">
+        <p>欢迎{{ user["nickname"] }}</p>
+        <div class="last-login">上次登录：{{ from_timestamp(user["last_login_time"]) }} at {{ user["last_login_ipaddr"] }}</div>
+    </div>
+    <p>用户面板功能正在开发中……</p>
+    {% if user["authority_group"] == 1 -%}
+        <p><a href="{{ url_for('yobot_setting') }}">进入设置页面</a></p>
+    {%- endif %}
+</body>

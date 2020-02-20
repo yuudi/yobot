@@ -23,7 +23,7 @@
         </div>
         消息：<input v-model="message" />
         <button @click="send_msg">发送</button>
-        <script>var api_path = "{{ api_path }}";</script>
-        <script src="{{ jsfile }}"></script>
+        <script>var api_path = "{{ url_for('yobot_marionette_api') }}";</script>
+        <script src="{{ url_for('yobot_static', filename='marionette.js') }}"></script>
     </div>
 </body>

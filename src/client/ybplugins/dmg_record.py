@@ -60,7 +60,7 @@ class Record():
         self.txt_list = []
         global boss_health_cache
         if boss_health_cache is None:
-            with open(os.path.join(self._path, "boss.json")) as f:
+            with open(os.path.join(self._path, "boss3.json")) as f:
                 self.Boss_health=json.load(f)
                 boss_health_cache = self.Boss_health
         else:

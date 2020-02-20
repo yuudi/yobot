@@ -1,6 +1,7 @@
 # coding=utf-8
 import json
 import os
+import random
 import shutil
 import socket
 import sys
@@ -16,16 +17,16 @@ from quart import Quart, send_file
 if __package__:
     from .ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
                             updater,  char_consult, push_news, calender, custom,
-                            homepage, marionette)
+                            homepage, marionette, login, settings)
 else:
     from ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
                            updater,  char_consult, push_news, calender, custom,
-                           homepage, marionette)
+                           homepage, marionette, login, settings)
 
 
 class Yobot:
-    Version = "[v3.2.0]"
-    Commit = {"yuudi": 37, "sunyubo": 1}
+    Version = "[v3.2.1]"
+    Commit = {"yuudi": 38, "sunyubo": 1}
 
     def __init__(self, *,
                  data_path: str,
@@ -54,7 +55,7 @@ class Yobot:
             self.glo_setting = json.load(config_file)
         if not os.path.exists(config_f_path):
             shutil.copyfile(default_config_f_path, config_f_path)
-        boss_filepath = os.path.join(dirname, "boss.json")
+        boss_filepath = os.path.join(dirname, "boss3.json")
         if not os.path.exists(boss_filepath):
             if is_packaged:
                 default_boss_filepath = os.path.join(
@@ -100,6 +101,11 @@ class Yobot:
                 json.dump(self.glo_setting, config_file,
                           ensure_ascii=False, indent=4)
 
+        # generate random secret_key
+        if(quart_app.secret_key is None):
+            quart_app.secret_key = bytes(
+                (random.randint(0, 255) for _ in range(16)))
+
         # add route for static files
         @quart_app.route(
             urljoin(self.glo_setting["public_basepath"], "assets/<filename>"),
@@ -136,6 +142,8 @@ class Yobot:
             calender.Event(**kwargs),
             homepage.Index(**kwargs),
             marionette.Marionette(**kwargs),
+            login.Login(**kwargs),
+            settings.Setting(**kwargs),
             custom.Custom(**kwargs),
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]

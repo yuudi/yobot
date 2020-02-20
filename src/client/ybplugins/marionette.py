@@ -1,15 +1,18 @@
+"""
+后台模式的实验性功能，验证后台交互的可行性
+"""
 import random
 import string
 import time
 from urllib.parse import urljoin
 
 import peewee
-from quart import Quart, make_response, request, send_from_directory, jsonify, url_for
+from quart import Quart, make_response, request, jsonify
 
-from .templating import render_template, static_folder
+from .templating import render_template
 
 
-def rand_string(n=8):
+def _rand_string(n=8):
     return ''.join(
         random.choice(
             string.ascii_uppercase +
@@ -47,16 +50,16 @@ class Marionette:
         self.Data = Admin_key
 
     def _gen_key(self):
-        newkey = rand_string(6)
+        newkey = _rand_string(6)
         self.Data.create(
             key=newkey,
             valid=True,
             key_used=False,
-            cookie=rand_string(32),
+            cookie=_rand_string(32),
             create_time=int(time.time()),
         )
         newurl = urljoin(
-            self.setting['public_addr'], 'marionette?key='+newkey)
+            self.setting['public_addr'], 'marionette/?key='+newkey)
         return newurl
 
     @staticmethod
@@ -86,7 +89,7 @@ class Marionette:
     def register_routes(self, app: Quart):
 
         @app.route(
-            urljoin(self.setting['public_basepath'], 'marionette'),
+            urljoin(self.setting['public_basepath'], 'marionette/'),
             methods=['GET'])
         async def yobot_marionette():
             new_cookie = None
@@ -116,16 +119,13 @@ class Marionette:
             if not user.valid:
                 return '登录已过期', 410
 
-            res = await make_response(await render_template(
-                'marionette.html',
-                jsfile=url_for('yobot_static', filename='marionette.js'),
-                api_path=url_for('yobot_marionette_api')))
+            res = await make_response(await render_template('marionette.html'))
             if new_cookie is not None:
                 res.set_cookie('yobot_auth', new_cookie, max_age=604800)
             return res
 
         @app.route(
-            urljoin(self.setting['public_basepath'], 'marionette/api'),
+            urljoin(self.setting['public_basepath'], 'marionette/api/'),
             methods=['POST'])
         async def yobot_marionette_api():
             auth = request.cookies.get('yobot_auth')
