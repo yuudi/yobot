@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
+    <title>yobot用户信息</title>
+    <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+    <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
+    <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+</head>
+
+{% if user["uid"] != visited_user["uid"] and user["authority_group"] >= 100 %}{# 不是本人且不是管理员 -#}
+<body>
+    <h1>yobot用户信息</h1>
+    <p>你无权查看这个页面</p>
+</body>
+{%- else %}{# 本人或管理员 -#}
+<body>
+    <h1>yobot用户信息</h1>
+    <div id="app">
+    <p :hidden="edit">用户名：[[ nickname ]]<el-button type="primary" size="mini" icon="el-icon-edit" @click="edit=true" circle></el-button></p>
+    <p :hidden="!edit">用户名：<el-input v-model="nickname" placeholder="昵称"></el-input><el-button type="success" size="mini" icon="el-icon-check" @click="edit_nickname" circle></el-button></p>
+    <p>用户权限：{{ user["authority_group"] }}</p>
+    <p>公会战所在群：{{ user["clan_group_id"] }}</p>
+    <p>上次登录时间：{{ from_timestamp(user["last_login_time"]) }}</p>
+    <p>上次登录ip地址：{{ user["last_login_ipaddr"] }}（[[ addr.join('') ]]）</p>
+</div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            addr: [],
+            nickname: '{{ user["nickname"] }}',
+            edit: false,
+        },
+        mounted() {
+            var thisvue = this;
+            axios.get('{{ url_for("yobot_api_iplocation", ip=user["last_login_ipaddr"]) }}').then(function (res) {                
+                thisvue.addr = res.data;
+            }).catch(function (error) {
+                console.log(error);
+                thisvue.addr = ['未知'];
+            });
+        },
+        methods: {
+            edit_nickname: function(event){
+                var thisvue = this;
+                axios.put('{{ url_for("yobot_user_info_nickname", uid=visited_user["uid"]) }}',{nickname: thisvue.nickname}).then(function (res) {
+                    thisvue.edit = false;
+                }).catch(function (error) {
+                    alert('改名失败');
+                    console.log(error);
+                })
+            },
+        },
+        delimiters: ['[[', ']]'],
+    })
+</script>
+{%- endif %}
+
+</html>

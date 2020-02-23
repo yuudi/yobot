@@ -207,7 +207,7 @@ class Updater:
         return match | ver
 
     def execute(self, match_num: int, msg: dict = {}) -> dict:
-        if self.evn=="nonebot-plugin":
+        if self.evn == "nonebot-plugin":
             return "作为插件无法这么做"
 
         super_admins = self.setting.get("super-admin", list())
@@ -276,7 +276,7 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
             "ver_name": "yobot" + base_version,
             "ver_id": 3300 + sum(base_commit.values()),
             "check_url": [
-                "https://yobot.gitee.io/v3/ver.json",
+                "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
                 "https://yuudi.github.io/yobot/v3/ver.json",
                 "http://api.yobot.xyz/v3/version/"
             ]

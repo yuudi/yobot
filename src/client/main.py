@@ -38,7 +38,7 @@ def main():
                    enable_http_post=False)
     bot = yobot.Yobot(data_path=".",
                       quart_app=cqbot.server_app,
-                      send_msg_func=cqbot.send_msg,
+                      bot_api=cqbot._api,
                       )
     host = bot.glo_setting.get("host", "0.0.0.0")
     port = bot.glo_setting.get("port", 9222)

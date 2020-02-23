@@ -5,7 +5,7 @@ import random
 import string
 import time
 from urllib.parse import urljoin
-
+from aiocqhttp.api import Api
 import peewee
 from quart import Quart, make_response, request, jsonify
 
@@ -30,11 +30,11 @@ class Marionette:
     def __init__(self,
                  glo_setting,
                  database_model: peewee.Model,
-                 send_msg_func,
+                 bot_api:Api,
                  *args, **kwargs):
         self.setting = glo_setting
         self.public_basepath = glo_setting['public_basepath']
-        self.send_msg = send_msg_func
+        self.api = bot_api
         Databasemodel = database_model
 
         class Admin_key(Databasemodel):
@@ -59,7 +59,7 @@ class Marionette:
             create_time=int(time.time()),
         )
         newurl = urljoin(
-            self.setting['public_addr'], 'marionette/?key='+newkey)
+            self.setting['public_address'], 'marionette/?key='+newkey)
         return newurl
 
     @staticmethod
@@ -138,7 +138,7 @@ class Marionette:
             if req is None:
                 return '406 Not Acceptable', 406
             try:
-                await self.send_msg(**req)
+                await self.api.send_msg(**req)
             except Exception as e:
                 return jsonify(code=1, message=str(e))
             return jsonify(code=0, message='success')

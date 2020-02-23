@@ -16,7 +16,7 @@
 
 `black-list` 黑名单 user_id 列表
 
-`setting-restrict` 权限控制，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 3
+`setting-restrict` 权限控制，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 `3`
 
 `auto_update` 自动更新，默认值 `true`
 

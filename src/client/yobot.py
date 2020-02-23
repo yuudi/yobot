@@ -9,29 +9,30 @@ from functools import reduce
 from typing import Any, Callable, Dict, Iterable, List, Tuple
 from urllib.parse import urljoin
 
-import jinja2
 import peewee
+import requests
+from aiocqhttp.api import Api
 from opencc import OpenCC
 from quart import Quart, send_file
 
 if __package__:
     from .ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
                             updater,  char_consult, push_news, calender, custom,
-                            homepage, marionette, login, settings)
+                            homepage, marionette, login, settings, web_api)
 else:
     from ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
                            updater,  char_consult, push_news, calender, custom,
-                           homepage, marionette, login, settings)
+                           homepage, marionette, login, settings, web_api)
 
 
 class Yobot:
-    Version = "[v3.2.1]"
-    Commit = {"yuudi": 38, "sunyubo": 1}
+    Version = "[v3.2.2]"
+    Commit = {"yuudi": 39, "sunyubo": 1}
 
     def __init__(self, *,
                  data_path: str,
                  quart_app: Quart,
-                 send_msg_func: Callable,
+                 bot_api: Api,
                  verinfo: str = None):
 
         # initialize config
@@ -83,18 +84,22 @@ class Yobot:
 
         # initialize web path
         modified = False
-        if self.glo_setting.get("public_addr") is None:
-            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-                s.connect(("8.8.8.8", 53))
-                ipaddr = s.getsockname()[0]
-            self.glo_setting["public_addr"] = "http://{}:{}/{}/".format(
+        if self.glo_setting.get("public_address") is None:
+            try:
+                res = requests.get("http://members.3322.org/dyndns/getip")
+                ipaddr = res.text.strip()
+            except:
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                    s.connect(("8.8.8.8", 53))
+                    ipaddr = s.getsockname()[0]
+            self.glo_setting["public_address"] = "http://{}:{}/{}/".format(
                 ipaddr,
                 self.glo_setting["port"],
                 self.glo_setting["public_basepath"].strip("/")
             )
             modified = True
-        if not self.glo_setting["public_addr"].endswith("/"):
-            self.glo_setting["public_addr"] += "/"
+        if not self.glo_setting["public_address"].endswith("/"):
+            self.glo_setting["public_address"] += "/"
             modified = True
         if modified:
             with open(config_f_path, "w", encoding="utf-8") as config_file:
@@ -126,7 +131,7 @@ class Yobot:
         kwargs = {
             "glo_setting": self.glo_setting,
             "database_model": database_model,
-            "send_msg_func": send_msg_func,
+            "bot_api": bot_api,
         }
 
         # load plugins
@@ -144,6 +149,7 @@ class Yobot:
             marionette.Marionette(**kwargs),
             login.Login(**kwargs),
             settings.Setting(**kwargs),
+            web_api.WebApi(**kwargs),
             custom.Custom(**kwargs),
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]
@@ -183,7 +189,10 @@ class Yobot:
         # run
         replys = []
         for pitem in self.plug_passive:
-            func_num = pitem.match(msg["raw_message"])
+            if hasattr(pitem, 'match'):
+                func_num = pitem.match(msg["raw_message"])
+            else:
+                func_num = True
             if func_num:
                 res = pitem.execute(func_num, msg)
                 replys.append(res["reply"])
@@ -223,7 +232,10 @@ class Yobot:
         # run
         replys = []
         for pitem in self.plug_passive:
-            func_num = pitem.match(msg["raw_message"])
+            if hasattr(pitem, 'match'):
+                func_num = pitem.match(msg["raw_message"])
+            else:
+                func_num = True
             if func_num:
                 if hasattr(pitem, "execute_async"):
                     res = await pitem.execute_async(func_num, msg)

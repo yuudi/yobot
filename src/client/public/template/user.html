@@ -1,18 +1,47 @@
 <!DOCTYPE html>
-<!--为什么界面这么丑，因为我不会写css。。。-->
 
 <head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
     <title>yobot用户面板</title>
+    <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+    <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
 <body>
     <h1>yobot用户面板</h1>
     <div class="greeting">
         <p>欢迎{{ user["nickname"] }}</p>
-        <div class="last-login">上次登录：{{ from_timestamp(user["last_login_time"]) }} at {{ user["last_login_ipaddr"] }}</div>
+        <div class="last-login">上次登录：{{ from_timestamp(user["last_login_time"]) }} at {{ user["last_login_ipaddr"] }}
+        </div>
     </div>
-    <p>用户面板功能正在开发中……</p>
-    {% if user["authority_group"] == 1 -%}
-        <p><a href="{{ url_for('yobot_setting') }}">进入设置页面</a></p>
-    {%- endif %}
+    <div id="app">
+        {% if user["authority_group"] < 100 -%}
+        <el-row>
+            <a href="{{ url_for('yobot_setting') }}">
+                <el-button type="primary">设置</el-button>
+            </a>
+            <a href="{{ url_for('yobot_users_managing') }}">
+                <el-button type="primary">用户管理</el-button>
+            </a>
+            <a href="{{ url_for('yobot_groups_managing') }}">
+                <el-button type="primary">群管理</el-button>
+            </a>
+        </el-row>
+        <br />
+        {%- endif %}
+        <el-row>
+            <a href="{{ url_for('yobot_user_info', uid=user['uid']) }}">
+                <el-button type="primary">我的主页</el-button>
+            </a>
+            <a href="#">
+                <el-button type="primary" disabled>我的公会战</el-button>
+            </a>
+        </el-row>
+    </div>
 </body>
+<script>
+    new Vue().$mount('#app');
+</script>
+
+</html>

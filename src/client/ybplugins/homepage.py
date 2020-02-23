@@ -2,7 +2,7 @@ from urllib.parse import urljoin
 
 from quart import Quart, send_from_directory
 
-from .templating import render_template, static_folder
+from .templating import render_template, static_folder, template_folder
 
 
 class Index:
@@ -30,10 +30,7 @@ class Index:
         preffix = self.setting["preffix_string"] if self.setting["preffix_on"] else ""
 
         @app.route(
-            urljoin(self.public_basepath, 'help'),
+            urljoin(self.public_basepath, 'help/'),
             methods=['GET'])
         async def yobot_help():
-            return await render_template(
-                "help.html",
-                preffix=preffix,
-            )
+            return await send_from_directory(template_folder, "help.html")

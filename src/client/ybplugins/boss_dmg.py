@@ -11,10 +11,12 @@ class Boss_dmg:
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
+        self.mode_on = (glo_setting["clan_battle_mode"] == "chat")
         self.prog = re.compile(r"^((\[CQ:at,qq=\d{5,10}\])|(@.+[:：]))? ?(尾刀|收尾|收掉|击败)$")
 
-    @staticmethod
-    def match(cmd: str) -> int:
+    def match(self, cmd: str) -> int:
+        if not self.mode_on:
+            return 0
         func = lock_boss.Lock.match(cmd)
         if func != 0:
             return func | 0x1000

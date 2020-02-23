@@ -48,7 +48,7 @@ cqbot = get_bot()
 bot = Yobot(data_path="./yobot_data",
             verinfo=verinfo,
             quart_app=cqbot.server_app,
-            send_msg_func=cqbot.send_msg,
+            bot_api=cqbot._api,
             )
 
 

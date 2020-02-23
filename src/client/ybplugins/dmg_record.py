@@ -111,7 +111,7 @@ class Record():
             return 1
         else:
             if len(self.Boss_health[self._conf[self._groupid]["area"]]) > 3:
-                if lap > 20:
+                if lap >= 35:
                     return 3
             return 2
 
