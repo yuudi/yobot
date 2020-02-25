@@ -31,12 +31,19 @@
         <br />
         {%- endif %}
         <el-row>
-            <a href="{{ url_for('yobot_user_info', uid=user['uid']) }}">
+            <a href="{{ url_for('yobot_user_info', qqid=user['qqid']) }}">
                 <el-button type="primary">我的主页</el-button>
             </a>
-            <a href="#">
-                <el-button type="primary" disabled>我的公会战</el-button>
+            {% if user['clan_group_id'] is none -%}
+            <el-tooltip effect="dark" placement="bottom">
+                <div slot="content">你还没有选择默认公会<br />请在你的公会群里发送“加入公会”来设置默认公会</div>
+                <el-button type="primary" disabled>我的公会</el-button>
+            </el-tooltip>
+            {%- else -%}
+            <a href="{{ url_for('yobot_clan', group_id=user['clan_group_id']) }}">
+                <el-button type="primary">我的公会</el-button>
             </a>
+            {%- endif %}
         </el-row>
     </div>
 </body>

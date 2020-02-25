@@ -291,8 +291,6 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
         }
     with os.popen("git shortlog --numbered --summary") as r:
         summary = r.read()
-    with os.popen("git rev-parse HEAD") as r:
-        hash_ = r.read().strip()
     logs = summary.split()
     commits = {}
     for key in base_commit.keys():
@@ -305,10 +303,18 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
                     for c in commits if commits[c] != 0]
     if extra_commit:
         vername += "\n额外的提交：\n" + "\n".join(extra_commit)
-    vername += "\nhash: {}...".format(hash_[:8])
+        with os.popen("git rev-parse HEAD") as r:
+            hash_ = r.read().strip()
+        vername += "\nhash: {}".format(hash_)
     return {
         "run-as": "python",
         "commited": True,
         "extra_commit": extra_commit,
-        "ver_name": vername
+        "ver_name": vername,
+        "ver_id": 3300 + sum(base_commit.values()),
+        "check_url": [
+            "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
+            "https://yuudi.github.io/yobot/v3/ver.json",
+            "http://api.yobot.xyz/v3/version/"
+        ],
     }

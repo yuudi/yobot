@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 from quart import Quart, jsonify, redirect, request, session, url_for
 
 from .templating import render_template
+from .ybdata import User,Clan_group
 
 
 class Setting:
@@ -14,7 +15,6 @@ class Setting:
 
     def __init__(self,
                  glo_setting,
-                 database_model,
                  bot_api,
                  *args, **kwargs):
         self.setting = glo_setting
@@ -26,7 +26,7 @@ class Setting:
             methods=['GET'])
         async def yobot_setting():
             if 'yobot_user' not in session:
-                return redirect(url_for('yobot_login'))
+                return redirect(url_for('yobot_login', callback=request.path))
             return await render_template(
                 'admin/setting.html',
                 user=session['yobot_user'],
@@ -80,12 +80,117 @@ class Setting:
 
         @app.route(
             urljoin(self.setting['public_basepath'], 'admin/users/'),
-            methods=['GET', 'PUT'])
+            methods=['GET'])
         async def yobot_users_managing():
-            return '建设中'
+            if 'yobot_user' not in session:
+                return redirect(url_for('yobot_login', callback=request.path))
+            if session['yobot_user']['authority_group'] >= 10:
+                return await render_template(
+                    'unauthorized.html',
+                    limit='机器人管理员',
+                    uath=session['yobot_user']['authority_group'],
+                )
+            return await render_template('admin/users.html')
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'admin/users/api/'),
+            methods=['POST'])
+        async def yobot_users_api():
+            if 'yobot_user' not in session:
+                return jsonify(
+                    code=10,
+                    message='Not logged in',
+                )
+            if session['yobot_user']['authority_group'] >= 10:
+                return jsonify(
+                    code=11,
+                    message='Insufficient authority',
+                )
+            try:
+                req = await request.get_json()
+                if req is None:
+                    return jsonify(
+                        code=30,
+                        message='Invalid payload',
+                    )
+                action = req['action']
+                if action == 'get_data':
+                    users = []
+                    for user in User.select():
+                        users.append({
+                            'qqid': user.qqid,
+                            'nickname': user.nickname,
+                            'clan_group_id': user.clan_group_id,
+                            'authority_group': user.authority_group,
+                            'last_login_time': user.last_login_time,
+                            'last_login_ipaddr': user.last_login_ipaddr,
+                        })
+                    return jsonify(code=0, data=users)
+                elif action == 'modify_user':
+                    data = req['data']
+                    user = User.get_or_none(qqid=data['qqid'])
+                    for key in data.keys():
+                        setattr(user, key, data[key])
+                    user.save()
+                    return jsonify(code=0, message='success')
+                else:
+                    return jsonify(code=32,message='unknown action')
+            except KeyError as e:
+                return jsonify(code=31, message=str(e))
 
         @app.route(
             urljoin(self.setting['public_basepath'], 'admin/groups/'),
-            methods=['GET', 'PUT'])
+            methods=['GET'])
         async def yobot_groups_managing():
-            return '建设中'
+            if 'yobot_user' not in session:
+                return redirect(url_for('yobot_login', callback=request.path))
+            if session['yobot_user']['authority_group'] >= 10:
+                return await render_template(
+                    'unauthorized.html',
+                    limit='机器人管理员',
+                    uath=session['yobot_user']['authority_group'],
+                )
+            return await render_template('admin/groups.html')
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'admin/groups/api/'),
+            methods=['POST'])
+        async def yobot_groups_api():
+            if 'yobot_user' not in session:
+                return jsonify(
+                    code=10,
+                    message='Not logged in',
+                )
+            if session['yobot_user']['authority_group'] >= 10:
+                return jsonify(
+                    code=11,
+                    message='Insufficient authority',
+                )
+            try:
+                req = await request.get_json()
+                if req is None:
+                    return jsonify(
+                        code=30,
+                        message='Invalid payload',
+                    )
+                action = req['action']
+                if action == 'get_data':
+                    groups = []
+                    for group in Clan_group.select():
+                        groups.append({
+                            'group_id': group.group_id,
+                            'group_name': group.group_name,
+                            'game_server': group.game_server,
+                        })
+                    return jsonify(code=0, data=groups)
+                elif action == 'modify_user':
+                    data = req['data']
+                    user = User.get_or_none(qqid=data['qqid'])
+                    for key in data.keys():
+                        setattr(user, key, data[key])
+                    user.save()
+                    return jsonify(code=0, message='success')
+                else:
+                    return jsonify(code=32,message='unknown action')
+            except KeyError as e:
+                return jsonify(code=31, message=str(e))

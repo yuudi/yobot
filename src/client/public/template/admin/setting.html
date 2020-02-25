@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 <head>
-    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
     <title>yobot设置</title>
     <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
     <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
@@ -11,8 +10,9 @@
 
 <body>
     <h1>yobot设置</h1>
-    {% if user["authority_group"] == 1 -%}
+    {% if user["authority_group"] < 10 -%}
     <div id="app">
+        <p><a href="{{ url_for('yobot_user') }}"><el-button type="primary" icon="el-icon-back" circle></el-button></a></p>
         <p>
             此站点的公开地址：<el-input v-model="setting.public_addr" placeholder="http://"></el-input>
         </p>
@@ -100,8 +100,8 @@
         </p>
         <p>
             公会战记录：
-            <el-radio v-model="setting.clan_battle_mode" label="chat">使用旧版（仅聊天）</el-radio>
-            <el-radio v-model="setting.clan_battle_mode" label="web" disabled>使用新版（聊天+网站）</el-radio>
+            <el-radio v-model="setting.clan_battle_mode" label="chat" @change="comfirm_change_clan_mode">使用旧版（仅聊天）</el-radio>
+            <el-radio v-model="setting.clan_battle_mode" label="web" @change="comfirm_change_clan_mode">使用新版（聊天+网站）</el-radio>
         </p>
         <p>
             <a @click="hide_jjckey+=1">模拟抽卡：</a>
@@ -185,9 +185,9 @@
     <p>你的权限不足</p>
     {%- endif %}
 </body>
-{% if user["authority_group"] == 1 -%}
+{% if user["authority_group"] < 10 -%}
 <script>var api_path = "{{ url_for('yobot_setting_api') }}";</script>
-<script src="{{ url_for('yobot_static', filename='setting.js') }}"></script>
+<script src="{{ url_for('yobot_static', filename='admin/setting.js') }}"></script>
 {%- endif %}
 
 </html>

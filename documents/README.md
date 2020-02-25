@@ -44,14 +44,6 @@ yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊�
 
 ![预约boss](./imgs/Kf2QPK.png)
 
-### 竞技场查询助手
-
-通过机器人快速查询竞技场阵容的解法
-
-（数据由[公主连结Re: Dive Fan Club](https://pcrdfans.com/)提供）
-
-![竞技场查询](./imgs/KfRDFx.jpg)
-
 ### 新闻推送
 
 机器人主动发送游戏新闻与活动提醒
@@ -74,3 +66,11 @@ yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊�
 ## 源码
 
 <https://gitee.com/yobot/yobot>
+
+## 使用协议
+
+使用时请遵循[GPL-3.0协议](https://www.gnu.org/licenses/gpl-3.0.html)，简单地说：
+
+- 自己使用、不重新分发，没有限制
+- 对本工具免费或收费提供下载或其它服务，需要在明显地方**说明本工具可以免费获取**并注明出处
+- 修改源代码并发布修改后的代码或提供其它服务，需要开放源码、改变名称、提供出处、说明变动、保持协议不变

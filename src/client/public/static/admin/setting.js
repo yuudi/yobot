@@ -30,7 +30,13 @@ var vm = new Vue({
             }).catch(function (error) {
                 alert(error);
             });
-        }
+        },
+        comfirm_change_clan_mode: function (event) {
+            this.$alert('修改模式后，公会战数据会重置。请不要在公会战期间修改！', '警告', {
+                confirmButtonText: '知道了',
+                type: 'warning',
+            });
+        },
     },
     watch: {
         'setting.public_basepath': function (newpath) {

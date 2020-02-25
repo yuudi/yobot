@@ -5,11 +5,13 @@ import random
 import string
 import time
 from urllib.parse import urljoin
-from aiocqhttp.api import Api
+
 import peewee
-from quart import Quart, make_response, request, jsonify
+from aiocqhttp.api import Api
+from quart import Quart, jsonify, make_response, request, url_for
 
 from .templating import render_template
+from .ybdata import Admin_key
 
 
 def _rand_string(n=8):
@@ -29,29 +31,15 @@ class Marionette:
 
     def __init__(self,
                  glo_setting,
-                 database_model: peewee.Model,
-                 bot_api:Api,
+                 bot_api: Api,
                  *args, **kwargs):
         self.setting = glo_setting
         self.public_basepath = glo_setting['public_basepath']
         self.api = bot_api
-        Databasemodel = database_model
-
-        class Admin_key(Databasemodel):
-            key = peewee.TextField(primary_key=True)
-            valid = peewee.BooleanField()
-            key_used = peewee.BooleanField()
-            cookie = peewee.TextField(index=True)
-            create_time = peewee.TimestampField()
-
-        if not Admin_key.table_exists():
-            Admin_key.create_table()
-
-        self.Data = Admin_key
 
     def _gen_key(self):
         newkey = _rand_string(6)
-        self.Data.create(
+        Admin_key.create(
             key=newkey,
             valid=True,
             key_used=False,
@@ -59,7 +47,8 @@ class Marionette:
             create_time=int(time.time()),
         )
         newurl = urljoin(
-            self.setting['public_address'], 'marionette/?key='+newkey)
+            self.setting['public_address'],
+            url_for('yobot_marionette', key=newkey))
         return newurl
 
     @staticmethod
@@ -96,7 +85,7 @@ class Marionette:
             key_used = False
             key = request.args.get('key')
             if key is not None:
-                user = self.Data.get_or_none(self.Data.key == key)
+                user = Admin_key.get_or_none(Admin_key.key == key)
                 if user is None:
                     return '403 Forbidden', 403
                 if user.key_used:
@@ -113,7 +102,7 @@ class Marionette:
                         return '链接已过期', 410
                     else:
                         return '403 Forbidden', 403
-                user = self.Data.get_or_none(self.Data.cookie == auth)
+                user = Admin_key.get_or_none(Admin_key.cookie == auth)
                 if user is None:
                     return '403 Forbidden', 403
             if not user.valid:
@@ -131,7 +120,7 @@ class Marionette:
             auth = request.cookies.get('yobot_auth')
             if auth is None:
                 return '403 Forbidden', 403
-            user = self.Data.get_or_none(self.Data.cookie == auth)
+            user = Admin_key.get_or_none(Admin_key.cookie == auth)
             if user is None:
                 return '403 Forbidden', 403
             req = await request.get_json()

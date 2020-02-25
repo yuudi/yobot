@@ -27,8 +27,6 @@ class Index:
         async def yobot_favicon():
             return await send_from_directory(static_folder, "small.ico")
 
-        preffix = self.setting["preffix_string"] if self.setting["preffix_on"] else ""
-
         @app.route(
             urljoin(self.public_basepath, 'help/'),
             methods=['GET'])

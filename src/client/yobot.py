@@ -1,5 +1,6 @@
 # coding=utf-8
 import json
+import mimetypes
 import os
 import random
 import shutil
@@ -9,25 +10,26 @@ from functools import reduce
 from typing import Any, Callable, Dict, Iterable, List, Tuple
 from urllib.parse import urljoin
 
-import peewee
 import requests
 from aiocqhttp.api import Api
 from opencc import OpenCC
 from quart import Quart, send_file
 
 if __package__:
-    from .ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
-                            updater,  char_consult, push_news, calender, custom,
-                            homepage, marionette, login, settings, web_api)
+    from .ybplugins import (boss_dmg, calender, char_consult, clan_battle, custom,
+                            gacha, homepage, jjc_consult, login, marionette,
+                            push_news, settings, switcher, updater, web_util,
+                            yobot_msg, ybdata)
 else:
-    from ybplugins import (switcher, yobot_msg, gacha, jjc_consult, boss_dmg,
-                           updater,  char_consult, push_news, calender, custom,
-                           homepage, marionette, login, settings, web_api)
+    from ybplugins import (boss_dmg, calender, char_consult, clan_battle, custom,
+                           gacha, homepage, jjc_consult, login, marionette,
+                           push_news, settings, switcher, updater, web_util,
+                           yobot_msg, ybdata)
 
 
 class Yobot:
     Version = "[v3.2.2]"
-    Commit = {"yuudi": 39, "sunyubo": 1}
+    Commit = {"yuudi": 40, "sunyubo": 1}
 
     def __init__(self, *,
                  data_path: str,
@@ -66,7 +68,10 @@ class Yobot:
                     os.path.dirname(__file__), "default_boss.json")
             shutil.copyfile(default_boss_filepath, boss_filepath)
         with open(config_f_path, "r+", encoding="utf-8") as config_file:
-            self.glo_setting.update(json.load(config_file))
+            cfg = json.load(config_file)
+            for k in self.glo_setting.keys():
+                if k in cfg:
+                    self.glo_setting[k] = cfg[k]
             config_file.seek(0)
             config_file.truncate()
             json.dump(self.glo_setting, config_file,
@@ -76,11 +81,7 @@ class Yobot:
             verinfo = updater.get_version(self.Version, self.Commit)
 
         # initialize database
-        self.database = peewee.SqliteDatabase(os.path.join(dirname, 'data.db'))
-
-        class database_model(peewee.Model):
-            class Meta:
-                database = self.database
+        ybdata.init(os.path.join(dirname, 'yobotdata.db'))
 
         # initialize web path
         modified = False
@@ -92,14 +93,20 @@ class Yobot:
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
                     s.connect(("8.8.8.8", 53))
                     ipaddr = s.getsockname()[0]
-            self.glo_setting["public_address"] = "http://{}:{}/{}/".format(
+            self.glo_setting["public_address"] = "http://{}:{}/".format(
                 ipaddr,
                 self.glo_setting["port"],
-                self.glo_setting["public_basepath"].strip("/")
             )
             modified = True
         if not self.glo_setting["public_address"].endswith("/"):
             self.glo_setting["public_address"] += "/"
+            modified = True
+        if not self.glo_setting["public_basepath"].startswith("/"):
+            self.glo_setting["public_basepath"] = "/" + \
+                self.glo_setting["public_basepath"]
+            modified = True
+        if not self.glo_setting["public_basepath"].endswith("/"):
+            self.glo_setting["public_basepath"] += "/"
             modified = True
         if modified:
             with open(config_f_path, "w", encoding="utf-8") as config_file:
@@ -111,13 +118,26 @@ class Yobot:
             quart_app.secret_key = bytes(
                 (random.randint(0, 255) for _ in range(16)))
 
+        # add mimetype for '.js' files
+        mimetypes.init()
+        mimetypes.add_type('application/javascript', '.js')
+
         # add route for static files
         @quart_app.route(
-            urljoin(self.glo_setting["public_basepath"], "assets/<filename>"),
+            urljoin(self.glo_setting["public_basepath"],
+                    "assets/<path:filename>"),
             methods=["GET"])
         async def yobot_static(filename):
             return await send_file(
-                os.path.join(os.path.dirname(__file__), "public/static", filename))
+                os.path.join(os.path.dirname(__file__), "public", "static", filename))
+
+        # add route for output files
+        @quart_app.route(
+            urljoin(self.glo_setting["public_basepath"],
+                    "output/<path:filename>"),
+            methods=["GET"])
+        async def yobot_output(filename):
+            return await send_file(os.path.join(dirname, "output", filename))
 
         # openCC
         self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))
@@ -130,7 +150,6 @@ class Yobot:
         })
         kwargs = {
             "glo_setting": self.glo_setting,
-            "database_model": database_model,
             "bot_api": bot_api,
         }
 
@@ -149,7 +168,8 @@ class Yobot:
             marionette.Marionette(**kwargs),
             login.Login(**kwargs),
             settings.Setting(**kwargs),
-            web_api.WebApi(**kwargs),
+            web_util.WebUtil(**kwargs),
+            clan_battle.ClanBattle(**kwargs),
             custom.Custom(**kwargs),
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]
@@ -195,6 +215,13 @@ class Yobot:
                 func_num = True
             if func_num:
                 res = pitem.execute(func_num, msg)
+                if res is None:
+                    continue
+                if isinstance(res, str):
+                    replys.append(res)
+                    break
+                if res is None:
+                    break
                 replys.append(res["reply"])
                 if res["block"]:
                     break
@@ -241,6 +268,13 @@ class Yobot:
                     res = await pitem.execute_async(func_num, msg)
                 else:
                     res = pitem.execute(func_num, msg)
+                if res is None:
+                    continue
+                if isinstance(res, str):
+                    replys.append(res)
+                    break
+                if res is None:
+                    break
                 replys.append(res["reply"])
                 if res["block"]:
                     break

@@ -5,7 +5,8 @@ feedparser~=5.2.1
 beautifulsoup4~=4.8.1
 pillow~=6.2.1
 arrow
-peewee
+peewee~=3.13.1
+expiringdict~=1.2.0
 
 # 插件版可以不遵守下面两条
 aiocqhttp==0.6.8

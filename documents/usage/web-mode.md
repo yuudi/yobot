@@ -16,31 +16,39 @@
 
 Nginx 代理配置后，在机器人配置文件中`public_addr`项替换为代理后的地址
 
-```nginx {12-25}
+```nginx
 server {
   listen 80;
   listen [::]:80;
   listen 443 ssl http2;
   listen [::]:443 ssl http2;
 
-  ssl_certificate /path/to/ssl_certificate.crt;  # 替换为你的证书路径
-  ssl_certificate_key /path/to/ssl_certificate.key;  # 替换为你的私钥路径
+  ssl_certificate /path/to/ssl_certificate.crt;  # 你的证书路径
+  ssl_certificate_key /path/to/ssl_certificate.key;  # 你的私钥路径
 
-  server_name io.yobot.xyz;  # 替换为你的域名
+  server_name io.yobot.xyz;  # 你的域名
 
+  # 静态文件直接访问（可选，性能）
   location /assets/ {
-    alias /home/yobot/src/client/public/assets/;  # 替换为你的静态文件目录
+    alias /home/yobot/src/client/public/assets/;  # 你的静态文件目录
     expires 30d;
   }
 
+  # 输出文件直接访问（可选，性能）
+  location /output/ {
+    alias /home/yobot/src/client/output/;  # 你的输出文件目录
+    expires 30d;
+  }
+
+  # 阻止酷Q接口被访问(可选，安全)
   location /ws/ {
-    allow 127.0.0.0/8;  # Windows 酷Q-httpapi
-    allow 172.16.0.0/12;  # Linux 酷Q-httpapi in docker
+    # allow 172.16.0.0/12;  # 允许酷Q通过（yobot与酷Q不在同一个服务器上时使用）
     deny all;
   }
 
   location / {
     proxy_pass http://localhost:9222/;
+    proxy_set_header X-Real-IP $remote_addr;
   }
 }
 ```

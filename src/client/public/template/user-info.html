@@ -9,18 +9,19 @@
     <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
-{% if user["uid"] != visited_user["uid"] and user["authority_group"] >= 100 %}{# 不是本人且不是管理员 -#}
+{% if user["qqid"] != visitor["qqid"] and user["authority_group"] >= 100 %}{# 不是本人且不是管理员 -#}
 <body>
     <h1>yobot用户信息</h1>
     <p>你无权查看这个页面</p>
+    <p><a href="#" onClick="javascript:history.go(-1);">返回</a></p>
 </body>
 {%- else %}{# 本人或管理员 -#}
 <body>
-    <h1>yobot用户信息</h1>
     <div id="app">
+        <el-page-header @back="location='..'" content="yobot用户信息"></el-page-header>
     <p :hidden="edit">用户名：[[ nickname ]]<el-button type="primary" size="mini" icon="el-icon-edit" @click="edit=true" circle></el-button></p>
     <p :hidden="!edit">用户名：<el-input v-model="nickname" placeholder="昵称"></el-input><el-button type="success" size="mini" icon="el-icon-check" @click="edit_nickname" circle></el-button></p>
-    <p>用户权限：{{ user["authority_group"] }}</p>
+    <p>用户权限：[[ authtype[{{ user["authority_group"] }}] ]]</p>
     <p>公会战所在群：{{ user["clan_group_id"] }}</p>
     <p>上次登录时间：{{ from_timestamp(user["last_login_time"]) }}</p>
     <p>上次登录ip地址：{{ user["last_login_ipaddr"] }}（[[ addr.join('') ]]）</p>
@@ -33,6 +34,12 @@
             addr: [],
             nickname: '{{ user["nickname"] }}',
             edit: false,
+            authtype: {
+                1: '主人',
+                2: '机器人管理员',
+                10: '公会战管理员',
+                100: '成员',
+            },
         },
         mounted() {
             var thisvue = this;
@@ -46,7 +53,7 @@
         methods: {
             edit_nickname: function(event){
                 var thisvue = this;
-                axios.put('{{ url_for("yobot_user_info_nickname", uid=visited_user["uid"]) }}',{nickname: thisvue.nickname}).then(function (res) {
+                axios.put('{{ url_for("yobot_user_info_nickname", qqid=user["qqid"]) }}',{nickname: thisvue.nickname}).then(function (res) {
                     thisvue.edit = false;
                 }).catch(function (error) {
                     alert('改名失败');

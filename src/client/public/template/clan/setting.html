@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<head>
+  <title>公会战设置</title>
+  <meta name='viewport' content='width=480' charset="utf-8" />
+  <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+  <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
+  <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
+  <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+</head>
+
+<body>
+  <div id="app">
+    <el-page-header @back="location='../'" :content="groupData.group_name + ' - 公会战设置'"></el-page-header>
+    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+      <el-menu-item index="1">面板</el-menu-item>
+      <el-menu-item index="2">预约</el-menu-item>
+      <el-menu-item index="3">查刀</el-menu-item>
+      <el-menu-item index="4">统计</el-menu-item>
+      <el-menu-item index="5">我的</el-menu-item>
+    </el-menu>
+    <h1 style="text-align:center">设置</h1>
+    <el-form ref="form" :model="form" label-width="120px">
+      <el-form-item label="游戏区服">
+        <el-select v-model="form.game_server">
+          <el-option label="日服" value="jp"></el-option>
+          <el-option label="韩服" value="kr"></el-option>
+          <el-option label="台服" value="tw"></el-option>
+          <el-option label="国服" value="cn"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="通知到群">
+        <el-checkbox v-model="form.notify.challenge">伤害上报</el-checkbox>
+        <el-checkbox v-model="form.notify.undo">撤销上报</el-checkbox>
+        <el-checkbox v-model="form.notify.apply">申请出刀</el-checkbox>
+        <el-checkbox v-model="form.notify.cancelapply">取消申请</el-checkbox>
+        <el-checkbox v-model="form.notify.subscribe">预约boss</el-checkbox>
+        <el-checkbox v-model="form.notify.cancelsubscribe">取消预约</el-checkbox>
+        <el-checkbox v-model="form.notify.suspend">挂树</el-checkbox>
+        <el-checkbox v-model="form.notify.cancelsuspend">取消挂树</el-checkbox>
+        <el-checkbox v-model="form.notify.modify">修改状态</el-checkbox>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submit">确定</el-button>
+        <el-button @click="location='..'">返回</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="export_data" icon="el-icon-download" size="mini">导出数据</el-button>
+          <el-button type="danger" @click="confirmVisible = true" icon="el-icon-delete" size="mini">重置数据</el-button>
+          <el-dialog title="警告" :visible.sync="confirmVisible">
+          <p>此操作会删除本次公会战所有数据</p>
+          <p>请提前保存好需要的数据</p>
+          <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="confirmVisible = false">取消</el-button>
+            <el-button type="danger" @click="delete_data">确定</el-button>
+          </span>
+        </el-dialog>
+      </el-form-item>
+      </el-form>
+  </div>
+</body>
+<script src="{{ url_for('yobot_static', filename='clan/setting.js') }}"></script>
+
+</html>

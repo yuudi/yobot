@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from quart import url_for
 
 
@@ -7,10 +9,11 @@ class Message:
     Request = False
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
-        self.public_addr = glo_setting["public_address"]
         self.version = glo_setting["verinfo"]["ver_name"]
         if glo_setting["public_priority"] == "self":
-            self.help_page = url_for('yobot_help')
+            self.help_page = urljoin(
+                glo_setting["public_address"],
+                url_for('yobot_help'))
         else:
             self.help_page = "http://h3.yobot.monster/"
 

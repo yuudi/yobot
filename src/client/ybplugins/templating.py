@@ -2,7 +2,7 @@ import datetime
 import os
 
 import jinja2
-from quart import url_for
+from quart import session, url_for
 
 static_folder = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../public/static'))
@@ -21,6 +21,7 @@ _env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_folder),
     enable_async=True,
 )
+_env.globals['session'] = session
 _env.globals['url_for'] = url_for
 _env.globals['from_timestamp'] = from_timestamp
 
