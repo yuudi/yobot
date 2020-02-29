@@ -37,7 +37,7 @@ class Login:
 
     @staticmethod
     def match(cmd: str):
-        if cmd == '登录':
+        if cmd == '登录' or cmd == '登陆':
             return 1
         return 0
 

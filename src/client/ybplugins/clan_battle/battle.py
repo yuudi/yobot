@@ -201,6 +201,21 @@ class ClanBattle:
         )[0]
         user.save()
 
+    def drop_member(self, group_id, member_list):
+        """
+        delete members from group member list
+
+        permission should be checked before this function is called.
+
+        Args:
+            group_id: group id
+            member_list: a list of qqid to delete
+        """
+        delete_count = Clan_member.delete().where(
+            Clan_member.qqid.in_(member_list)
+        ).execute()
+        return delete_count
+
     def boss_status_summary(self, group_id) -> str:
         """
         get a summary of boss status
@@ -497,6 +512,24 @@ class ClanBattle:
             Clan_challenge.gid == group_id,
         ).execute()
 
+    def send_remind(self, group_id, member_list):
+        """
+        remind members to finish challenge
+
+        permission should be checked before this function is called.
+
+        Args:
+            group_id: group id
+            member_list: a list of qqid to reminder
+        """
+        message = ' '.join((
+            atqq(qqid) for qqid in member_list
+        ))
+        asyncio.create_task(self.api.send_group_msg(
+            group_id=group_id,
+            message=message+'\n=======\n请及时完成今日出刀',
+        ))
+
     def add_subscribe(self, group_id, qqid, boss_num, comment={}):
         """
         subscribe a boss, get notification when boss is defeated.
@@ -722,7 +755,7 @@ class ClanBattle:
             })
         return report
 
-    @timed_cached_func(max_len=16, max_age_seconds=3600, ignore_self=True)
+    @timed_cached_func(max_len=16, max_age_seconds=60, ignore_self=True)
     def get_member_list(self, group_id) -> List[Dict[str, Any]]:
         """
         get the member lists from database
@@ -1389,6 +1422,22 @@ class ClanBattle:
                                 [status.num-1]
                             ),
                         },
+                    )
+                elif action == 'send_remind':
+                    if session['yobot_user']['authority_group'] >= 100:
+                        return jsonify(code=11, message='Insufficient authority')
+                    self.send_remind(group_id, payload['memberlist'])
+                    return jsonify(
+                        code=0,
+                        notice='发送成功',
+                    )
+                elif action == 'drop_member':
+                    if session['yobot_user']['authority_group'] >= 100:
+                        return jsonify(code=11, message='Insufficient authority')
+                    count = self.drop_member(group_id, payload['memberlist'])
+                    return jsonify(
+                        code=0,
+                        notice=f'已删除{count}条记录',
                     )
                 else:
                     return jsonify(code=32, message='unknown action')

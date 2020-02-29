@@ -28,8 +28,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.2.2]"
-    Commit = {"yuudi": 41, "sunyubo": 1}
+    Version = "[v3.3.0]"
+    Commit = {"yuudi": 42, "sunyubo": 1}
 
     def __init__(self, *,
                  data_path: str,
@@ -85,7 +85,7 @@ class Yobot:
 
         # initialize web path
         modified = False
-        if self.glo_setting.get("public_address") is None:
+        if not self.glo_setting.get("public_address"):
             try:
                 res = requests.get("http://members.3322.org/dyndns/getip")
                 ipaddr = res.text.strip()
@@ -118,7 +118,7 @@ class Yobot:
             quart_app.secret_key = bytes(
                 (random.randint(0, 255) for _ in range(16)))
 
-        # add mimetype for '.js' files
+        # add mimetype
         mimetypes.init()
         mimetypes.add_type('application/javascript', '.js')
         mimetypes.add_type('image/webp', '.webp')
@@ -135,6 +135,7 @@ class Yobot:
         # add route for output files
         if not os.path.exists(os.path.join(dirname, "output")):
             os.mkdir(os.path.join(dirname, "output"))
+
         @quart_app.route(
             urljoin(self.glo_setting["public_basepath"],
                     "output/<path:filename>"),
@@ -198,6 +199,7 @@ class Yobot:
             else:
                 msg["raw_message"] = (
                     msg["raw_message"][len(preffix):])
+                msg["message"] = msg["message"][len(preffix):]
 
         # black-list
         if msg["sender"]["user_id"] in self.glo_setting.get("black-list", list()):

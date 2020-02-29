@@ -6,6 +6,7 @@ var vm = new Vue({
         group_name: null,
         reportDate: null,
         activeIndex: '3',
+        multipleSelection: [],
     },
     mounted() {
         var thisvue = this;
@@ -97,11 +98,10 @@ var vm = new Vue({
                         detail: [],
                     }
                 }
+                m.detail[2 * m.finished] = c;
                 if (c.is_continue) {
-                    m.detail[2 * m.finished + 1] = c;
                     m.finished += 0.5;
                 } else {
-                    m.detail[2 * m.finished] = c;
                     if (c.health_ramain != 0) {
                         m.finished += 1;
                     } else {
@@ -134,7 +134,7 @@ var vm = new Vue({
             };
             return qqid;
         },
-        handleSelect(key, keyPath) {
+        handleTitleSelect(key, keyPath) {
             switch (key) {
                 case '1':
                     window.location = '../';
@@ -152,6 +152,43 @@ var vm = new Vue({
                     window.location = `../my/`;
                     break;
             }
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        selectUnfinished(event) {
+            this.progressData.forEach(row => {
+                if (row.finished < 3) {
+                    this.$refs.multipleTable.toggleRowSelection(row, true);
+                } else {
+                    this.$refs.multipleTable.toggleRowSelection(row, false);
+                }
+            });
+        },
+        sendRequest(action) {
+            var memberlist = [];
+            this.multipleSelection.forEach(row => {
+                memberlist.push(row.qqid);
+            });
+            var thisvue = this;
+            axios.post('../api/', {
+                action: action,
+                memberlist: memberlist,
+            }).then(function (res) {
+                if (res.data.code != 0) {
+                    if (res.data.code == 11) {
+                        res.data.message = '你的权限不足';
+                    }
+                    thisvue.$alert(res.data.message, '请求失败');
+                } else {
+                    thisvue.$notify({
+                        title: '提醒',
+                        message: res.data.notice,
+                    });
+                }
+            }).catch(function (error) {
+                thisvue.$alert(error, '请求失败');
+            })
         },
     },
     delimiters: ['[[', ']]'],
