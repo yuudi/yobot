@@ -171,6 +171,8 @@ class Updater:
                       os.path.join(self.path, "restart.bat")))
             sys.exit()
         else:
+            if self.evn == "nonebot-plugin":
+                return "作为插件无法这么做"
             cmd = '''
             kill {}
             sleep 1s
@@ -179,7 +181,7 @@ class Updater:
             '''.format(self_pid, self.path)
             with open(os.path.join(self.path, "restart.sh"), "w") as f:
                 f.write(cmd)
-            os.system("chmod u+x {0} && ./{0}".format(
+            os.system("chmod u+x {0} && bash {0}".format(
                 os.path.join(self.path, "restart.sh")))
             sys.exit()
 

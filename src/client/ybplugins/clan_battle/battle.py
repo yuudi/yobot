@@ -1,26 +1,24 @@
 import asyncio
-import datetime
 import json
 import logging
 import os
 import re
 import time
-from functools import lru_cache
-from typing import Any, Callable, Coroutine, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin
 
 import peewee
 from aiocqhttp.api import Api
+from apscheduler.triggers.cron import CronTrigger
 from expiringdict import ExpiringDict
-from quart import (Quart, jsonify, redirect, request, send_file, session,
-                   url_for)
+from quart import Quart, jsonify, redirect, request, session, url_for
 
 from ..templating import render_template
 from ..web_util import async_cached_func
-from ..ybdata import Clan_challenge, Clan_group, Clan_subscribe, User
-from .exception import DamageOverflowError, GroupError, InputError, UserError
-from .typing import (BossChallenge, BossStatus, ClanBattleReport, Groupid,
-                     Pcr_date, Pcr_time, QQid)
+from ..ybdata import (Clan_challenge, Clan_group, Clan_member, Clan_subscribe,
+                      User)
+from .exception import GroupError, InputError, UserError
+from .typing import BossStatus, ClanBattleReport, Groupid, Pcr_date, QQid
 from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func
 
 _logger = logging.getLogger(__name__)
@@ -28,7 +26,7 @@ _logger = logging.getLogger(__name__)
 
 class ClanBattle:
     Passive = True
-    Active = False
+    Active = True
     Request = True
 
     Commands = {
@@ -73,10 +71,15 @@ class ClanBattle:
         if not os.path.exists(os.path.join(glo_setting['dirname'], 'log')):
             os.mkdir(os.path.join(glo_setting['dirname'], 'log'))
 
-        _logger.addHandler(logging.FileHandler(
+        formater = logging.Formatter(
+            '[%(asctime)s] %(levelname)s: %(message)s')
+        filehandler = logging.FileHandler(
             os.path.join(glo_setting['dirname'], 'log', '公会战日志.log'),
             encoding='utf-8',
-        ))
+        )
+        filehandler.setFormatter(formater)
+        filehandler.setLevel('INFO')
+        _logger.addHandler(filehandler)
 
         # data initialize
         self._boss_status: Dict[str, asyncio.Future] = {}
@@ -121,37 +124,18 @@ class ClanBattle:
         except peewee.DoesNotExist:
             return None
 
-    # @timed_cached_func
-    # def _get_challenges(self
-    #                     group_id: Groupid,
-    #                     qqid: Optional[QQid] = None,
-    #                     pcrdate: Optional[Pcr_date] = None,
-    #                     ):
-    #     group = self._group_data.get(group_id)
-    #     if group is None:
-    #         raise GroupError('本群未初始化')
-    #     expressions = [
-    #         Clan_challenge.gid == group_id,
-    #     ]
-    #     if qqid is not None:
-    #         expressions.append(Clan_challenge.qqid == qqid)
-    #     if pcrdate is not None:
-    #         expressions.append(Clan_challenge.challenge_pcrdate == pcrdate)
-    #     challenges = Clan_challenge.select().where(
-    #         *expressions
-    #     ).order_by(Clan_challenge.cid)
-    #     return list(challenges)
-
     async def _update_group_list_async(self):
         try:
             group_list = await self.api.get_group_list()
         except Exception as e:
-            _logger.warning('获取群列表错误'+str(e))
+            _logger.error('获取群列表错误'+str(e))
             return False
         for group_info in group_list:
-            group = Clan_group.get_or_create(
+            group = Clan_group.get_or_none(
                 group_id=group_info['group_id'],
-            )[0]
+            )
+            if group is None:
+                continue
             group.group_name = group_info['group_name']
             group.save()
             self._group_data[group_list] = group
@@ -162,7 +146,7 @@ class ClanBattle:
         try:
             group_member_list = await self.api.get_group_member_list(group_id=group_id)
         except Exception as e:
-            _logger.warning('获取群成员列表错误'+str(e))
+            _logger.error('获取群成员列表错误'+str(e))
             return []
         return group_member_list
 
@@ -170,12 +154,16 @@ class ClanBattle:
         group_member_list = await self._fetch_member_list_async(group_id)
         for member in group_member_list:
             user = User.get_or_create(qqid=member['user_id'])[0]
+            membership = Clan_member.get_or_create(
+                group_id=group_id, qqid=member['user_id'])[0]
             user.nickname = member.get('card') or member['nickname']
             user.clan_group_id = group_id
             if user.authority_group >= 10:
                 user.authority_group = (
                     100 if member['role'] == 'member' else 10)
+                membership.role = user.authority_group
             user.save()
+            membership.save()
 
     def creat_group(self, group_id, game_server, group_name=None) -> None:
         """
@@ -203,10 +191,14 @@ class ClanBattle:
 
         Args:
             group_id: group id
-            game_server: name of game server("jp" "tw" "cn" "kr")
+            qqid: qqid
         """
         user = User.get_or_create(qqid=qqid)[0]
         user.clan_group_id = group_id
+        membership = Clan_member.get_or_create(
+            group_id=group_id,
+            qqid=qqid,
+        )[0]
         user.save()
 
     def boss_status_summary(self, group_id) -> str:
@@ -741,14 +733,25 @@ class ClanBattle:
             group_id: group id
         """
         member_list = []
-        for member in User.select().where(
-            User.clan_group_id == group_id,
+        for user in User.select().join(
+            Clan_member,
+            on=(User.qqid == Clan_member.qqid)
+        ).where(
+            Clan_member.group_id == group_id,
         ):
             member_list.append({
-                'qqid': member.qqid,
-                'nickname': member.nickname,
+                'qqid': user.qqid,
+                'nickname': user.nickname,
             })
         return member_list
+
+    def jobs(self):
+        trigger = CronTrigger(hour=5)
+
+        def create_task_update_all_group_members():
+            asyncio.create_task(self._update_group_list_async())
+
+        return ((trigger, create_task_update_all_group_members),)
 
     def match(self, cmd):
         if not self.mode_on:
@@ -772,17 +775,21 @@ class ClanBattle:
             try:
                 self.creat_group(group_id, game_server)
             except GroupError as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return ('公会创建成功，请登录后台查看，'
                     '公会战成员请发送“加入公会”，'
                     '或发送“加入全部成员”')
         elif match_num == 2:  # 加入
             if cmd == '加入公会':
                 self.bind_group(group_id, user_id)
+                _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '{}已加入本公会' .format(atqq(user_id))
             if cmd == '加入全部成员':
                 if ctx['sender']['role'] == 'member':
                     return '只有管理员才可以这么做'
+                _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 asyncio.create_task(
                     self._update_all_group_members_async(group_id))
                 return '本群所有成员已添加记录'
@@ -812,7 +819,9 @@ class ClanBattle:
             try:
                 boss_status = self.damage(group_id, user_id, damage, behalf)
             except (InputError, GroupError) as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return str(boss_status)
         elif match_num == 5:  # 尾刀
             match = re.match(
@@ -823,7 +832,9 @@ class ClanBattle:
             try:
                 boss_status = self.defeat(group_id, user_id, behalf)
             except (InputError, GroupError) as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return str(boss_status)
         elif match_num == 6:  # 撤销
             if cmd != '撤销':
@@ -831,7 +842,9 @@ class ClanBattle:
             try:
                 boss_status = self.undo(group_id, user_id)
             except (GroupError, UserError) as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return str(boss_status)
         elif match_num == 7:  # 修正
             if len(cmd) != 2:
@@ -874,7 +887,9 @@ class ClanBattle:
             try:
                 self.add_subscribe(group_id, user_id, boss_num)
             except (GroupError, UserError) as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return '预约成功'
         elif match_num == 11:  # 挂树
             if cmd != '挂树':
@@ -882,7 +897,9 @@ class ClanBattle:
             try:
                 self.add_subscribe(group_id, user_id, 0)
             except (GroupError, UserError) as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return '已挂树'
         elif match_num == 12:  # 申请
             if cmd != '申请出刀':
@@ -890,7 +907,9 @@ class ClanBattle:
             try:
                 boss_status = self.apply_for_challenge(group_id, user_id)
             except GroupError as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return str(boss_status)
         elif match_num == 13:  # 取消
             match = re.match(r'^取消(?:预约)?([1-5]|挂树)$', cmd)
@@ -906,6 +925,8 @@ class ClanBattle:
             counts = self.cancel_subscribe(group_id, user_id, boss_num)
             if counts == 0:
                 return '你没有'+event
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return '已取消'+event
         elif match_num == 14:  # 解锁
             if cmd != '解锁':
@@ -913,7 +934,9 @@ class ClanBattle:
             try:
                 boss_status = self.cancel_application(group_id, user_id)
             except GroupError as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return str(boss_status)
         elif match_num == 15:  # 面板
             if len(cmd) != 2:
@@ -977,6 +1000,7 @@ class ClanBattle:
                     code=10,
                     message='Not logged in',
                 )
+            user_id = session['yobot_user']['qqid']
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return jsonify(
@@ -1027,7 +1051,7 @@ class ClanBattle:
                         },
                         is_admin=(is_member and
                                   session['yobot_user']['authority_group'] < 100),
-                        self_id=session['yobot_user']['qqid'],
+                        self_id=user_id,
                     )
                 elif action == 'get_challenge':
                     report = self.get_report(
@@ -1058,6 +1082,7 @@ class ClanBattle:
                                     [status.num-1]
                                 ),
                             },
+                            notice=status.info,
                         )
                     except asyncio.TimeoutError:
                         return jsonify(
@@ -1068,14 +1093,18 @@ class ClanBattle:
                     if payload['defeat']:
                         try:
                             status = self.defeat(group_id,
-                                                 session['yobot_user']['qqid'],
+                                                 user_id,
                                                  payload['behalf'],
                                                  )
                         except InputError as e:
+                            _logger.info('网页 失败 {} {} {}'.format(
+                                user_id, group_id, action))
                             return jsonify(
                                 code=10,
                                 message=str(e),
                             )
+                        _logger.info('网页 成功 {} {} {}'.format(
+                            user_id, group_id, action))
                         if group.notification & 0x01:
                             asyncio.create_task(
                                 self.api.send_group_msg(
@@ -1085,7 +1114,6 @@ class ClanBattle:
                             )
                         return jsonify(
                             code=0,
-                            notice=status.info,
                             bossData={
                                 'cycle': status.cycle,
                                 'num': status.num,
@@ -1102,15 +1130,19 @@ class ClanBattle:
                     else:
                         try:
                             status = self.damage(group_id,
-                                                 session['yobot_user']['qqid'],
+                                                 user_id,
                                                  payload['damage'],
                                                  payload['behalf'],
                                                  )
                         except InputError as e:
+                            _logger.info('网页 失败 {} {} {}'.format(
+                                user_id, group_id, action))
                             return jsonify(
                                 code=10,
                                 message=str(e),
                             )
+                        _logger.info('网页 成功 {} {} {}'.format(
+                            user_id, group_id, action))
                         if group.notification & 0x01:
                             asyncio.create_task(
                                 self.api.send_group_msg(
@@ -1120,7 +1152,6 @@ class ClanBattle:
                             )
                         return jsonify(
                             code=0,
-                            notice=status.info,
                             bossData={
                                 'cycle': status.cycle,
                                 'num': status.num,
@@ -1137,12 +1168,16 @@ class ClanBattle:
                 elif action == 'undo':
                     try:
                         status = self.undo(
-                            group_id, session['yobot_user']['qqid'])
+                            group_id, user_id)
                     except (UserError, GroupError) as e:
+                        _logger.info('网页 失败 {} {} {}'.format(
+                            user_id, group_id, action))
                         return jsonify(
                             code=10,
                             message=str(e),
                         )
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     if group.notification & 0x02:
                         asyncio.create_task(
                             self.api.send_group_msg(
@@ -1152,7 +1187,6 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        notice=status.info,
                         bossData={
                             'cycle': status.cycle,
                             'num': status.num,
@@ -1169,12 +1203,16 @@ class ClanBattle:
                 elif action == 'apply':
                     try:
                         status = self.apply_for_challenge(
-                            group_id, session['yobot_user']['qqid'])
+                            group_id, user_id)
                     except GroupError as e:
+                        _logger.info('网页 失败 {} {} {}'.format(
+                            user_id, group_id, action))
                         return jsonify(
                             code=10,
                             message=str(e),
                         )
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     if group.notification & 0x04:
                         asyncio.create_task(
                             self.api.send_group_msg(
@@ -1185,7 +1223,6 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        notice=status.info,
                         bossData={
                             'cycle': status.cycle,
                             'num': status.num,
@@ -1202,12 +1239,16 @@ class ClanBattle:
                 elif action == 'cancelapply':
                     try:
                         status = self.cancel_application(
-                            group_id, session['yobot_user']['qqid'])
+                            group_id, user_id)
                     except GroupError as e:
+                        _logger.info('网页 失败 {} {} {}'.format(
+                            user_id, group_id, action))
                         return jsonify(
                             code=10,
                             message=str(e),
                         )
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     if group.notification & 0x08:
                         asyncio.create_task(
                             self.api.send_group_msg(
@@ -1217,7 +1258,6 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        notice=status.info,
                         bossData={
                             'cycle': status.cycle,
                             'num': status.num,
@@ -1242,14 +1282,18 @@ class ClanBattle:
                     try:
                         self.add_subscribe(
                             group_id,
-                            session['yobot_user']['qqid'],
+                            user_id,
                             boss_num,
                         )
                     except UserError as e:
+                        _logger.info('网页 失败 {} {} {}'.format(
+                            user_id, group_id, action))
                         return jsonify(
                             code=10,
                             message=str(e),
                         )
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     if boss_num == 0:
                         notice = '挂树成功'
                         if group.notification & 0x10:
@@ -1276,12 +1320,16 @@ class ClanBattle:
                     boss_num = payload['boss_num']
                     counts = self.cancel_subscribe(
                         group_id,
-                        session['yobot_user']['qqid'],
+                        user_id,
                         boss_num,
                     )
                     if counts == 0:
+                        _logger.info('网页 失败 {} {} {}'.format(
+                            user_id, group_id, action))
                         return jsonify(code=0, notice=(
                             '没有预约记录' if boss_num else '没有挂树记录'))
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     if boss_num == 0:
                         notice = '取消挂树成功'
                         if group.notification & 0x20:
@@ -1315,7 +1363,11 @@ class ClanBattle:
                             boss_health=payload['health'],
                         )
                     except InputError as e:
+                        _logger.info('网页 失败 {} {} {}'.format(
+                            user_id, group_id, action))
                         return jsonify(code=10, message=str(e))
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     if group.notification & 0x100:
                         asyncio.create_task(
                             self.api.send_group_msg(
@@ -1325,7 +1377,6 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        notice=status.info,
                         bossData={
                             'cycle': status.cycle,
                             'num': status.num,
@@ -1345,7 +1396,7 @@ class ClanBattle:
                 _logger.error(e)
                 return jsonify(code=31, message='missing key: '+str(e))
             except Exception as e:
-                _logger.error(e)
+                _logger.exception(e)
                 return jsonify(code=40, message='server error')
 
         @app.route(
@@ -1400,6 +1451,7 @@ class ClanBattle:
                     code=10,
                     message='Not logged in',
                 )
+            user_id = session['yobot_user']['qqid']
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return jsonify(
@@ -1433,9 +1485,13 @@ class ClanBattle:
                     group.game_server = payload['game_server']
                     group.notification = payload['notification']
                     group.save()
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     return jsonify(code=0, message='success')
                 elif action == 'restart':
                     self.restart(group_id)
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
                     return jsonify(code=0, message='success')
                 else:
                     return jsonify(code=32, message='unknown action')

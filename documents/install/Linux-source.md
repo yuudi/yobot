@@ -56,7 +56,7 @@ Linux运行存在问题较多，不推荐使用，如果你坚持使用Linux来�
 
 请尽量使用 git clone 而不是 download zip ，否则无法自动更新版本
 
-安装依赖 `pip install -r src/client/requirements.txt`
+安装依赖 `pip3 install -r src/client/requirements.txt`
 （如果在国内建议加上参数 `-i https://pypi.tuna.tsinghua.edu.cn/simple`）
 
 启动：

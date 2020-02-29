@@ -2,7 +2,7 @@
 
 <head>
   <title>出刀记录</title>
-  <meta name='viewport' content='width=1320' charset="utf-8" />
+  <meta name='viewport' content='width=1375' charset="utf-8" />
   <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
   <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
   <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
@@ -28,44 +28,72 @@
     <h1 style="text-align:center">出刀记录</h1>
     <el-date-picker v-model="reportDate" type="date" placeholder="选择日期"></el-date-picker>
     <el-button type="primary" @click="report_day" icon="el-icon-search" circle></el-button>
+    <el-button type="primary" disabled>选中未完成</el-button>
+    <el-button type="warning" disabled>提醒出刀</el-button>
+    <el-button type="danger" disabled>删除成员</el-button>
     <template v-if="progressData.length > 0">
-      <el-table :data="progressData" :span-method="arraySpanMethod" style="width: 100%" stripe>
+      <el-table :data="progressData" :span-method="arraySpanMethod" style="width: 1375" stripe>
+        <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="qqid" label="QQ号" width="120" sortable></el-table-column>
         <el-table-column prop="nickname" label="昵称" width="200" sortable></el-table-column>
         <el-table-column prop="finished" label="已完成" width="100" sortable></el-table-column>
         <el-table-column label="第一刀">
           <el-table-column label="尾刀" width="150">
-            <template slot-scope="scope">
-              [[ cinfo(scope.row.detail[0]) ]]
+            <template v-if="scope.row.detail[0]" slot-scope="scope">
+              [[ csummary(scope.row.detail[0]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[0])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
-            <template slot-scope="scope">
-              [[ cinfo(scope.row.detail[1]) ]]
+            <template v-if="scope.row.detail[1]" slot-scope="scope">
+              [[ csummary(scope.row.detail[1]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[1])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
             </template>
           </el-table-column>
         </el-table-column>
         <el-table-column label="第二刀">
           <el-table-column label="尾刀" width="150">
-            <template slot-scope="scope">
-              [[ cinfo(scope.row.detail[2]) ]]
+            <template v-if="scope.row.detail[2]" slot-scope="scope">
+              [[ csummary(scope.row.detail[2]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[2])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
-            <template slot-scope="scope">
-              [[ cinfo(scope.row.detail[3]) ]]
+            <template v-if="scope.row.detail[3]" slot-scope="scope">
+              [[ csummary(scope.row.detail[3]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[3])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
             </template>
           </el-table-column>
         </el-table-column>
         <el-table-column label="第三刀">
           <el-table-column label="尾刀" width="150">
-            <template slot-scope="scope">
-              [[ cinfo(scope.row.detail[4]) ]]
+            <template v-if="scope.row.detail[4]" slot-scope="scope">
+              [[ csummary(scope.row.detail[4]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[4])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
-            <template slot-scope="scope">
-              [[ cinfo(scope.row.detail[5]) ]]
+            <template v-if="scope.row.detail[5]" slot-scope="scope">
+              [[ csummary(scope.row.detail[5]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[5])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
             </template>
           </el-table-column>
         </el-table-column>

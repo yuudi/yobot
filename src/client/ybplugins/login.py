@@ -5,6 +5,7 @@ from hashlib import sha256
 from urllib.parse import urljoin
 
 import peewee
+from aiocqhttp.api import Api
 from quart import (Quart, jsonify, make_response, redirect, request, session,
                    url_for)
 
@@ -29,8 +30,10 @@ class Login:
 
     def __init__(self,
                  glo_setting,
+                 bot_api: Api,
                  *args, **kwargs):
         self.setting = glo_setting
+        self.api = bot_api
 
     @staticmethod
     def match(cmd: str):
@@ -46,19 +49,22 @@ class Login:
             }
 
         login_code = _rand_string(6)
-        if ctx['user_id'] in self.setting['super-admin']:
+        if not self.setting['super-admin']:
+            authority_group = 1
+            self.setting['super-admin'].append(ctx['user_id'])
+        elif ctx['user_id'] in self.setting['super-admin']:
             authority_group = 1
         else:
             authority_group = 100
 
         # 取出数据
-        user = User.get_or_none(User.qqid == ctx['user_id'])
-        if user is None:
-            user = User(
-                qqid=ctx['user_id'],
-                nickname=ctx['sender']['nickname'],
-                authority_group=authority_group,
-            )
+        user = User.get_or_create(
+            qqid = ctx['user_id'],
+            defaults={
+                'nickname': ctx['sender']['nickname'],
+                'authority_group': authority_group,
+            }
+        )[0]
         user.login_code = login_code
         user.login_code_available = True
         user.login_code_expire_time = int(time.time())+60
@@ -73,6 +79,8 @@ class Login:
             )
         )
         reply = '请在一分钟内点击链接登录：'+newurl
+        if self.setting['web_mode_hint']:
+            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/v3/usage/web-mode.html'
         return {
             'reply': reply,
             'block': True
@@ -120,7 +128,8 @@ class Login:
                         user.last_login_time = now
                         user.last_login_ipaddr = request.headers.get(
                             'X-Real-IP', request.remote_addr)
-                        user.auth_cookie = sha256((new_key+user.salt).encode()).hexdigest()
+                        user.auth_cookie = sha256(
+                            (new_key+user.salt).encode()).hexdigest()
                         user.auth_cookie_expire_time = now+604800  # 7 days
                         user.save()
 

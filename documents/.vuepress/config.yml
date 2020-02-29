@@ -18,10 +18,10 @@ themeConfig:
       link: /features.md
     - text: 高级
       items:
-      - text: 配置文件说明
-        link: /usage/configuration.md
-      - text: Web模式
+      - text: 开启Web模式
         link: /usage/web-mode.md
+      - text: Web模式 - 公会战
+        link: /usage/web-clanbattle.md
     - text: 工具
       items:
         - text: 十连抽

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>jjc解法</title>
+    <style>
+        #mark {
+            float: left
+        }
+
+        h1 {
+            font-size: 40px
+        }
+
+        p {
+            font-size: 28px
+        }
+
+        .equip {
+            width: 16px;
+            height: 16px;
+            background: url("{{ public_base }}assets/chara_marks.png")-0 -0;
+        }
+
+        .star {
+            width: 16px;
+            height: 16px;
+            background: url("{{ public_base }}assets/chara_marks.png")-16px -0;
+        }
+
+        .star_disabled {
+            width: 16px;
+            height: 16px;
+            background: url("{{ public_base }}assets/chara_marks.png")-0 -16px;
+        }
+
+        .star_pink {
+            width: 16px;
+            height: 16px;
+            background: url("{{ public_base }}assets/chara_marks.png")-16px -16px;
+        }
+    </style>
+</head>
+
+<body>
+    <p><a class="footer" href="https://yobot.xyz/">返回主页</a></p>
+    <h1>解法</h1>
+    <p>查找到{{ len(solution) }}条解法</p>
+    <table border="0">
+        <tbody>
+            {% for team in solution -%}
+            <tr>
+                {% for chara in parse_team(team) -%}
+                <td>
+                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id[chara[0]] + (60 if chara[1]==6 else 30) }}.webp">
+                    <br>
+                    {% if chara[1] == 6 -%}
+                    <div class="star" id="mark"></div>
+                    <div class="star" id="mark"></div>
+                    <div class="star" id="mark"></div>
+                    <div class="star" id="mark"></div>
+                    <div class="star" id="mark"></div>
+                    <div class="star_pink" id="mark"></div>
+                    {% else -%}
+                    {% for i in range(chara[1]) -%}
+                    <div class="star" id="mark"></div>
+                    {% endfor -%}
+                    {% if chara[2] -%}
+                    <div class="equip" id="mark"></div>
+                    {% endif -%}
+                    {% endif -%}
+                </td>
+                {% endfor -%}
+                <td>
+                    👍{{ team['good'] }}<br>
+                    👎{{ team['bad'] }}<br>
+                    {{ team['updated'] }}
+                </td>
+            </tr>
+            {% endfor -%}
+        </tbody>
+    </table>
+</body>
+
+</html>

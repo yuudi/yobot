@@ -29,7 +29,7 @@ else:
 
 class Yobot:
     Version = "[v3.2.2]"
-    Commit = {"yuudi": 40, "sunyubo": 1}
+    Commit = {"yuudi": 41, "sunyubo": 1}
 
     def __init__(self, *,
                  data_path: str,
@@ -121,6 +121,7 @@ class Yobot:
         # add mimetype for '.js' files
         mimetypes.init()
         mimetypes.add_type('application/javascript', '.js')
+        mimetypes.add_type('image/webp', '.webp')
 
         # add route for static files
         @quart_app.route(
@@ -132,6 +133,8 @@ class Yobot:
                 os.path.join(os.path.dirname(__file__), "public", "static", filename))
 
         # add route for output files
+        if not os.path.exists(os.path.join(dirname, "output")):
+            os.mkdir(os.path.join(dirname, "output"))
         @quart_app.route(
             urljoin(self.glo_setting["public_basepath"],
                     "output/<path:filename>"),

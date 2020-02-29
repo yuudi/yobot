@@ -30,7 +30,13 @@ def main():
             config = json.load(f)
         token = config.get("access_token", None)
         if token is None:
-            print("警告：没有设置access_token，这可能会带来安全隐患")
+            print("*************************************************")
+            print("警告：没有设置access_token，这会直接暴露机器人接口")
+            print("这意味着允许机器人执行任何人的请求，造成安全隐患")
+            print("请在yobot_config.json文件中修改access_token项")
+            print("并使其与httpapi中的access_token保持一致")
+            print("*************************************************")
+            # input("（按回车继续）")
     else:
         token = None
 

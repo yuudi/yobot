@@ -27,28 +27,42 @@ var vm = new Vue({
                 return;
             }
             thisvue.members = memres.data.members;
+            for (m of thisvue.members) {
+                m.finished = 0;
+                m.detail = [];
+            }
             thisvue.refresh(res.data.challenges);
         })).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');
         });
     },
     methods: {
-        cinfo: function (cha) {
+        csummary: function (cha) {
             if (cha == undefined) {
                 return '';
             }
-            var info = '(' + cha.cycle + '-' + cha.boss_num + ')' + cha.damage.toLocaleString();
-            return info;
+            return '(' + cha.cycle + '-' + cha.boss_num + ')' + cha.damage.toLocaleString();
+        },
+        cdetail: function (cha) {
+            if (cha == undefined) {
+                return '';
+            }
+            var nd = new Date();
+            nd.setTime(cha.challenge_time * 1000);
+            var detailstr = nd.toLocaleString() + '<br />';
+            detailstr += cha.cycle + '周目' + cha.boss_num + '号boss<br />';
+            detailstr += (cha.health_ramain + cha.damage).toLocaleString() + '→' + cha.health_ramain.toLocaleString();
+            return detailstr;
         },
         arraySpanMethod: function ({ row, column, rowIndex, columnIndex }) {
-            if (columnIndex >= 3) {
-                if (columnIndex % 2 == 1) {
-                    var detail = row.detail[columnIndex - 3];
+            if (columnIndex >= 4) {
+                if (columnIndex % 2 == 0) {
+                    var detail = row.detail[columnIndex - 4];
                     if (detail != undefined && detail.health_ramain != 0) {
                         return [1, 2];
                     }
                 } else {
-                    var detail = row.detail[columnIndex - 4];
+                    var detail = row.detail[columnIndex - 5];
                     if (detail != undefined && detail.health_ramain != 0) {
                         return [0, 0];
                     }
@@ -71,34 +85,46 @@ var vm = new Vue({
             })
         },
         refresh: function (challenges) {
-            this.progressData = [];
+            this.progressData = [...this.members];
             var thisvue = this;
             var m = { qqid: -1 };
             for (c of challenges) {
                 if (m.qqid != c.qqid) {
-                    if (m.qqid != -1) {
-                        thisvue.progressData.push(m);
-                    }
+                    thisvue.update_member_info(m);
                     m = {
                         qqid: c.qqid,
-                        nickname: thisvue.find_name(c.qqid),
                         finished: 0,
                         detail: [],
                     }
                 }
                 if (c.is_continue) {
                     m.detail[2 * m.finished + 1] = c;
-                    m.finished += 1;
+                    m.finished += 0.5;
                 } else {
                     m.detail[2 * m.finished] = c;
                     if (c.health_ramain != 0) {
                         m.finished += 1;
+                    } else {
+                        m.finished += 0.5;
                     }
                 }
             }
-            if (m.qqid != -1) {
-                thisvue.progressData.push(m);
+            thisvue.update_member_info(m);
+        },
+        update_member_info: function (m) {
+            if (m.qqid == -1) {
+                return
             }
+            for (let index = 0; index < this.progressData.length; index++) {
+                if (m.qqid == this.progressData[index].qqid) {
+                    let nickname = this.progressData[index].nickname;
+                    this.progressData[index] = m;
+                    this.progressData[index].nickname = nickname;
+                    return
+                }
+            }
+            m.nickname = '（未加入）';
+            this.progressData.push(m);
         },
         find_name: function (qqid) {
             for (m of this.members) {

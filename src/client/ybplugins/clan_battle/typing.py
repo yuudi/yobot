@@ -17,11 +17,11 @@ class BossStatus:
 
     def __str__(self):
         summary = (
-            f'现在{self.cycle}周目，{self.num}号boss\n'
-            f'生命值{self.health}'
-        )
-        if self.challenger:
-            summary += '\n' + f'{self.challenger}正在挑战boss'
+            '现在{}周目，{}号boss\n'
+            '生命值{:,}'
+        ).format(self.cycle, self.num, self.health)
+        # if self.challenger:
+        #     summary += '\n' + '{}正在挑战boss'.format(self.challenger)
         if self.info:
             summary = self.info + '\n' + summary
         return summary

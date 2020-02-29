@@ -10,10 +10,10 @@ class Message:
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.version = glo_setting["verinfo"]["ver_name"]
-        if glo_setting["public_priority"] == "self":
+        if glo_setting["clan_battle_mode"] == "web":
             self.help_page = urljoin(
                 glo_setting["public_address"],
-                url_for('yobot_help'))
+                '{}help/'.format(glo_setting['public_basepath']))
         else:
             self.help_page = "http://h3.yobot.monster/"
 

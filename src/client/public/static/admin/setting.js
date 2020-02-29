@@ -18,6 +18,7 @@ var vm = new Vue({
     },
     methods: {
         update: function (event) {
+            this.setting.web_mode_hint = false;
             axios.put(
                 api_path,
                 this.setting,

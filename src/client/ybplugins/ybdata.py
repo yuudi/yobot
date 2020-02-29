@@ -65,6 +65,16 @@ class Clan_group(_BaseModel):
     challenging_comment = TextField(null=True)
 
 
+class Clan_member(_BaseModel):
+    group_id = BigIntegerField()
+    qqid = BigIntegerField()
+    role = IntegerField(default=100)
+    last_save_slot = IntegerField(null=True)
+
+    class Meta:
+        primary_key = CompositeKey('group_id', 'qqid')
+
+
 class Clan_challenge(_BaseModel):
     cid = AutoField(primary_key=True)
     gid = BigIntegerField()
@@ -126,6 +136,8 @@ def init(sqlite_filename):
         User.create_table()
     if not Clan_group.table_exists():
         Clan_group.create_table()
+    if not Clan_member.table_exists():
+        Clan_member.create_table()
     if not Clan_challenge.table_exists():
         Clan_challenge.create_table()
     if not Clan_subscribe.table_exists():
