@@ -94,7 +94,8 @@ class Lock():
     def boss_challenged(self):
         if self._data.get(self._groupid, [0])[0] == 0:
             return
-        else:
+        elif self._data.get(self._groupid, [0, 0])[1] == self._qqid:
+            # 只能解锁自己申请出刀的boss
             del self._data[self._groupid]
             self.txt_list.append("boss已解锁")
             self._save()
