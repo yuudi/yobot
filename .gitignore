@@ -11,3 +11,4 @@ src/client/*.db
 src/client/*.ics
 src/client/*.spec
 src/client/test.py
+**/yobot.pid
