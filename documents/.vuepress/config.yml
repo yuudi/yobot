@@ -1,4 +1,4 @@
-base: /yobot/
+base: /
 dest: ../docs
 title: yobot
 description: 公主链接群聊机器人

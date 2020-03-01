@@ -30,7 +30,14 @@
     <el-button type="primary" @click="report_day" icon="el-icon-search" circle></el-button>
     <el-button type="primary" @click="selectUnfinished">选中未完成</el-button>
     <el-button type="warning" @click="sendRequest('send_remind')">提醒出刀</el-button>
-    <el-button type="danger" @click="sendRequest('drop_member')">删除成员</el-button>
+    <el-button type="danger" @click="dropMemberVisible = true">删除成员</el-button>
+    <el-dialog title="警告" :visible.sync="dropMemberVisible">
+      <p>你确定要删除这[[ multipleSelection.length ]]名成员吗</p>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dropMemberVisible = false">取消</el-button>
+        <el-button type="danger" @click="sendRequest('drop_member'),dropMemberVisible = false">确定</el-button>
+      </span>
+    </el-dialog>
     <template v-if="progressData.length > 0">
       <el-table :data="progressData" :span-method="arraySpanMethod" style="width: 1375" ref="multipleTable"
         @selection-change="handleSelectionChange" stripe>

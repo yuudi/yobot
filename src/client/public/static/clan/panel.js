@@ -17,6 +17,7 @@ var vm = new Vue({
         subscribeFormVisible: false,
         subscribeCancelVisible: false,
         statusFormVisible: false,
+        leavePage: false,
     },
     mounted() {
         var thisvue = this;
@@ -100,7 +101,7 @@ var vm = new Vue({
                     });
                 }
             }).catch(function (error) {
-                if (axios.isCancel(error)) {
+                if (thisvue.leavePage) {
                     return;
                 }
                 thisvue.$confirm(error, '刷新boss错误', {
@@ -215,6 +216,7 @@ var vm = new Vue({
             this.statusFormVisible = false;
         },
         handleSelect(key, keyPath) {
+            this.leavePage=true;
             switch (key) {
                 case '2':
                     window.location = './subscribers/';

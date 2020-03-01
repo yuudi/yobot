@@ -128,7 +128,7 @@
           <el-col :span="6"><el-button type="warning" size="small" @click="addsuspend">&nbsp;&nbsp;挂树&nbsp;&nbsp;</el-button></el-col>
           <el-col :span="6"><el-button type="info" size="small" @click="cancelsuspend">取消挂树</el-button></el-col>
           <el-col :span="6"><el-button type="danger" size="small" @click="startmodify">修改状态</el-button></el-col>
-          <el-col :span="6"><a href='./setting/'><el-button type="info" size="small">更多操作</el-button></a></el-col>
+          <el-col :span="6"><a href='./setting/'><el-button type="info" size="small" @click="leavePage=true">&nbsp;&nbsp;设置&nbsp;&nbsp;</el-button></a></el-col>
           <el-dialog title="修改状态" :visible.sync="statusFormVisible">
             <el-form>
               <el-form-item label="周目数" label-width="120">

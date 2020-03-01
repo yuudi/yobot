@@ -7,6 +7,7 @@ var vm = new Vue({
         reportDate: null,
         activeIndex: '3',
         multipleSelection: [],
+        dropMemberVisible:false,
     },
     mounted() {
         var thisvue = this;

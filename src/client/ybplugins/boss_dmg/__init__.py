@@ -26,11 +26,16 @@ class Boss_dmg:
         func = reserve.Reserve.match(cmd)
         if func != 0:
             return func | 0x3000
+        if re.match(r'^创建(?:([日台韩国])服)?[公工]会$', cmd):
+            return -1
         return 0
 
     def execute(self, match_num: int, msg: dict) -> dict:
         if msg["message_type"] != "group":
             reply = "此功能仅可用于群聊"
+            return {"reply": reply, "block": True}
+        if match_num == -1:
+            reply = "群聊模式下无需创建（如需网页模式，请登录后台切换）"
             return {"reply": reply, "block": True}
         swit = match_num & 0xf000
         func = match_num & 0x0fff

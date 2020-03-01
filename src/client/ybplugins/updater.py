@@ -21,6 +21,9 @@ class Updater:
         self.ver = glo_setting["verinfo"]
         self.setting = glo_setting
 
+        with open(os.path.join(glo_setting['dirname'], 'yobot.pid'), 'w') as f:
+            f.write(str(os.getpid()))
+
     def windows_update(self, force: bool = False, test_ver: int = 0):
         test_version = ["stable", "beta", "alpha"][test_ver]
         if not os.path.exists(os.path.join(self.path, "temp")):
@@ -133,11 +136,11 @@ class Updater:
         kill {}
         sleep 1s
         cd src/client
-        python3 main.py
+        nohup python3 main.py &
         '''.format(git_dir, os.getpid())
         with open(os.path.join(git_dir, "update.sh"), "w") as f:
             f.write(cmd)
-        os.system("chmod u+x {0} ; exec ./{0}".format(
+        os.system("chmod u+x {0} ; sh {0}".format(
             os.path.join(git_dir, "update.sh")))
         sys.exit()
 
@@ -177,7 +180,7 @@ class Updater:
             kill {}
             sleep 1s
             cd {}
-            python3 main.py
+            nohup python3 main.py &
             '''.format(self_pid, self.path)
             with open(os.path.join(self.path, "restart.sh"), "w") as f:
                 f.write(cmd)

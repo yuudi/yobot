@@ -78,8 +78,8 @@ class ClanBattle:
             encoding='utf-8',
         )
         filehandler.setFormatter(formater)
-        filehandler.setLevel('INFO')
         _logger.addHandler(filehandler)
+        _logger.setLevel(logging.INFO)
 
         # data initialize
         self._boss_status: Dict[str, asyncio.Future] = {}
@@ -165,6 +165,9 @@ class ClanBattle:
             user.save()
             membership.save()
 
+        # refresh member list
+        self.get_member_list(group_id, nocache=True)
+
     def creat_group(self, group_id, game_server, group_name=None) -> None:
         """
         create a group for clan-battle
@@ -185,6 +188,9 @@ class ClanBattle:
         self._group_data[group_id] = group
         self._boss_status[group_id] = asyncio.Future()
 
+        # refresh group list
+        asyncio.create_task(self._update_group_list_async())
+
     def bind_group(self, group_id, qqid) -> None:
         """
         set user's default group
@@ -201,6 +207,9 @@ class ClanBattle:
         )[0]
         user.save()
 
+        # refresh member list
+        self.get_member_list(group_id, nocache=True)
+
     def drop_member(self, group_id, member_list):
         """
         delete members from group member list
@@ -214,6 +223,9 @@ class ClanBattle:
         delete_count = Clan_member.delete().where(
             Clan_member.qqid.in_(member_list)
         ).execute()
+
+        # refresh member list
+        self.get_member_list(group_id, nocache=True)
         return delete_count
 
     def boss_status_summary(self, group_id) -> str:
@@ -755,7 +767,7 @@ class ClanBattle:
             })
         return report
 
-    @timed_cached_func(max_len=16, max_age_seconds=60, ignore_self=True)
+    @timed_cached_func(max_len=16, max_age_seconds=3600, ignore_self=True)
     def get_member_list(self, group_id) -> List[Dict[str, Any]]:
         """
         get the member lists from database
@@ -801,7 +813,7 @@ class ClanBattle:
         group_id = ctx['group_id']
         user_id = ctx['user_id']
         if match_num == 1:  # 创建
-            match = re.match(r'^创建(?:([日台韩国])服)?公会$', cmd)
+            match = re.match(r'^创建(?:([日台韩国])服)?[公工]会$', cmd)
             if not match:
                 return
             game_server = self.Server.get(match.group(1), 'cn')

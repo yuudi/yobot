@@ -28,8 +28,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.0]"
-    Commit = {"yuudi": 42, "sunyubo": 1}
+    Version = "[v3.3.1]"
+    Commit = {"yuudi": 43, "sunyubo": 1}
 
     def __init__(self, *,
                  data_path: str,
@@ -250,6 +250,7 @@ class Yobot:
             else:
                 msg["raw_message"] = (
                     msg["raw_message"][len(preffix):])
+                msg["message"] = msg["message"][len(preffix):]
 
         # black-list
         if msg["sender"]["user_id"] in self.glo_setting.get("black-list", list()):

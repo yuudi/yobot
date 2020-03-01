@@ -42,6 +42,8 @@ class WebUtil:
         self.setting = glo_setting
         self.resource_path = os.path.join(
             glo_setting['dirname'], 'output', 'resource')
+        if not os.path.exists(self.resource_path):
+            os.makedirs(self.resource_path)
 
     def register_routes(self, app: Quart):
 

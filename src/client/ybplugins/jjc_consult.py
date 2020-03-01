@@ -30,6 +30,7 @@ class Consult:
     Request = False
     URL = "http://api.yobot.xyz/v2/nicknames/?type=csv"
     Feedback_URL = "http://api.yobot.xyz/v2/nicknames/?type=feedback&name="
+    Nicknames_repo = "https://gitee.com/yobot/pcr-nickname/blob/master/nicknames.csv"
 
     def __init__(self, glo_setting: dict, *args, refresh_nickfile=False,  **kwargs):
         self.setting = glo_setting
@@ -65,9 +66,11 @@ class Consult:
                     try:
                         requests.get(self.Feedback_URL+index)
                     except requests.exceptions.ConnectionError:
-                        msg = "没有找到【{}】，目前昵称表：{}".format(index, self.URL)
+                        msg = "没有找到【{}】，目前昵称表：{}".format(
+                            index, self.Nicknames_repo)
                     else:
-                        msg = "没有找到【{}】，已自动反馈，目前昵称表：{}".format(index, self.URL)
+                        msg = "没有找到【{}】，已自动反馈，目前昵称表：{}".format(
+                            index, self.Nicknames_repo)
                     raise ValueError(msg)
                 else:
                     self.__init__(self.setting, refresh_nickfile=True)
@@ -106,6 +109,7 @@ class Consult:
         try:
             solution = json.loads(restxt)
         except json.JSONDecodeError as e:
+            print('解析json错误：'+restxt)
             return '解析响应错误'+str(e)
         if len(solution) == 0:
             return '没有找到解法'
