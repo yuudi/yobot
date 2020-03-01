@@ -17,7 +17,7 @@
             此站点的公开地址：<el-input v-model="setting.public_address" placeholder="http://"></el-input>
         </p>
         <p>
-            此站点的目录前缀：<el-input v-model="setting.public_basepath" placeholder="/yobot/"></el-input>
+            此站点的URL前缀：<el-input v-model="setting.public_basepath" placeholder="/yobot/"></el-input>
         </p>
         <p>
             生成聊天链接：
@@ -41,7 +41,7 @@
                     <el-checkbox v-model="setting.zht_in">接受繁中输入</el-checkbox>
                 </el-col>
                 <el-col :span="6">
-                    <el-checkbox v-model="setting.zht_in">输出转化为繁中</el-checkbox>
+                    <el-checkbox v-model="setting.zht_out">输出转化为繁中</el-checkbox>
                 </el-col>
                 <el-col :span="4">
                     转化风格：
@@ -176,6 +176,29 @@
                     </el-input>
                 </el-col>
             </el-row>
+        </p>
+        <p>
+            <el-collapse v-model="activeNames" @change="bossSetting = !bossSetting">
+                <el-collapse-item title="boss设置" name="1">
+                    <div :hidden="!bossSetting">
+                        <div v-for="area_health,area in setting.boss">
+                            <h4>[[ {jp:"日服",tw:"台服",cn:"国服",eff:"得分系数"}[area] ]]</h4>
+                            <table>
+                                <tr>
+                                    <th></th>
+                                    <th v-for="k in 5">[[k]]号boss</th>
+                                </tr>
+                                <tr v-for="level,k in area_health">
+                                    <td>[[k+1]]阶段</td>
+                                    <td v-for="health,b in level"><input v-model.number="area_health[k][b]"
+                                            placeholder="boss血量" type="number" v-bind="{step: (area=='eff')?0.1:1000000}" />
+                                    </td>
+                                </tr>
+                            </table><button @click="switch_levels(area)">切换阶段数</button>
+                        </div>
+                    </div>
+                </el-collapse-item>
+            </el-collapse>
         </p>
         <p>
             <el-button type="success" @click="update">确定</el-button>

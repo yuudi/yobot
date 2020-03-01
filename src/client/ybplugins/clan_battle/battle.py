@@ -138,7 +138,7 @@ class ClanBattle:
                 continue
             group.group_name = group_info['group_name']
             group.save()
-            self._group_data[group_list] = group
+            self._group_data[group.group_id] = group
         return True
 
     @async_cached_func(16)
@@ -304,7 +304,8 @@ class ClanBattle:
                                ensure_ascii=False),
         )
         group.boss_health -= damage
-        group.challenging_member_qq_id = None
+        if user.qqid == group.challenging_member_qq_id:
+            group.challenging_member_qq_id = None
 
         challenge.save()
         group.save()
@@ -380,7 +381,8 @@ class ClanBattle:
             self.bossinfo[group.game_server]
             [self._level_by_cycle(group.boss_cycle, group.level_4)]
             [group.boss_num-1])
-        group.challenging_member_qq_id = None
+        if user.qqid == group.challenging_member_qq_id:
+            group.challenging_member_qq_id = None
 
         group.save()
         challenge.save()
@@ -425,7 +427,6 @@ class ClanBattle:
         group.boss_num = last_challenge.boss_num
         group.boss_health = (last_challenge.boss_health_ramain
                              + last_challenge.challenge_damage)
-        group.challenging_member_qq_id = None
         last_challenge.delete_instance()
         group.save()
 
@@ -809,7 +810,7 @@ class ClanBattle:
         if ctx['message_type'] != 'group':
             if match_num < 15:
                 return
-        cmd = ctx['message']
+        cmd = ctx['raw_message']
         group_id = ctx['group_id']
         user_id = ctx['user_id']
         if match_num == 1:  # 创建

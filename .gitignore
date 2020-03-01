@@ -9,6 +9,6 @@ src/client/*.json
 src/client/*.csv
 src/client/*.db
 src/client/*.ics
+src/client/*.pid
 src/client/*.spec
 src/client/test.py
-**/yobot.pid

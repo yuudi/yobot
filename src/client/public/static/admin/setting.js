@@ -3,6 +3,8 @@ var vm = new Vue({
     data: {
         setting: {},
         hide_jjckey: 0,
+        activeNames: [],
+        bossSetting: false,
     },
     mounted() {
         var thisvue = this;
@@ -24,7 +26,7 @@ var vm = new Vue({
                 this.setting,
             ).then(function (res) {
                 if (res.data.code == 0) {
-                    alert('设置成功');
+                    alert('设置成功，重启机器人后生效');
                 } else {
                     alert('设置失败：' + res.data.message);
                 }
@@ -32,22 +34,19 @@ var vm = new Vue({
                 alert(error);
             });
         },
+        switch_levels: function (area) {
+            if (this.setting.boss[area].length <= 3) {
+                this.setting.boss[area].push([0, 0, 0, 0, 0]);
+            } else {
+                this.setting.boss[area].pop();
+            }
+        },
         comfirm_change_clan_mode: function (event) {
             this.$alert('修改模式后，公会战数据会重置。请不要在公会战期间修改！', '警告', {
                 confirmButtonText: '知道了',
                 type: 'warning',
             });
         },
-    },
-    watch: {
-        'setting.public_basepath': function (newpath) {
-            if (newpath.charAt(0) !== '/') {
-                newpath = '/' + newpath;
-            }
-            if (newpath.charAt(newpath.length - 1) !== '/') {
-                newpath = newpath + '/';
-            }
-        }
     },
     delimiters: ['[[', ']]'],
 })
