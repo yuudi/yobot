@@ -8,7 +8,6 @@ import json
 import os.path
 import re
 
-
 class Re_cache:
     def __init__(self):
         self.prog = {}
@@ -40,6 +39,7 @@ class Reserve():
         else:
             self._data = {}
         self.txt_list = []
+        self.is_on_tree = False
 
     def __del__(self):
         pass
@@ -64,6 +64,8 @@ class Reserve():
                 ("挂树了，目前挂树人数：" if boss == "0" else "预约成功，目前预约人数：") +
                 str(len(self._data[self._groupid][boss])))
             self._save()
+            if boss == "0":
+                self.is_on_tree = True
 
     def _notify(self, boss):
         trig = (boss == "0")  # 被动触发

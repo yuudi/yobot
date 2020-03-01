@@ -87,6 +87,10 @@ class Boss_dmg:
             rsv = reserve.Reserve(cmd_list[:3], basepath)
             rsv.rsv(cmd, func)
             txt_list.extend(rsv.txt_list)
+            if rsv.is_on_tree:
+                lockboss = lock_boss.Lock(cmd_list[:3], basepath)
+                lockboss.on_tree()
+                txt_list.extend(lockboss.txt_list)
         return {
             "reply": "\n-------\n".join(txt_list),
             "block": True}

@@ -99,6 +99,15 @@ class Lock():
             self.txt_list.append("boss已解锁")
             self._save()
             return
+    
+    def on_tree(self):
+        # 如果锁定boss的人挂树了就解锁boss
+        if self._data.get(self._groupid, [0])[0] == 0:
+            return
+        elif self._data.get(self._groupid, [0, 0])[1] == self._qqid:
+            del self._data[self._groupid]
+            self.txt_list.append("boss已解锁")
+            self._save()
 
     @staticmethod
     def match(cmd):
