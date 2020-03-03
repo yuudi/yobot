@@ -45,6 +45,9 @@ var vm = new Vue({
         });
         this.status_long_polling();
     },
+    destroyed: function () {
+        this.leavePage=true;
+    },
     computed: {
         damageHint: function () {
             if (this.damage < 10000) {

@@ -67,7 +67,9 @@ yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊�
 
 <https://gitee.com/yobot/yobot>
 
-## 使用协议
+## 开源协议
+
+本工具使用了[这些](./thanks.md)开源软件和工具
 
 使用时请遵循[GPL-3.0协议](https://www.gnu.org/licenses/gpl-3.0.html)，简单地说：
 

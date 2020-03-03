@@ -6,9 +6,8 @@ import string
 import time
 from urllib.parse import urljoin
 
-import peewee
 from aiocqhttp.api import Api
-from quart import Quart, jsonify, make_response, request, url_for
+from quart import Quart, jsonify, make_response, request
 
 from .templating import render_template
 from .ybdata import Admin_key
@@ -34,7 +33,6 @@ class Marionette:
                  bot_api: Api,
                  *args, **kwargs):
         self.setting = glo_setting
-        self.public_basepath = glo_setting['public_basepath']
         self.api = bot_api
 
     def _gen_key(self):
@@ -48,7 +46,7 @@ class Marionette:
         )
         newurl = urljoin(
             self.setting['public_address'],
-            url_for('yobot_marionette', key=newkey))
+            '{}yobot_marionette/key={}'.format(self.setting['public_basepath'], newkey))
         return newurl
 
     @staticmethod

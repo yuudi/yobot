@@ -13,13 +13,25 @@
     {% if user["authority_group"] < 10 -%}
     <div id="app">
         <p><a href="{{ url_for('yobot_user') }}"><el-button type="primary" icon="el-icon-back" circle></el-button></a></p>
-        <p>
-            此站点的公开地址：<el-input v-model="setting.public_address" placeholder="http://"></el-input>
-        </p>
+        此站点的公开地址：<el-input v-model="setting.public_address" placeholder="http://"></el-input>
+        <el-button type="info" @click="domainApply = true">yobot 域名</el-button>
+        <el-dialog title="申请yobot域名" :visible.sync="domainApply">
+            <el-form>
+                <el-form-item label="域名" label-width="120">
+                    <el-input v-model="applyName" placeholder="字母、数字" maxlength="16" show-word-limit>
+                        <template slot="append">.yobot.xyz</template>
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="domainApply = false">取消</el-button>
+                <el-button type="primary" @click="sendApply('{{ url_for('yobot_api_getdomain') }}')">申请</el-button>
+            </div>
+        </el-dialog>
         <p>
             此站点的URL前缀：<el-input v-model="setting.public_basepath" placeholder="/yobot/"></el-input>
         </p>
-        <p>
+        <p hidden>
             生成聊天链接：
             <el-radio v-model="setting.public_priority" label="self" disabled>使用此站点</el-radio>
             <el-radio v-model="setting.public_priority" label="monster">使用io.yobot.monster</el-radio>

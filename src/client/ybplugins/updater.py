@@ -110,6 +110,7 @@ class Updater:
         sys.exit()
 
     def linux_update(self, force: bool = False, test_ver: int = 0):
+        return "Linux版自动更新存在问题，请等待修复"
         test_version = ["stable", "beta", "alpha"][test_ver]
         if not force:
             pullcheck = self.check_commit()
@@ -176,6 +177,7 @@ class Updater:
         else:
             if self.evn == "nonebot-plugin":
                 return "作为插件无法这么做"
+            return "Linux版自动重启存在问题，请等待修复"
             cmd = '''
             kill {}
             sleep 1s

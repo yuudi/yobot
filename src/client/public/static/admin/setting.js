@@ -5,6 +5,8 @@ var vm = new Vue({
         hide_jjckey: 0,
         activeNames: [],
         bossSetting: false,
+        domainApply: false,
+        applyName: '',
     },
     mounted() {
         var thisvue = this;
@@ -29,6 +31,31 @@ var vm = new Vue({
                     alert('设置成功，重启机器人后生效');
                 } else {
                     alert('设置失败：' + res.data.message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            });
+        },
+        sendApply: function (api) {
+            if (/^\w{1,16}$/.test(this.applyName)) {
+                ;
+            } else {
+                alert('只能包含字母、数字');
+                return;
+            }
+            var thisvue = this;
+            axios.get(
+                api + '?name=' + thisvue.applyName + '.yobot.xyz'
+            ).then(function (res) {
+                if (res.data.code == 0) {
+                    alert('申请成功，请等待3分钟左右解析生效');
+                    thisvue.setting.public_address = thisvue.setting.public_address.replace(/\/\/([^:\/]+)/, '//' + thisvue.applyName + '.yobot.xyz');
+                    thisvue.domainApply = false;
+                    thisvue.update(null);
+                } else if (res.data.code == 1) {
+                    alert('申请失败，此域已被占用');
+                } else {
+                    alert('申请失败，' + res.data.message);
                 }
             }).catch(function (error) {
                 alert(error);

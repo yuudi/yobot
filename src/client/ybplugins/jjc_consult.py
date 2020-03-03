@@ -20,7 +20,7 @@ def _parse_team(team):
     return [[
         atk[i].split(',')[0],
         int(atk[i].split(',')[1]),
-        bool(equip[i]),
+        bool(int(equip[i])),
     ] for i in range(5)]
 
 
@@ -109,10 +109,9 @@ class Consult:
         try:
             solution = json.loads(restxt)
         except json.JSONDecodeError as e:
-            print('解析json错误：'+restxt)
-            return '解析响应错误'+str(e)
+            return '服务器错误，请稍后再试'
         if len(solution) == 0:
-            return '没有找到解法'
+            return '没有找到公开的解法'
 
         page = await render_template(
             'jjc-solution.html',

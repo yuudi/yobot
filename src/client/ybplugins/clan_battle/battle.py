@@ -1479,7 +1479,9 @@ class ClanBattle:
                     'clan/<int:group_id>/<int:qqid>/'),
             methods=['GET'])
         async def yobot_clan_user(group_id, qqid):
-            return '建设中'
+            return await render_template(
+                'clan/user.html',
+            )
 
         @app.route(
             urljoin(self.setting['public_basepath'],

@@ -63,16 +63,42 @@ class WebUtil:
             return jsonify(location)
 
         @app.route(
+            urljoin(self.setting['public_basepath'], 'api/get-domain/'),
+            methods=['GET'])
+        async def yobot_api_getdomain():
+            if 'yobot_user' not in session:
+                return jsonify(code=400, message='Unauthorized')
+            name = request.args.get('name')
+            if name is None:
+                return jsonify(code=400, message='No name specified')
+            try:
+                async with aiohttp.request('GET', url='https://api.v3.yobot.xyz/winname/?name='+name) as response:
+                    if response.status != 200:
+                        raise ServerError(
+                            f'http code {response.status} from api.v3.yobot.xyz')
+                    res = await response.json()
+            except:
+                return jsonify(code=401, message='Fail: Connect to Server')
+            return jsonify(res)
+
+        @app.route(
             urljoin(self.setting["public_basepath"],
                     "resource/<path:filename>"),
             methods=["GET"])
         async def yobot_resource(filename):
             localfile = os.path.join(self.resource_path, filename)
             if not os.path.exists(localfile):
-                async with aiohttp.request("GET", url=f'https://redive.estertion.win/{filename}') as response:
-                    res = await response.read()
-                    if response.status != 200:
-                        return res, response.status
+                try:
+                    async with aiohttp.request(
+                        "GET",
+                        url=f'https://redive.estertion.win/{filename}'
+                    ) as response:
+                        res = await response.read()
+                        if response.status != 200:
+                            return res, response.status
+                except aiohttp.ClientError as e:
+                    print(e)
+                    return '404: Not Found', 404
                 if not os.path.exists(os.path.dirname(localfile)):
                     os.makedirs(os.path.dirname(localfile))
                 with open(localfile, 'wb') as f:
