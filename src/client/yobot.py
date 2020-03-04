@@ -12,27 +12,31 @@ from urllib.parse import urljoin
 
 import requests
 from aiocqhttp.api import Api
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from opencc import OpenCC
 from quart import Quart, send_file
 
 if __package__:
-    from .ybplugins import (boss_dmg, calender, char_consult, clan_battle, custom,
+    from .ybplugins import (boss_dmg, calender, char_consult, clan_battle,
                             gacha, homepage, jjc_consult, login, marionette,
                             push_news, settings, switcher, updater, web_util,
                             yobot_msg, ybdata)
+    from .yybplugins import custom
 else:
-    from ybplugins import (boss_dmg, calender, char_consult, clan_battle, custom,
+    from ybplugins import (boss_dmg, calender, char_consult, clan_battle,
                            gacha, homepage, jjc_consult, login, marionette,
                            push_news, settings, switcher, updater, web_util,
                            yobot_msg, ybdata)
+    from yybplugins import custom
 
 
 class Yobot:
-    Version = "[v3.3.3]"
-    Commit = {"yuudi": 47, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.4]"
+    Commit = {"yuudi": 48, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
+                 scheduler: AsyncIOScheduler,
                  quart_app: Quart,
                  bot_api: Api,
                  verinfo: str = None):
@@ -155,6 +159,8 @@ class Yobot:
         kwargs = {
             "glo_setting": self.glo_setting,
             "bot_api": bot_api,
+            "scheduler": scheduler,
+            "app": quart_app,
         }
 
         # load plugins
@@ -174,7 +180,6 @@ class Yobot:
             settings.Setting(**kwargs),
             web_util.WebUtil(**kwargs),
             clan_battle.ClanBattle(**kwargs),
-            custom.Custom(**kwargs),
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]
         self.plug_active = [p for p in plug_all if p.Active]
@@ -183,54 +188,14 @@ class Yobot:
             if p.Request:
                 p.register_routes(quart_app)
 
+        # load new plugins
+        self.plug_new = [
+            custom.Custom(**kwargs),
+        ]
+
     def active_jobs(self) -> List[Tuple[Any, Callable[[], Iterable[Dict[str, Any]]]]]:
         jobs = [p.jobs() for p in self.plug_active]
         return reduce(lambda x, y: x+y, jobs)
-
-    def proc(self, msg: dict, *args, **kwargs) -> str:
-        '''
-        receive a message and return a reply
-        '''
-        # prefix
-        if self.glo_setting.get("preffix_on", False):
-            preffix = self.glo_setting.get("preffix_string", "")
-            if not msg["raw_message"].startswith(preffix):
-                return None
-            else:
-                msg["raw_message"] = (
-                    msg["raw_message"][len(preffix):])
-                msg["message"] = msg["message"][len(preffix):]
-
-        # black-list
-        if msg["sender"]["user_id"] in self.glo_setting.get("black-list", list()):
-            return None
-
-        # zht-zhs convertion
-        if self.glo_setting.get("zht_in", False):
-            msg["raw_message"] = self.cct2s.convert(msg["raw_message"])
-        if msg["sender"].get("card", "") == "":
-            msg["sender"]["card"] = msg["sender"]["nickname"]
-
-        # run
-        replys = []
-        for pitem in self.plug_passive:
-            if hasattr(pitem, 'match'):
-                func_num = pitem.match(msg["raw_message"])
-            else:
-                func_num = True
-            if func_num:
-                res = pitem.execute(func_num, msg)
-                if res is None:
-                    continue
-                if isinstance(res, str):
-                    replys.append(res)
-                    break
-                if res is None:
-                    break
-                replys.append(res["reply"])
-                if res["block"]:
-                    break
-        reply_msg = "\n".join(replys)
 
         # zhs-zht convertion
         if self.glo_setting.get("zht_out", False):
@@ -250,7 +215,6 @@ class Yobot:
             else:
                 msg["raw_message"] = (
                     msg["raw_message"][len(preffix):])
-                msg["message"] = msg["message"][len(preffix):]
 
         # black-list
         if msg["sender"]["user_id"] in self.glo_setting.get("black-list", list()):
@@ -261,6 +225,33 @@ class Yobot:
             msg["raw_message"] = self.cct2s.convert(msg["raw_message"])
         if msg["sender"].get("card", "") == "":
             msg["sender"]["card"] = msg["sender"]["nickname"]
+
+        # run new
+        reply_msg = None
+        for plug in self.plug_new:
+            if hasattr(plug, "execute_async"):
+                ret = await plug.execute_async(msg)
+            elif hasattr(plug, "execute"):
+                ret = plug.execute(msg)
+            else:
+                continue
+            if ret is None:
+                continue
+            elif isinstance(ret, bool):
+                if ret:
+                    break
+                else:
+                    continue
+            elif isinstance(ret, str):
+                reply_msg = ret
+                break
+            else:
+                raise ValueError('unsupport return type: {}'.format(type(ret)))
+
+        if reply_msg:
+            if self.glo_setting.get("zht_out", False):
+                reply_msg = self.ccs2t.convert(reply_msg)
+            return reply_msg
 
         # run
         replys = []

@@ -88,6 +88,8 @@ class WebUtil:
         async def yobot_resource(filename):
             localfile = os.path.join(self.resource_path, filename)
             if not os.path.exists(localfile):
+                if filename.endswith('.jpg'):
+                    filename = filename[:-4] + '.webp@w400'
                 try:
                     async with aiohttp.request(
                         "GET",

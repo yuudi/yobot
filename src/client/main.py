@@ -42,7 +42,9 @@ def main():
 
     cqbot = CQHttp(access_token=token,
                    enable_http_post=False)
+    sche = AsyncIOScheduler()
     bot = yobot.Yobot(data_path=".",
+                      scheduler=sche,
                       quart_app=cqbot.server_app,
                       bot_api=cqbot._api,
                       )
@@ -55,7 +57,7 @@ def main():
             reply = await bot.proc_async(context)
         else:
             reply = None
-        if reply != "" and reply is not None:
+        if isinstance(reply, str) and reply != "":
             return {'reply': reply,
                     'at_sender': False}
         else:
@@ -73,7 +75,6 @@ def main():
 
     jobs = bot.active_jobs()
     if jobs:
-        sche = AsyncIOScheduler()
         for trigger, job in jobs:
             sche.add_job(func=send_it,
                          args=(job,),

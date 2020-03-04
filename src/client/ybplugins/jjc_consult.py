@@ -81,7 +81,7 @@ class Consult:
             raise ValueError("防守人数过少")
         return def_lst
 
-    async def jjcsearch_async(self, def_lst: list) -> str:
+    async def jjcsearch_async(self, def_lst: list, retry: int = 0) -> str:
         headers = {
             'User-Agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                            'AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -109,7 +109,10 @@ class Consult:
         try:
             solution = json.loads(restxt)
         except json.JSONDecodeError as e:
-            return '服务器错误，请稍后再试'
+            if retry >= 2:
+                return '服务器错误，请稍后再试'
+            else:
+                return await self.jjcsearch_async(def_lst, retry+1)
         if len(solution) == 0:
             return '没有找到公开的解法'
 

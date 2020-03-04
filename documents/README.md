@@ -44,6 +44,14 @@ yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊�
 
 ![预约boss](./imgs/Kf2QPK.png)
 
+### 公会战伤害统计助手（新版）
+
+新版助手提供了一个网页面板，面板上可以进行更多操作
+
+![主面板](./imgs/poYvQO.jpg)
+
+![数据面板](./imgs/HOh17P.jpg)
+
 ### 新闻推送
 
 机器人主动发送游戏新闻与活动提醒

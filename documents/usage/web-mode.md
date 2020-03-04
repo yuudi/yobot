@@ -60,10 +60,24 @@ server {
 
 ### 方法 3：使用 Apache 代理
 
-请根据服务器实际情况设定 Apache 代理
+请根据服务器实际情况设定 Apache 代理，这里给出一个示例
 
-```apache
-//TODO
+```apacheconf
+<VirtualHost *:80>
+    Servername io.yobot.xyz
+        ProxyRequests Off
+        ProxyPass http://localhost:9222/
+        ProxyPassReverse http://localhost:9222/
+        <Proxy *>
+            Order Deny, Allow
+            Allow from All
+        </Proxy>
+        <Location "/ws/">
+        AllowOverride None
+            Order Deny, Allow
+            Deny from All
+        </Location>
+</VirtualHost>
 ```
 
 ## 开始使用 Web 模式

@@ -5,6 +5,7 @@
 - vuejs: <https://github.com/vuejs/vue>
 - element-UI: <https://github.com/elemefe>
 - Quart: <https://github.com/pgjones/quart>
+- pyinstaller: <https://github.com/pyinstaller/pyinstaller>
 - peewee: <https://github.com/coleifer/peewee>
 - requests: <https://pypi.org/project/requests>
 - aiohttp: <https://github.com/aio-libs/aiohttp>
@@ -15,4 +16,3 @@
 - opencc-python: <https://github.com/yichen0831/opencc-python>
 - feedparser: <https://github.com/kurtmckee/feedparser>
 - expiringdict: <https://pypi.org/project/expiringdict/>
-- ics-python: <https://github.com/C4ptainCrunch/ics.py>

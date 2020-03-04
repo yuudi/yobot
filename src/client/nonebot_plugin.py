@@ -47,6 +47,7 @@ verinfo = {
 cqbot = get_bot()
 bot = Yobot(data_path="./yobot_data",
             verinfo=verinfo,
+            scheduler=scheduler,
             quart_app=cqbot.server_app,
             bot_api=cqbot._api,
             )

@@ -51,7 +51,7 @@
             <tr>
                 {% for chara in parse_team(team) -%}
                 <td>
-                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id[chara[0]] + (60 if chara[1]==6 else 30) }}.webp">
+                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id[chara[0]] + (60 if chara[1]==6 else 30) }}.jpg">
                     <br>
                     {% if chara[1] == 6 -%}
                     <div class="star" id="mark"></div>
