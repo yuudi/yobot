@@ -45,23 +45,15 @@ class Custom:
         self.setting = glo_setting
         self.api = bot_api
 
-        # 注册定时任务，详见apscheduler文档
-        @scheduler.scheduled_job('cron', hour=8)
-        async def good_morning():
-            await bot_api.send_group_msg(group_id=123456, message='早上好')
+        # # 注册定时任务，详见apscheduler文档
+        # @scheduler.scheduled_job('cron', hour=8)
+        # async def good_morning():
+        #     await bot_api.send_group_msg(group_id=123456, message='早上好')
 
-        # 注册web路由，详见flask与quart文档
-        @app.route('/is-bot-running', methods=['GET'])
-        async def check_bot():
-            return 'yes, bot is running'
-
-    async def api_init(self, bot_api: Api, *args, **kwargs) -> None:
-        '''
-        初始化，只在bot第一次连接成功时执行一次
-
-        参数同上
-        '''
-        pass
+        # # 注册web路由，详见flask与quart文档
+        # @app.route('/is-bot-running', methods=['GET'])
+        # async def check_bot():
+        #     return 'yes, bot is running'
 
     async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
         '''
@@ -69,6 +61,9 @@ class Custom:
 
         参数ctx 具体格式见：https://cqhttp.cc/docs/#/Post
         '''
+
+        # 如果需要使用，请注释掉下面一行
+        return
 
         cmd = ctx['raw_message']
         if cmd == '你好':

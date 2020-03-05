@@ -43,7 +43,7 @@ var vm = new Vue({
             if (cha == undefined) {
                 return '';
             }
-            return '(' + cha.cycle + '-' + cha.boss_num + ')' + cha.damage.toLocaleString();
+            return '(' + cha.cycle + '-' + cha.boss_num + ') ' + cha.damage.toLocaleString();
         },
         cdetail: function (cha) {
             if (cha == undefined) {

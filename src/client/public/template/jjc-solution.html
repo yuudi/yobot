@@ -5,7 +5,14 @@
     <title>jjc解法</title>
     <style>
         #mark {
-            float: left
+            float: left;
+            position: relative;
+            bottom: 22px;
+            left: 2px;
+        }
+
+        .detail {
+            position: absolute;
         }
 
         h1 {
@@ -50,24 +57,25 @@
             {% for team in solution -%}
             <tr>
                 {% for chara in parse_team(team) -%}
-                <td>
+                <td valign="top">
                     <img src="{{ public_base }}resource/icon/unit/{{ jpname2id[chara[0]] + (60 if chara[1]==6 else 30) }}.jpg">
-                    <br>
-                    {% if chara[1] == 6 -%}
-                    <div class="star" id="mark"></div>
-                    <div class="star" id="mark"></div>
-                    <div class="star" id="mark"></div>
-                    <div class="star" id="mark"></div>
-                    <div class="star" id="mark"></div>
-                    <div class="star_pink" id="mark"></div>
-                    {% else -%}
-                    {% for i in range(chara[1]) -%}
-                    <div class="star" id="mark"></div>
-                    {% endfor -%}
-                    {% if chara[2] -%}
-                    <div class="equip" id="mark"></div>
-                    {% endif -%}
-                    {% endif -%}
+                    <div class="detail">
+                        {% if chara[1] == 6 -%}
+                        <div class="star" id="mark"></div>
+                        <div class="star" id="mark"></div>
+                        <div class="star" id="mark"></div>
+                        <div class="star" id="mark"></div>
+                        <div class="star" id="mark"></div>
+                        <div class="star_pink" id="mark"></div>
+                        {% else -%}
+                        {% for i in range(chara[1]) -%}
+                        <div class="star" id="mark"></div>
+                        {% endfor -%}
+                        {% if chara[2] -%}
+                        <div class="equip" id="mark"></div>
+                        {% endif -%}
+                        {% endif -%}
+                    </div>
                 </td>
                 {% endfor -%}
                 <td>

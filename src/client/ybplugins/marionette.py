@@ -46,7 +46,7 @@ class Marionette:
         )
         newurl = urljoin(
             self.setting['public_address'],
-            '{}yobot_marionette/key={}'.format(self.setting['public_basepath'], newkey))
+            '{}marionette/?key={}'.format(self.setting['public_basepath'], newkey))
         return newurl
 
     @staticmethod
@@ -68,6 +68,8 @@ class Marionette:
             }
         newurl = self._gen_key()
         reply = '点击链接开始使用我：'+newurl
+        if self.setting['web_mode_hint']:
+            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/usage/web-mode.html'
         return {
             'reply': reply,
             'block': True

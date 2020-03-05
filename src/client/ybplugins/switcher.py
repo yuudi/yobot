@@ -150,6 +150,9 @@ class Switcher:
                     "calender_region")
             reply = (self.dump_url(keys, "global") + "\n请在此页进行设置，完成后发送设置码即可\n"
                      "其他设置请发送“设置卡池”、“设置邮箱”、“设置新闻”、“设置boss”")
+            reply += "\n\n或使用新版设置：" + urljoin(
+                self.setting['public_address'],
+                '{}admin/setting/'.format(self.setting['public_basepath']))
         elif match_num == 0x400:
             in_code = cmd[3:]
             res = self.get_url_content(self.code_api+in_code)
@@ -196,7 +199,7 @@ class Switcher:
                 full_url = self.setting_url['boss'] + "?form=" + quote(query)
                 reply = shorten_url.shorten(full_url)
             else:
-                reply = "未知的设置"
+                return
 
         return {
             "reply": reply,

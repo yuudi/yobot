@@ -80,7 +80,7 @@ class Login:
         )
         reply = '请在一分钟内点击链接登录：'+newurl
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/v3/usage/web-mode.html'
+            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/usage/web-mode.html'
         return {
             'reply': reply,
             'block': True

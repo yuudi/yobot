@@ -62,7 +62,6 @@ class ClanBattle:
                  glo_setting: Dict[str, Any],
                  bot_api: Api,
                  *args, **kwargs):
-        self.mode_on = (glo_setting["clan_battle_mode"] == "web")
         self.setting = glo_setting
         self.bossinfo = glo_setting['boss']
         self.api = bot_api
@@ -284,11 +283,12 @@ class ClanBattle:
             Clan_challenge.challenge_pcrdate == d,
         ).order_by(Clan_challenge.cid)
         challenges = list(challenges)
-        if sum((not c.is_continue) for c in challenges) >= 3:
-            raise InputError('今日上报次数已达到3次')
         is_continue = (challenges
                        and challenges[-1].boss_health_ramain == 0
                        and not challenges[-1].is_continue)
+        if (sum((not c.is_continue) for c in challenges) >= 3
+                and not is_continue):
+            raise InputError('今日上报次数已达到3次')
         challenge = Clan_challenge.create(
             gid=group_id,
             qqid=user.qqid,
@@ -352,11 +352,12 @@ class ClanBattle:
             Clan_challenge.challenge_pcrdate == d,
         ).order_by(Clan_challenge.cid)
         challenges = list(challenges)
-        if sum((not c.is_continue) for c in challenges) >= 3:
-            raise InputError('今日上报次数已达到3次')
         is_continue = (challenges
                        and challenges[-1].boss_health_ramain == 0
                        and not challenges[-1].is_continue)
+        if (sum((not c.is_continue) for c in challenges) >= 3
+                and not is_continue):
+            raise InputError('今日上报次数已达到3次')
         challenge = Clan_challenge.create(
             gid=group_id,
             qqid=user.qqid,
@@ -800,7 +801,7 @@ class ClanBattle:
         return ((trigger, create_task_update_all_group_members),)
 
     def match(self, cmd):
-        if not self.mode_on:
+        if self.setting['clan_battle_mode'] != 'web':
             return 0
         if len(cmd) < 2:
             return 0
@@ -828,17 +829,22 @@ class ClanBattle:
                     '公会战成员请发送“加入公会”，'
                     '或发送“加入全部成员”')
         elif match_num == 2:  # 加入
-            if cmd == '加入公会':
-                self.bind_group(group_id, user_id)
-                _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-                return '{}已加入本公会' .format(atqq(user_id))
             if cmd == '加入全部成员':
                 if ctx['sender']['role'] == 'member':
-                    return '只有管理员才可以这么做'
+                    return '只有管理员才可以加入全部成员'
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 asyncio.create_task(
                     self._update_all_group_members_async(group_id))
                 return '本群所有成员已添加记录'
+            match = re.match(r'^加入公会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
+            if match:
+                if match.group(1):
+                    if ctx['sender']['role'] == 'member':
+                        return '只有管理员才可以加入其他成员'
+                    user_id = int(match.group(1))
+                self.bind_group(group_id, user_id)
+                _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
+                return '{}已加入本公会' .format(atqq(user_id))
         elif match_num == 3:  # 状态
             if cmd != '状态':
                 return
@@ -919,7 +925,7 @@ class ClanBattle:
                 return
             url = urljoin(
                 self.setting['public_address'],
-                '{}clan/{}/statistics/'.format(
+                '{}clan/{}/progress/'.format(
                     self.setting['public_basepath'],
                     group_id
                 )
@@ -1108,6 +1114,17 @@ class ClanBattle:
                     return jsonify(
                         code=0,
                         challenges=report
+                    )
+                elif action == 'get_user_challenge':
+                    report = self.get_report(
+                        group_id,
+                        payload['qqid'],
+                        None,
+                    )
+                    return jsonify(
+                        code=0,
+                        challenges=report,
+                        game_server=group.game_server,
                     )
                 elif action == 'update_boss':
                     try:
@@ -1465,7 +1482,7 @@ class ClanBattle:
             urljoin(self.setting['public_basepath'],
                     'clan/<int:group_id>/my/'),
             methods=['GET'])
-        async def yobot_clan_user_aotu(group_id):
+        async def yobot_clan_user_auto(group_id):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
             return redirect(url_for(
@@ -1479,6 +1496,16 @@ class ClanBattle:
                     'clan/<int:group_id>/<int:qqid>/'),
             methods=['GET'])
         async def yobot_clan_user(group_id, qqid):
+            if 'yobot_user' not in session:
+                return redirect(url_for('yobot_login', callback=request.path))
+            group = Clan_group.get_or_none(group_id=group_id)
+            if group is None:
+                return await render_template('404.html', item='公会'), 404
+            is_member = (
+                session['yobot_user']['clan_group_id'] == group.group_id)
+            if (not is_member
+                    and session['yobot_user']['authority_group'] >= 10):
+                return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/user.html',
             )
@@ -1584,6 +1611,22 @@ class ClanBattle:
             return await render_template(
                 'clan/statistics.html',
             )
+
+        @app.route(
+            urljoin(self.setting['public_basepath'],
+                    'clan/<int:group_id>/statistics/api/'),
+            methods=['GET'])
+        async def yobot_clan_statistics_api(group_id):
+            if 'yobot_user' not in session:
+                return jsonify(code=10, message='Not logged in')
+            group = Clan_group.get_or_none(group_id=group_id)
+            if group is None:
+                return jsonify(code=20, message='Group not exists')
+            is_member = session['yobot_user']['clan_group_id'] == group.group_id
+            if (not is_member and session['yobot_user']['authority_group'] >= 10):
+                return jsonify(code=11, message='Insufficient authority')
+            report = self.get_report(group_id, None, None)
+            return jsonify(code=0, challenges=report)
 
         @app.route(
             urljoin(self.setting['public_basepath'],
