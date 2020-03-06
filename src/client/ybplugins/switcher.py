@@ -3,7 +3,7 @@ import hashlib
 import json
 import os
 from typing import Union
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 import requests
 

@@ -89,12 +89,14 @@ class ClanBattle:
             self._group_data[group.group_id] = group
             self._boss_status[group.group_id] = asyncio.Future()
 
-    def _level_by_cycle(self, cycle, level_4=False):
+    def _level_by_cycle(self, cycle, *, level_4=None, game_server=None):
         if cycle <= 3:
             return 0
         elif cycle <= 10:
             return 1
         else:
+            if level_4 is None:
+                level_4 = (len(self.setting['boss'][game_server]) == 4)
             if level_4 and cycle >= 35:
                 return 3
             return 2
@@ -380,7 +382,8 @@ class ClanBattle:
         health_before = group.boss_health
         group.boss_health = (
             self.bossinfo[group.game_server]
-            [self._level_by_cycle(group.boss_cycle, group.level_4)]
+            [self._level_by_cycle(
+                group.boss_cycle, game_server=group.game_server)]
             [group.boss_num-1])
         if user.qqid == group.challenging_member_qq_id:
             group.challenging_member_qq_id = None
@@ -471,7 +474,8 @@ class ClanBattle:
         if boss_health is None:
             boss_health = (
                 self.bossinfo[group.game_server]
-                [self._level_by_cycle(group.boss_cycle, group.level_4)]
+                [self._level_by_cycle(
+                    group.boss_cycle, game_server=group.game_server)]
                 [group.boss_num-1])
         group.boss_health = boss_health
         group.save()
@@ -1097,7 +1101,7 @@ class ClanBattle:
                             'full_health': (
                                 self.bossinfo[group.game_server]
                                 [self._level_by_cycle(
-                                    group.boss_cycle, group.level_4)]
+                                    group.boss_cycle, game_server=group.game_server)]
                                 [group.boss_num-1]
                             ),
                         },
@@ -1141,7 +1145,7 @@ class ClanBattle:
                                 'full_health': (
                                     self.bossinfo[group.game_server]
                                     [self._level_by_cycle(
-                                        status.cycle, group.level_4)]
+                                        status.cycle, game_server=group.game_server)]
                                     [status.num-1]
                                 ),
                             },
@@ -1185,7 +1189,7 @@ class ClanBattle:
                                 'full_health': (
                                     self.bossinfo[group.game_server]
                                     [self._level_by_cycle(
-                                        status.cycle, group.level_4)]
+                                        status.cycle, game_server=group.game_server)]
                                     [status.num-1]
                                 ),
                             },
@@ -1223,7 +1227,7 @@ class ClanBattle:
                                 'full_health': (
                                     self.bossinfo[group.game_server]
                                     [self._level_by_cycle(
-                                        status.cycle, group.level_4)]
+                                        status.cycle, game_server=group.game_server)]
                                     [status.num-1]
                                 ),
                             },
@@ -1258,7 +1262,7 @@ class ClanBattle:
                             'full_health': (
                                 self.bossinfo[group.game_server]
                                 [self._level_by_cycle(
-                                    status.cycle, group.level_4)]
+                                    status.cycle, game_server=group.game_server)]
                                 [status.num-1]
                             ),
                         },
@@ -1294,7 +1298,7 @@ class ClanBattle:
                             'full_health': (
                                 self.bossinfo[group.game_server]
                                 [self._level_by_cycle(
-                                    status.cycle, group.level_4)]
+                                    status.cycle, game_server=group.game_server)]
                                 [status.num-1]
                             ),
                         },
@@ -1329,7 +1333,7 @@ class ClanBattle:
                             'full_health': (
                                 self.bossinfo[group.game_server]
                                 [self._level_by_cycle(
-                                    status.cycle, group.level_4)]
+                                    status.cycle, game_server=group.game_server)]
                                 [status.num-1]
                             ),
                         },
@@ -1448,7 +1452,7 @@ class ClanBattle:
                             'full_health': (
                                 self.bossinfo[group.game_server]
                                 [self._level_by_cycle(
-                                    status.cycle, group.level_4)]
+                                    status.cycle, game_server=group.game_server)]
                                 [status.num-1]
                             ),
                         },

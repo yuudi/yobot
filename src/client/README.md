@@ -2,54 +2,12 @@
 
 ## 运行环境
 
-在`python3.7.4`中通过测试，其他环境未测试
-
 python最低要求为`python3.6`
 
-## 主程序
+## 扩展
 
-导入yobot并调用
+见[custom.py](./yybplugins/custom.py)文件
 
-```python
-import yobot
-bot = yobot.Yobot(
-    data_path=".", # 存放数据的目录，默认为当前目录
-)
-reply = bot.proc(context)
-```
+## 移植
 
-其中：
-`reply`是一个`str`；
-`context`是一个`dict`，其结构为
-
-```python
-context = {
-    "group_id": 12345, # 聊天编号（QQ群号）
-    "raw_message": "你好", # 消息内容
-    "sender": {
-        "user_id": 456, # 用户编号（QQ号）
-        "nickname": "nickname", # 用户昵称
-        "role": "admin" # 用户身份
-    }
-}
-```
-
-主文件`main.py`是利用aiocqhttp作为QQ机器人的实例
-
-文件`chatroom.py`是简单网页聊天的实例
-
-文件`nonebot_plugin.py`是作为nonebot插件的实例
-
-## 增加功能
-
-### 被动回复
-
-在![custom.py](./plugins/custom.py)文件中可以增加简单的功能，详见文件内描述
-
-### 主动推送
-
-在![custom_push.py](./plugins/custom_push.py)文件中可以增加简单的推送功能，详见文件内描述
-
-### RSS订阅与网页抓取
-
-见![custom_push.py](./plugins/spider/README.md)
+经过多次迭代，yobot与[cq-http-api](https://github.com/richardchien/coolq-http-api/)的耦合越来越深，不再适合移植了

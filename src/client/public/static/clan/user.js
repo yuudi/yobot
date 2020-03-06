@@ -40,7 +40,7 @@ var vm = new Vue({
             }
             var nd = new Date();
             nd.setTime(cha.challenge_time * 1000);
-            var detailstr = nd.toLocaleString() + '<br />';
+            var detailstr = nd.toLocaleString('chinese', { hour12: false }) + '<br />';
             detailstr += cha.cycle + '周目' + cha.boss_num + '号boss<br />';
             detailstr += (cha.health_ramain + cha.damage).toLocaleString() + '→' + cha.health_ramain.toLocaleString();
             return detailstr;

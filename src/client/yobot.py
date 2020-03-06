@@ -31,8 +31,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.5]"
-    Commit = {"yuudi": 49, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.6]"
+    Commit = {"yuudi": 50, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
@@ -196,12 +196,6 @@ class Yobot:
     def active_jobs(self) -> List[Tuple[Any, Callable[[], Iterable[Dict[str, Any]]]]]:
         jobs = [p.jobs() for p in self.plug_active]
         return reduce(lambda x, y: x+y, jobs)
-
-        # zhs-zht convertion
-        if self.glo_setting.get("zht_out", False):
-            reply_msg = self.ccs2t.convert(reply_msg)
-
-        return reply_msg
 
     async def proc_async(self, msg: dict, *args, **kwargs) -> str:
         '''

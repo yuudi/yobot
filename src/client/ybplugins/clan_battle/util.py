@@ -4,9 +4,7 @@ from functools import lru_cache
 from typing import Tuple, Union
 
 from expiringdict import ExpiringDict
-from quart import jsonify, session
 
-from ..ybdata import Clan_group
 from .typing import Pcr_date, Pcr_time
 
 pcr_time_offset = {

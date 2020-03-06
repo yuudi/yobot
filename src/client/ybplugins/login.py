@@ -4,7 +4,6 @@ import time
 from hashlib import sha256
 from urllib.parse import urljoin
 
-import peewee
 from aiocqhttp.api import Api
 from quart import (Quart, jsonify, make_response, redirect, request, session,
                    url_for)

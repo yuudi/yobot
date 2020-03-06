@@ -26,7 +26,7 @@ var vm = new Vue({
             }
             var nd = new Date();
             nd.setTime(ts * 1000);
-            return nd.toLocaleString();
+            return nd.toLocaleString('chinese', { hour12: false });
         },
         refresh: function (event) {
             var thisvue = this;
