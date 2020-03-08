@@ -29,7 +29,7 @@ class Setting:
                 return redirect(url_for('yobot_login', callback=request.path))
             return await render_template(
                 'admin/setting.html',
-                user=session['yobot_user'],
+                user=User.get_by_id(session['yobot_user']),
             )
 
         @app.route(
@@ -41,7 +41,8 @@ class Setting:
                     code=10,
                     message='Not logged in',
                 )
-            if session['yobot_user']['authority_group'] >= 100:
+            user = User.get_by_id(session['yobot_user'])
+            if user.authority_group >= 100:
                 return jsonify(
                     code=11,
                     message='Insufficient authority',
@@ -84,11 +85,12 @@ class Setting:
         async def yobot_users_managing():
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
-            if session['yobot_user']['authority_group'] >= 10:
+            user = User.get_by_id(session['yobot_user'])
+            if user.authority_group >= 10:
                 return await render_template(
                     'unauthorized.html',
                     limit='机器人管理员',
-                    uath=session['yobot_user']['authority_group'],
+                    uath=user.authority_group,
                 )
             return await render_template('admin/users.html')
 
@@ -101,7 +103,8 @@ class Setting:
                     code=10,
                     message='Not logged in',
                 )
-            if session['yobot_user']['authority_group'] >= 10:
+            user = User.get_by_id(session['yobot_user'])
+            if user.authority_group >= 10:
                 return jsonify(
                     code=11,
                     message='Insufficient authority',
@@ -144,11 +147,12 @@ class Setting:
         async def yobot_groups_managing():
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
-            if session['yobot_user']['authority_group'] >= 10:
+            user = User.get_by_id(session['yobot_user'])
+            if user.authority_group >= 10:
                 return await render_template(
                     'unauthorized.html',
                     limit='机器人管理员',
-                    uath=session['yobot_user']['authority_group'],
+                    uath=user.authority_group,
                 )
             return await render_template('admin/groups.html')
 
@@ -161,7 +165,8 @@ class Setting:
                     code=10,
                     message='Not logged in',
                 )
-            if session['yobot_user']['authority_group'] >= 10:
+            user = User.get_by_id(session['yobot_user'])
+            if user.authority_group >= 10:
                 return jsonify(
                     code=11,
                     message='Insufficient authority',

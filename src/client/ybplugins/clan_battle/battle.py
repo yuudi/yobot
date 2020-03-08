@@ -192,7 +192,7 @@ class ClanBattle:
         # refresh group list
         asyncio.create_task(self._update_group_list_async())
 
-    def bind_group(self, group_id, qqid) -> None:
+    def bind_group(self, group_id, qqid):
         """
         set user's default group
 
@@ -210,6 +210,8 @@ class ClanBattle:
 
         # refresh member list
         self.get_member_list(group_id, nocache=True)
+
+        return membership
 
     def drop_member(self, group_id, member_list):
         """
@@ -1014,13 +1016,13 @@ class ClanBattle:
         async def yobot_clan(group_id):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return await render_template('404.html', item='公会'), 404
-            is_member = (
-                session['yobot_user']['clan_group_id'] == group.group_id)
-            if (not is_member
-                    and session['yobot_user']['authority_group'] >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member and user.authority_group >= 10):
                 return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/panel.html',
@@ -1034,13 +1036,13 @@ class ClanBattle:
         async def yobot_clan_subscribers(group_id):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return await render_template('404.html', item='公会'), 404
-            is_member = (
-                session['yobot_user']['clan_group_id'] == group.group_id)
-            if (not is_member
-                    and session['yobot_user']['authority_group'] >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member and user.authority_group >= 10):
                 return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/subscribers.html',
@@ -1056,17 +1058,17 @@ class ClanBattle:
                     code=10,
                     message='Not logged in',
                 )
-            user_id = session['yobot_user']['qqid']
+            user_id = session['yobot_user']
+            user = User.get_by_id(user_id)
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return jsonify(
                     code=20,
                     message='Group not exists',
                 )
-            is_member = (
-                session['yobot_user']['clan_group_id'] == group.group_id)
-            if (not is_member
-                    and session['yobot_user']['authority_group'] >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=user_id)
+            if (not is_member and user.authority_group >= 10):
                 return jsonify(
                     code=11,
                     message='Insufficient authority',
@@ -1105,8 +1107,7 @@ class ClanBattle:
                                 [group.boss_num-1]
                             ),
                         },
-                        is_admin=(is_member and
-                                  session['yobot_user']['authority_group'] < 100),
+                        is_admin=(is_member and user.authority_group < 100),
                         self_id=user_id,
                     )
                 elif action == 'get_challenge':
@@ -1284,8 +1285,7 @@ class ClanBattle:
                         asyncio.create_task(
                             self.api.send_group_msg(
                                 group_id=group_id,
-                                message='{}已开始挑战boss'.format(
-                                    session['yobot_user']['nickname']),
+                                message='{}已开始挑战boss'.format(user.nickname),
                             )
                         )
                     return jsonify(
@@ -1367,8 +1367,7 @@ class ClanBattle:
                             asyncio.create_task(
                                 self.api.send_group_msg(
                                     group_id=group_id,
-                                    message='{}已挂树'.format(
-                                        session['yobot_user']['nickname']),
+                                    message='{}已挂树'.format(user.nickname),
                                 )
                             )
                     else:
@@ -1378,7 +1377,7 @@ class ClanBattle:
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message='{}已预约{}号boss'.format(
-                                        session['yobot_user']['nickname'],
+                                        user.nickname,
                                         boss_num),
                                 )
                             )
@@ -1404,7 +1403,7 @@ class ClanBattle:
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message='{}已取消挂树'.format(
-                                        session['yobot_user']['nickname']),
+                                        user.nickname),
                                 )
                             )
                     else:
@@ -1414,13 +1413,13 @@ class ClanBattle:
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message='{}已取消预约{}号boss'.format(
-                                        session['yobot_user']['nickname'],
+                                        user.nickname,
                                         boss_num),
                                 )
                             )
                     return jsonify(code=0, notice=notice)
                 elif action == 'modify':
-                    if session['yobot_user']['authority_group'] >= 100:
+                    if user.authority_group >= 100:
                         return jsonify(code=11, message='Insufficient authority')
                     try:
                         status = self.modify(
@@ -1458,7 +1457,7 @@ class ClanBattle:
                         },
                     )
                 elif action == 'send_remind':
-                    if session['yobot_user']['authority_group'] >= 100:
+                    if user.authority_group >= 100:
                         return jsonify(code=11, message='Insufficient authority')
                     self.send_remind(group_id, payload['memberlist'])
                     return jsonify(
@@ -1466,7 +1465,7 @@ class ClanBattle:
                         notice='发送成功',
                     )
                 elif action == 'drop_member':
-                    if session['yobot_user']['authority_group'] >= 100:
+                    if user.authority_group >= 100:
                         return jsonify(code=11, message='Insufficient authority')
                     count = self.drop_member(group_id, payload['memberlist'])
                     return jsonify(
@@ -1492,7 +1491,7 @@ class ClanBattle:
             return redirect(url_for(
                 'yobot_clan_user',
                 group_id=group_id,
-                qqid=session['yobot_user']['qqid'],
+                qqid=session['yobot_user'],
             ))
 
         @app.route(
@@ -1502,13 +1501,13 @@ class ClanBattle:
         async def yobot_clan_user(group_id, qqid):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return await render_template('404.html', item='公会'), 404
-            is_member = (
-                session['yobot_user']['clan_group_id'] == group.group_id)
-            if (not is_member
-                    and session['yobot_user']['authority_group'] >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member and user.authority_group >= 10):
                 return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/user.html',
@@ -1521,15 +1520,16 @@ class ClanBattle:
         async def yobot_clan_setting(group_id):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return await render_template('404.html', item='公会'), 404
-            if (session['yobot_user']['clan_group_id'] != group.group_id):
+            if (user.clan_group_id != group.group_id):
                 return await render_template(
                     'unauthorized.html',
                     limit='本公会成员',
                     uath='无')
-            if (session['yobot_user']['authority_group'] >= 10):
+            if (user.authority_group >= 10):
                 return await render_template(
                     'unauthorized.html',
                     limit='公会战管理员',
@@ -1546,15 +1546,16 @@ class ClanBattle:
                     code=10,
                     message='Not logged in',
                 )
-            user_id = session['yobot_user']['qqid']
+            user_id = session['yobot_user']
+            user = User.get_by_id(user_id)
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return jsonify(
                     code=20,
                     message='Group not exists',
                 )
-            if (session['yobot_user']['clan_group_id'] != group.group_id
-                    or session['yobot_user']['authority_group'] >= 10):
+            if (user.clan_group_id != group.group_id
+                    or user.authority_group >= 10):
                 return jsonify(
                     code=11,
                     message='Insufficient authority',
@@ -1604,13 +1605,13 @@ class ClanBattle:
         async def yobot_clan_statistics(group_id):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return await render_template('404.html', item='公会'), 404
-            is_member = (
-                session['yobot_user']['clan_group_id'] == group.group_id)
-            if (not is_member
-                    and session['yobot_user']['authority_group'] >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member and user.authority_group >= 10):
                 return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/statistics.html',
@@ -1623,11 +1624,13 @@ class ClanBattle:
         async def yobot_clan_statistics_api(group_id):
             if 'yobot_user' not in session:
                 return jsonify(code=10, message='Not logged in')
+            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return jsonify(code=20, message='Group not exists')
-            is_member = session['yobot_user']['clan_group_id'] == group.group_id
-            if (not is_member and session['yobot_user']['authority_group'] >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member and user.authority_group >= 10):
                 return jsonify(code=11, message='Insufficient authority')
             report = self.get_report(group_id, None, None)
             return jsonify(code=0, challenges=report)
@@ -1639,13 +1642,13 @@ class ClanBattle:
         async def yobot_clan_progress(group_id):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return await render_template('404.html', item='公会'), 404
-            is_member = (
-                session['yobot_user']['clan_group_id'] == group.group_id)
-            if (not is_member
-                    and session['yobot_user']['authority_group'] >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member and user.authority_group >= 10):
                 return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/progress.html',

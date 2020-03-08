@@ -53,13 +53,13 @@ var vm = new Vue({
                 if (res.data.code == 0) {
                     alert('申请成功，请等待3分钟左右解析生效');
                     thisvue.setting.public_address = thisvue.setting.public_address.replace(/\/\/([^:\/]+)/, '//' + thisvue.applyName + '.yobot.xyz');
-                    thisvue.loading = false;
                     thisvue.update(null);
                 } else if (res.data.code == 1) {
                     alert('申请失败，此域已被占用');
                 } else {
                     alert('申请失败，' + res.data.message);
                 }
+                thisvue.loading = false;
             }).catch(function (error) {
                 thisvue.loading = false;
                 alert(error);

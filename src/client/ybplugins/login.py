@@ -115,14 +115,7 @@ class Login:
                     else:
                         # 登录码有效
                         new_key = _rand_string(32)
-                        session['yobot_user'] = {
-                            'qqid': qqid,
-                            'authority_group': user.authority_group,
-                            'nickname': user.nickname,
-                            'clan_group_id': user.clan_group_id,
-                            'last_login_time': user.last_login_time,
-                            'last_login_ipaddr': user.last_login_ipaddr,
-                        }
+                        session['yobot_user'] = qqid
                         user.login_code_available = False
                         user.last_login_time = now
                         user.last_login_ipaddr = request.headers.get(
@@ -157,14 +150,7 @@ class Login:
                         if user.auth_cookie == auth:
                             if user.auth_cookie_expire_time > now:
                                 # cookie有效
-                                session['yobot_user'] = {
-                                    'qqid': qqid,
-                                    'authority_group': user.authority_group,
-                                    'nickname': user.nickname,
-                                    'clan_group_id': user.clan_group_id,
-                                    'last_login_time': user.last_login_time,
-                                    'last_login_ipaddr': user.last_login_ipaddr,
-                                }
+                                session['yobot_user'] = qqid
                                 user.last_login_time = now
                                 user.last_login_ipaddr = request.remote_addr
                                 user.save()
@@ -193,7 +179,7 @@ class Login:
                 return redirect(url_for('yobot_login', callback=request.path))
             return await render_template(
                 'user.html',
-                user=session['yobot_user'],
+                user=User.get_by_id(session['yobot_user']),
             )
 
         @app.route(
@@ -202,24 +188,17 @@ class Login:
         async def yobot_user_info(qqid):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
-            if session['yobot_user']['qqid'] == qqid:
-                visited_user_info = session['yobot_user']
+            if session['yobot_user'] == qqid:
+                visited_user_info = User.get_by_id(session['yobot_user'])
             else:
                 visited_user = User.get_or_none(User.qqid == qqid)
                 if visited_user is None:
                     return '没有此用户', 404
-                visited_user_info = {
-                    'qqid': qqid,
-                    'authority_group': visited_user.authority_group,
-                    'nickname': visited_user.nickname,
-                    'clan_group_id': visited_user.clan_group_id,
-                    'last_login_time': visited_user.last_login_time,
-                    'last_login_ipaddr': visited_user.last_login_ipaddr,
-                }
+                visited_user_info = visited_user
             return await render_template(
                 'user-info.html',
                 user=visited_user_info,
-                visitor=session['yobot_user'],
+                visitor=User.get_by_id(session['yobot_user']),
             )
 
         @app.route(
@@ -229,8 +208,8 @@ class Login:
         async def yobot_user_info_nickname(qqid):
             if 'yobot_user' not in session:
                 return jsonify(code=10, message='未登录')
-            user = session['yobot_user']
-            if user['qqid'] != qqid and user['authority_group'] >= 100:
+            user = User.get_by_id(session['yobot_user'])
+            if user.qqid != qqid and user.authority_group >= 100:
                 return jsonify(code=11, message='权限不足')
             user_data = User.get_or_none(User.qqid == qqid)
             if user_data is None:

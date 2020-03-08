@@ -1,7 +1,5 @@
 from urllib.parse import urljoin
 
-from quart import url_for
-
 
 class Message:
     Passive = True

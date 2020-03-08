@@ -4,10 +4,6 @@
 
 yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊机器人，开源、免费。
 
-## 试用
-
-（试用功能崩溃中。。）
-
 ## 安装
 
 [安装教程](/install/)
