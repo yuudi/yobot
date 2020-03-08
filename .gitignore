@@ -1,6 +1,7 @@
 *.py[cdo]
 .vscode/
 src/client/*.bat
+src/client/*.sh
 src/client/*/
 !src/client/ybplugins/
 !src/client/yybplugins/

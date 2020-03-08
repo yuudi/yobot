@@ -287,12 +287,13 @@ class ClanBattle:
             Clan_challenge.challenge_pcrdate == d,
         ).order_by(Clan_challenge.cid)
         challenges = list(challenges)
+        finished = sum(bool(c.boss_health_ramain or c.is_continue)
+                       for c in challenges)
+        if finished >= 3:
+            raise InputError('今日上报次数已达到3次')
         is_continue = (challenges
                        and challenges[-1].boss_health_ramain == 0
                        and not challenges[-1].is_continue)
-        if (sum((not c.is_continue) for c in challenges) >= 3
-                and not is_continue):
-            raise InputError('今日上报次数已达到3次')
         challenge = Clan_challenge.create(
             gid=group_id,
             qqid=user.qqid,
@@ -320,7 +321,9 @@ class ClanBattle:
             group.boss_num,
             group.boss_health,
             0,
-            f'{nik}对boss造成了{damage:,}点伤害',
+            '{}对boss造成了{:,}点伤害\n（今日第{}刀，{}）'.format(
+                nik, damage, finished+1, '剩余刀' if is_continue else '完整刀'
+            ),
         )
         self._boss_status[group_id].set_result(status)
         self._boss_status[group_id] = asyncio.Future()
@@ -356,12 +359,13 @@ class ClanBattle:
             Clan_challenge.challenge_pcrdate == d,
         ).order_by(Clan_challenge.cid)
         challenges = list(challenges)
+        finished = sum(bool(c.boss_health_ramain or c.is_continue)
+                       for c in challenges)
+        if finished >= 3:
+            raise InputError('今日上报次数已达到3次')
         is_continue = (challenges
                        and challenges[-1].boss_health_ramain == 0
                        and not challenges[-1].is_continue)
-        if (sum((not c.is_continue) for c in challenges) >= 3
-                and not is_continue):
-            raise InputError('今日上报次数已达到3次')
         challenge = Clan_challenge.create(
             gid=group_id,
             qqid=user.qqid,
@@ -398,7 +402,9 @@ class ClanBattle:
             group.boss_num,
             group.boss_health,
             0,
-            f'{nik}对boss造成了{health_before:,}点伤害，击败了boss',
+            '{}对boss造成了{:,}点伤害，击败了boss\n（今日第{}刀，{}）'.format(
+                nik, health_before, finished+1, '尾余刀' if is_continue else '收尾刀'
+            ),
         )
         self._boss_status[group_id].set_result(status)
         self._boss_status[group_id] = asyncio.Future()

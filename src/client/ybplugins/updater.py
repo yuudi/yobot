@@ -110,7 +110,6 @@ class Updater:
         sys.exit()
 
     def linux_update(self, force: bool = False, test_ver: int = 0):
-        return "Linux版自动更新存在问题，请等待修复"
         test_version = ["stable", "beta", "alpha"][test_ver]
         if not force:
             pullcheck = self.check_commit()
@@ -141,9 +140,8 @@ class Updater:
         '''.format(git_dir, os.getpid())
         with open(os.path.join(git_dir, "update.sh"), "w") as f:
             f.write(cmd)
-        os.system("chmod u+x {0} ; sh {0}".format(
-            os.path.join(git_dir, "update.sh")))
-        sys.exit()
+        os.system(f'cd "{git_dir}" ; git pull')
+        sys.exit(10)
 
     def check_commit(self):
         if not self.ver["commited"]:
@@ -173,22 +171,11 @@ class Updater:
                 f.write(cmd)
             os.system('powershell Start-Process -FilePath "{}"'.format(
                       os.path.join(self.path, "restart.bat")))
-            sys.exit()
+            sys.exit(10)
         else:
             if self.evn == "nonebot-plugin":
                 return "作为插件无法这么做"
-            return "Linux版自动重启存在问题，请等待修复"
-            cmd = '''
-            kill {}
-            sleep 1s
-            cd {}
-            nohup python3 main.py &
-            '''.format(self_pid, self.path)
-            with open(os.path.join(self.path, "restart.sh"), "w") as f:
-                f.write(cmd)
-            os.system("chmod u+x {0} && bash {0}".format(
-                os.path.join(self.path, "restart.sh")))
-            sys.exit()
+            sys.exit(10)
 
     @staticmethod
     def match(cmd: str) -> int:

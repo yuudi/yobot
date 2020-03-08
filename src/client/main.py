@@ -2,6 +2,27 @@
 实例1：利用aiocqhttp作为httpapi的服务端
 """
 
+import platform
+import sys
+
+if platform.system() == "Linux" and "-g" not in sys.argv[1:]:
+    with open("yobotg.sh", "w") as g:
+        g.write("""
+echo $$ > yobotg.pid
+loop=true
+while $loop
+do
+    loop=false
+    python3 main.py -g
+    if [ $? == 10 ]
+    then
+        loop=true
+    fi
+done
+""")
+    print('请通过"sh yobotg.sh"启动')
+    sys.exit()
+
 import asyncio
 import json
 import os
@@ -90,4 +111,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nCtrl-C")
+        sys.exit(0)
