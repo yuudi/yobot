@@ -10,7 +10,6 @@ from urllib.parse import urljoin
 import peewee
 from aiocqhttp.api import Api
 from apscheduler.triggers.cron import CronTrigger
-from expiringdict import ExpiringDict
 from quart import Quart, jsonify, redirect, request, session, url_for
 
 from ..templating import render_template
@@ -82,11 +81,8 @@ class ClanBattle:
 
         # data initialize
         self._boss_status: Dict[str, asyncio.Future] = {}
-        self._group_data: Dict[str, Clan_group] = {}
-        self._report_cache = ExpiringDict(max_len=64, max_age_seconds=60)
 
         for group in Clan_group.select():
-            self._group_data[group.group_id] = group
             self._boss_status[group.group_id] = asyncio.Future()
 
     def _level_by_cycle(self, cycle, *, level_4=None, game_server=None):
@@ -129,7 +125,7 @@ class ClanBattle:
         try:
             group_list = await self.api.get_group_list()
         except Exception as e:
-            _logger.error('获取群列表错误'+str(e))
+            _logger.exception('获取群列表错误'+str(e))
             return False
         for group_info in group_list:
             group = Clan_group.get_or_none(
@@ -139,7 +135,6 @@ class ClanBattle:
                 continue
             group.group_name = group_info['group_name']
             group.save()
-            self._group_data[group.group_id] = group
         return True
 
     @async_cached_func(16)
@@ -147,7 +142,8 @@ class ClanBattle:
         try:
             group_member_list = await self.api.get_group_member_list(group_id=group_id)
         except Exception as e:
-            _logger.error('获取群成员列表错误'+str(e))
+            _logger.exception('获取群成员列表错误'+str(type(e))+str(e))
+            self.api.send_group_msg(group_id=group_id, message='获取群成员错误，请查看日志')
             return []
         return group_member_list
 
@@ -186,13 +182,12 @@ class ClanBattle:
             game_server=game_server,
             boss_health=self.bossinfo[game_server][0][0],
         )
-        self._group_data[group_id] = group
         self._boss_status[group_id] = asyncio.Future()
 
         # refresh group list
         asyncio.create_task(self._update_group_list_async())
 
-    def bind_group(self, group_id, qqid):
+    def bind_group(self, group_id, qqid, nickname):
         """
         set user's default group
 
@@ -202,6 +197,7 @@ class ClanBattle:
         """
         user = User.get_or_create(qqid=qqid)[0]
         user.clan_group_id = group_id
+        user.nickname = nickname
         membership = Clan_member.get_or_create(
             group_id=group_id,
             qqid=qqid,
@@ -227,6 +223,12 @@ class ClanBattle:
             Clan_member.qqid.in_(member_list)
         ).execute()
 
+        for user_id in member_list:
+            user = User.get_or_none(qqid=user_id)
+            if user is not None:
+                user.clan_group_id = None
+                user.save()
+
         # refresh member list
         self.get_member_list(group_id, nocache=True)
         return delete_count
@@ -238,7 +240,7 @@ class ClanBattle:
         Args:
             group_id: group id
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         boss_summary = (
@@ -265,7 +267,7 @@ class ClanBattle:
         """
         if damage < 0:
             raise InputError('伤害不可以是负数')
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         if damage >= group.boss_health:
@@ -279,7 +281,11 @@ class ClanBattle:
             defaults={
                 'clan_group_id': group_id,
             }
-        )[0]
+        )[0]        
+        is_member = Clan_member.get_or_none(
+            group_id=group_id, qqid=qqid)
+        if not is_member:
+            raise GroupError('未加入公会，请先发送“加入公会”')
         d, t = pcr_datetime(area=group.game_server)
         challenges = Clan_challenge.select().where(
             Clan_challenge.gid == group_id,
@@ -339,7 +345,7 @@ class ClanBattle:
             behalfed: the real member who did the challenge
             comment: extra infomation about the challenge
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         if behalfed is not None:
@@ -352,6 +358,10 @@ class ClanBattle:
                 'clan_group_id': group_id,
             }
         )[0]
+        is_member = Clan_member.get_or_none(
+            group_id=group_id, qqid=qqid)
+        if not is_member:
+            raise GroupError('未加入公会，请先发送“加入公会”')
         d, t = pcr_datetime(area=group.game_server)
         challenges = Clan_challenge.select().where(
             Clan_challenge.gid == group_id,
@@ -421,7 +431,7 @@ class ClanBattle:
             group_id: group id
             qqid: qqid of member who ask for the undo
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         user = User.get_or_create(
@@ -472,7 +482,7 @@ class ClanBattle:
             raise InputError('boss编号必须在1~5间')
         if boss_health and boss_health < 1:
             raise InputError('boss生命值不能为负')
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         if cycle is not None:
@@ -511,7 +521,7 @@ class ClanBattle:
         """
         if game_server not in ("jp", "tw", "cn", "kr"):
             raise InputError(f'不存在{game_server}游戏服务器')
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         group.game_server = game_server
@@ -527,7 +537,7 @@ class ClanBattle:
         Args:
             group_id: group id
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         group.boss_cycle = 1
@@ -568,7 +578,7 @@ class ClanBattle:
             boss_num: number of boss to subscribe, `0` for all
             comment: extra infomation about the subscribe
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         subscribe = Clan_subscribe.get_or_none(
@@ -638,7 +648,7 @@ class ClanBattle:
             group_id: group id
             boss_num: number of new boss
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         if boss_num is None:
@@ -666,7 +676,7 @@ class ClanBattle:
             qqid: qq id
             comment: extra infomation about the application
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         if group.challenging_member_qq_id is not None:
@@ -687,7 +697,7 @@ class ClanBattle:
             group.boss_num,
             group.boss_health,
             qqid,
-            f'{nik}已开始boss',
+            f'{nik}已开始挑战boss',
         )
         self._boss_status[group_id].set_result(status)
         self._boss_status[group_id] = asyncio.Future()
@@ -702,7 +712,7 @@ class ClanBattle:
             qqid: qq id of the canceler
             force_cancel: ignore the 3-minutes restriction
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         if group.challenging_member_qq_id is None:
@@ -751,7 +761,7 @@ class ClanBattle:
             qqid: user id of report
             pcrdate: pcrdate of report
         """
-        group = self._group_data.get(group_id)
+        group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化')
         report = []
@@ -854,7 +864,10 @@ class ClanBattle:
                     if ctx['sender']['role'] == 'member':
                         return '只有管理员才可以加入其他成员'
                     user_id = int(match.group(1))
-                self.bind_group(group_id, user_id)
+                    nickname = match.group(1)
+                else:
+                    nickname = ctx['sender'].get('card') or ctx['sender'].get('nickname')
+                self.bind_group(group_id, user_id, nickname)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '{}已加入本公会' .format(atqq(user_id))
         elif match_num == 3:  # 状态
@@ -1012,7 +1025,7 @@ class ClanBattle:
                     group_id
                 )
             )
-            return '公会战面板：\n'+url
+            return f'公会战面板：\n{url}\n建议添加到浏览器收藏夹或桌面快捷方式'
 
     def register_routes(self, app: Quart):
 
@@ -1132,10 +1145,18 @@ class ClanBattle:
                         payload['qqid'],
                         None,
                     )
+                    try:
+                        visited_user = User.get_by_id(payload['qqid'])
+                    except peewee.DoesNotExist:
+                        return jsonify(code=20, message='user not found')
                     return jsonify(
                         code=0,
                         challenges=report,
                         game_server=group.game_server,
+                        user_info={
+                            'qqid': payload['qqid'],
+                            'nickname': visited_user.nickname,
+                        }
                     )
                 elif action == 'update_boss':
                     try:
@@ -1517,6 +1538,7 @@ class ClanBattle:
                 return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/user.html',
+                qqid=qqid,
             )
 
         @app.route(
@@ -1530,7 +1552,9 @@ class ClanBattle:
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return await render_template('404.html', item='公会'), 404
-            if (user.clan_group_id != group.group_id):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member):
                 return await render_template(
                     'unauthorized.html',
                     limit='本公会成员',
@@ -1560,8 +1584,9 @@ class ClanBattle:
                     code=20,
                     message='Group not exists',
                 )
-            if (user.clan_group_id != group.group_id
-                    or user.authority_group >= 10):
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (user.authority_group >= 100 or not is_member):
                 return jsonify(
                     code=11,
                     message='Insufficient authority',
@@ -1601,7 +1626,7 @@ class ClanBattle:
                 _logger.error(e)
                 return jsonify(code=31, message='missing key: '+str(e))
             except Exception as e:
-                _logger.error(e)
+                _logger.exception(e)
                 return jsonify(code=40, message='server error')
 
         @app.route(

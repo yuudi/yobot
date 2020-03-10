@@ -130,16 +130,6 @@ class Updater:
         if not (force or verinfo["version"] > self.ver["ver_id"]):
             return "已经是最新版本"
         git_dir = os.path.dirname(os.path.dirname(self.path))
-        cmd = '''
-        cd "{}"
-        git pull
-        kill {}
-        sleep 1s
-        cd src/client
-        nohup python3 main.py &
-        '''.format(git_dir, os.getpid())
-        with open(os.path.join(git_dir, "update.sh"), "w") as f:
-            f.write(cmd)
         os.system(f'cd "{git_dir}" ; git pull')
         sys.exit(10)
 

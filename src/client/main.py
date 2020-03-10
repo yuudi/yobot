@@ -107,7 +107,13 @@ def main():
 
     print("初始化完成，启动服务...")
 
-    cqbot.run(host=host, port=port, debug=False, use_reloader=False)
+    cqbot.run(
+        host=host,
+        port=port,
+        debug=False,
+        use_reloader=False,
+        loop=asyncio.get_event_loop(),
+    )
 
 
 if __name__ == "__main__":

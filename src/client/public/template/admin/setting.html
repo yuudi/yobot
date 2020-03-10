@@ -191,7 +191,7 @@
         </p>
         <p>
             <el-collapse v-model="activeNames" @change="bossSetting = !bossSetting">
-                <el-collapse-item title="boss设置" name="1">
+                <el-collapse-item title="boss设置（点击展开）" name="1">
                     <div :hidden="!bossSetting">
                         <div v-for="area_health,area in setting.boss">
                             <h4>[[ {jp:"日服",tw:"台服",cn:"国服",eff:"得分系数"}[area] ]]</h4>

@@ -9,19 +9,22 @@ var vm = new Vue({
     data: {
         challengeData: [],
         activeIndex: '5',
+        qqid: 0,
+        nickname: '',
     },
     mounted() {
         var thisvue = this;
         var pathname = window.location.pathname.split('/');
-        var qqid = parseInt(pathname[pathname.length - 2]);
+        thisvue.qqid = parseInt(pathname[pathname.length - 2]);
         axios.post('../api/', {
             action: 'get_user_challenge',
-            qqid: qqid,
+            qqid: thisvue.qqid,
         }).then(function (res) {
             if (res.data.code != 0) {
                 thisvue.$alert(res.data.message, '获取记录失败');
                 return;
             }
+            thisvue.nickname = res.data.user_info.nickname;
             thisvue.refresh(res.data.challenges, res.data.game_server);
         }).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');

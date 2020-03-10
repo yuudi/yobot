@@ -6,18 +6,23 @@
 
 在 yobot 配置文件中，将`host`字段设置为`0.0.0.0`（即默认值）
 
-在服务器的防火墙面板里，打开 9222 端口（如端口更换则为更换后的端口）
+在服务器的防火墙面板里，打开 9222 端口（如端口更换则为更换后的端口）  
 （[阿里云开启方法](https://yq.aliyun.com/articles/701181) [腾讯云开启方法](https://cloud.tencent.com/document/product/213/39740)）
 
 如果服务器没有公网地址，可以使用端口映射
 
-警告：如果使用这种方法，**必须**为 httpapi 和 yobot 设定 access_token 防止入侵
+::: warning
+
+- 如果使用这种方法，**必须**为 httpapi 和 yobot 设定 access_token 防止入侵
+- 此方式无法使用https，仍存在被劫持的可能（[了解更多](https://baike.baidu.com/item/https/285356)）
+
+:::
 
 ### 方法 2：使用 Nginx 代理（推荐）
 
 如果需要为网页添加日志记录、HTTPS支持、安全限制等，可以使用 Nginx、Apache 之类的服务器软件
 
-请根据服务器实际情况设定 Nginx 代理，这里给出一个示例
+请根据服务器实际情况设定 Nginx 代理，这里给出一个示例，**不要直接复制**，如果不懂请用工具生成或请熟悉的人代劳
 
 Nginx 代理配置后，在机器人配置文件中`public_address`项替换为代理后的地址，安全起见可以将`host`项设置为`127.0.0.1`
 
@@ -32,6 +37,11 @@ server {
   ssl_certificate_key /path/to/ssl_certificate.key;  # 你的私钥路径
 
   server_name io.yobot.xyz;  # 你的域名
+
+  ## 强制使用https加密通信（可选，安全）
+  #if ($server_port !~ 443){
+  #  rewrite ^(/.*)$ https://$host$1 permanent;
+  #}
 
   ## 静态文件直接访问（可选，性能）
   #location /assets/ {
@@ -60,7 +70,7 @@ server {
 
 ### 方法 3：使用 Apache 代理
 
-请根据服务器实际情况设定 Apache 代理，这里给出一个示例
+请根据服务器实际情况设定 Apache 代理，这里给出一个示例，**不要直接复制**
 
 ```apacheconf
 <VirtualHost *:80>

@@ -7,7 +7,5 @@ pillow~=6.2.1
 arrow
 peewee~=3.13.1
 expiringdict~=1.2.0
-
-# 插件版可以不遵守下面两条
-aiocqhttp==0.6.8
-quart==0.6.15
+aiocqhttp>=0.6.8
+quart~=0.6
