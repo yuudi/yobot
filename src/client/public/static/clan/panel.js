@@ -46,7 +46,7 @@ var vm = new Vue({
         this.status_long_polling();
     },
     destroyed: function () {
-        this.leavePage=true;
+        this.leavePage = true;
     },
     computed: {
         damageHint: function () {
@@ -88,7 +88,7 @@ var vm = new Vue({
                     if (res.data.notice) {
                         thisvue.$notify({
                             title: '通知',
-                            message: res.data.notice,
+                            message: (new Date()).toLocaleTimeString('chinese', { hour12: false }) + res.data.notice,
                             duration: 60000,
                         });
                     }
@@ -219,7 +219,7 @@ var vm = new Vue({
             this.statusFormVisible = false;
         },
         handleSelect(key, keyPath) {
-            this.leavePage=true;
+            this.leavePage = true;
             switch (key) {
                 case '2':
                     window.location = './subscribers/';

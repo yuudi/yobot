@@ -48,6 +48,12 @@ class ClanBattle:
         '解锁': 14,
         '面板': 15,
         '后台': 15,
+        '查树': 20,
+        '查1': 21,
+        '查2': 22,
+        '查3': 23,
+        '查4': 24,
+        '查5': 25,
     }
 
     Server = {
@@ -100,7 +106,12 @@ class ClanBattle:
     @timed_cached_func(128, 3600, ignore_self=True)
     def _get_nickname_by_qqid(self, qqid) -> Union[str, None]:
         user = User.get_or_create(qqid=qqid)[0]
-        return user.nickname
+        if user.nickname is None:
+            asyncio.create_task(self._update_user_nickname_async(
+                qqid=qqid,
+                group_id=None,
+            ))
+        return user.nickname or str(qqid)
 
     def _get_previous_challenge(self, *, qqid=None, group_id=None):
         expressions = []
@@ -165,6 +176,24 @@ class ClanBattle:
         # refresh member list
         self.get_member_list(group_id, nocache=True)
 
+    async def _update_user_nickname_async(self, qqid, group_id=None):
+        try:
+            user = User.get_or_create(qqid=qqid)[0]
+            if group_id is None:
+                userinfo = await self.api.get_stranger_info(user_id=qqid)
+                user.nickname = userinfo['nickname']
+            else:
+                userinfo = await self.api.get_group_member_info(
+                    group_id=group_id, user_id=qqid)
+                user.nickname = userinfo['card'] or userinfo['nickname']
+            user.save()
+
+            # refresh
+            if user.nickname is not None:
+                self._get_nickname_by_qqid(qqid, nocache=True)
+        except Exception as e:
+            _logger.exception(e)
+
     def creat_group(self, group_id, game_server, group_name=None) -> None:
         """
         create a group for clan-battle
@@ -204,8 +233,13 @@ class ClanBattle:
         )[0]
         user.save()
 
-        # refresh member list
+        # refresh
         self.get_member_list(group_id, nocache=True)
+        if nickname is None:
+            asyncio.create_task(self._update_user_nickname_async(
+                qqid=qqid,
+                group_id=group_id,
+            ))
 
         return membership
 
@@ -281,7 +315,7 @@ class ClanBattle:
             defaults={
                 'clan_group_id': group_id,
             }
-        )[0]        
+        )[0]
         is_member = Clan_member.get_or_none(
             group_id=group_id, qqid=qqid)
         if not is_member:
@@ -603,7 +637,7 @@ class ClanBattle:
                                ensure_ascii=False),
         )
 
-    def get_subscribe_list(self, group_id) -> List[Tuple[int, QQid, dict]]:
+    def get_subscribe_list(self, group_id, boss_num=None) -> List[Tuple[int, QQid, dict]]:
         """
         get the subscribe lists.
 
@@ -614,8 +648,11 @@ class ClanBattle:
             group_id: group id
         """
         subscribe_list = []
+        query = [Clan_subscribe.gid == group_id]
+        if boss_num is not None:
+            query.append(Clan_subscribe.subscribe_item == boss_num)
         for subscribe in Clan_subscribe.select().where(
-            Clan_subscribe.gid == group_id,
+            *query
         ):
             subscribe_list.append({
                 'boss': subscribe.subscribe_item,
@@ -864,9 +901,10 @@ class ClanBattle:
                     if ctx['sender']['role'] == 'member':
                         return '只有管理员才可以加入其他成员'
                     user_id = int(match.group(1))
-                    nickname = match.group(1)
+                    nickname = None
                 else:
-                    nickname = ctx['sender'].get('card') or ctx['sender'].get('nickname')
+                    nickname = (ctx['sender'].get('card')
+                                or ctx['sender'].get('nickname'))
                 self.bind_group(group_id, user_id, nickname)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '{}已加入本公会' .format(atqq(user_id))
@@ -1026,6 +1064,16 @@ class ClanBattle:
                 )
             )
             return f'公会战面板：\n{url}\n建议添加到浏览器收藏夹或桌面快捷方式'
+        elif 20 <= match_num <= 25:
+            beh = '挂树' if match_num == 20 else '预约{}号boss'.format(match_num-20)
+            subscribers = self.get_subscribe_list(group_id, match_num-20)
+            if not subscribers:
+                return '没有人'+beh
+            reply = beh+'的成员：\n' + '\n'.join(
+                self._get_nickname_by_qqid(m['qqid'])
+                for m in subscribers
+            )
+            return reply
 
     def register_routes(self, app: Quart):
 

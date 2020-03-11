@@ -65,7 +65,7 @@ var vm = new Vue({
             });
         },
         export_data: function (event) {
-            alert('开发中');
+            window.location = '../statistics/api/';
         },
         delete_data: function (event) {
             var thisvue = this;
