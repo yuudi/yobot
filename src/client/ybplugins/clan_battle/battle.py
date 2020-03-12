@@ -82,7 +82,10 @@ class ClanBattle:
             encoding='utf-8',
         )
         filehandler.setFormatter(formater)
+        consolehandler = logging.StreamHandler()
+        consolehandler.setFormatter(formater)
         _logger.addHandler(filehandler)
+        _logger.addHandler(consolehandler)
         _logger.setLevel(logging.INFO)
 
         # data initialize
@@ -154,7 +157,8 @@ class ClanBattle:
             group_member_list = await self.api.get_group_member_list(group_id=group_id)
         except Exception as e:
             _logger.exception('获取群成员列表错误'+str(type(e))+str(e))
-            self.api.send_group_msg(group_id=group_id, message='获取群成员错误，请查看日志')
+            asyncio.create_task(self.api.send_group_msg(
+                group_id=group_id, message='获取群成员错误，请查看日志'))
             return []
         return group_member_list
 

@@ -56,9 +56,9 @@ class Consult:
         def_set = set()
         in_list = cmd.split()
         if len(in_list) == 1:
-            return {"code": 2, "msg": "请将5个名称以空格分隔"}
+            raise ValueError("请将5个名称以空格分隔")
         if len(in_list) > 5:
-            return {"code": 5, "msg": "防守人数过多"}
+            raise ValueError("防守人数过多")
         for index in in_list:
             item = self.name2jp.get(index.lower(), None)
             if item is None:
@@ -150,7 +150,7 @@ class Consult:
             return 0
 
     def execute(*args, **kwargs):
-        raise RuntimeError('no more sync calling')
+        raise RuntimeError('no more sync calling supported')
 
     async def execute_async(self, match_num: int, msg: dict) -> dict:
         if self.setting.get("jjc_consult", True) == False:

@@ -128,7 +128,13 @@ class User_box(_BaseModel):
 
 
 def init(sqlite_filename):
-    _db.init(sqlite_filename)
+    _db.init(
+        database=sqlite_filename,
+        pragmas={
+            'journal_mode': 'wal',
+            'cache_size': -1024 * 64,
+        },
+    )
 
     if not Admin_key.table_exists():
         Admin_key.create_table()

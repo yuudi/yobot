@@ -14,7 +14,7 @@ Linux运行存在问题较多，不推荐使用，如果你坚持使用Linux来�
 
 ## 准备服务器
 
-选项 1：租一个服务器，[服务器选择参考](https://yobot.xyz/p/9/)
+选项 1：租一个服务器
 
 选项 2：在自己电脑运行
 
@@ -32,7 +32,7 @@ Linux运行存在问题较多，不推荐使用，如果你坚持使用Linux来�
 
 参考：[httpapi插件文档配置说明](https://cqhttp.cc/docs/#/Configuration)  
 
-配置文件位于：`<酷Q运行目录>coolq/app/io.github.richardchien.coolqhttpapi/config/general.json`或`<QQ号>.json`，将其修改为[这里](https://gitee.com/yobot/codes/9wae4oc8str13huky7g2j56)的配置，如果启动过httpapi，会出现`QQ号.ini`文件，请将其删除。
+配置文件位于：`<酷Q运行目录>coolq/app/io.github.richardchien.coolqhttpapi/config/general.json`或`<QQ号>.json`，将其修改为[这里](./config.md)的配置，如果启动过httpapi，会出现`QQ号.ini`文件，请将其删除。
 
 **请注意：** docker 版本默认的网络模式为“桥接模式（bridge）”，此模式下与宿主机进行网络通信的ip地址为172.17.0.1，如果使用阿里云服务器，这个地址被占用则改为172.18.0.1，请将配置文件中127.0.0.1修改为这个地址。
 
@@ -61,12 +61,16 @@ Linux运行存在问题较多，不推荐使用，如果你坚持使用Linux来�
 
 ```shell
 cd yobot/src/client
+
 # 建议使用sreen或类似的终端复用器
 screen -S yobot
-python3 main.py
-# 然后按下 Ctrl+a, d 连续组合键暂离这个会话
-## 或者使用nohup（不推荐）
-# nohup python3 main.py &
+
+python3 main.py  # 生成yobotg.sh
+sh yobotg.sh  # 如果python的路径不是python3，请手动修改这个脚本
+# 然后按下 Ctrl+a, d 连续组合键暂离这个会话（这个快捷键只适用于screen）
+
+## 或者使用nohup
+# nohup sh yobotg.sh &
 ```
 
 如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
@@ -81,7 +85,7 @@ python3 main.py
 
 需要修改服务程序的端口号和httpapi的配置文件
 
-服务程序的配置文件在yobot/yobot_config.json，port字段就是端口号，默认值为9222，可以修改为8000至65535之间的数。
+服务程序的配置文件在src/client/yobot_config.json，port字段就是端口号，默认值为9222，可以修改为8000至65535之间的数。
 
 httpapi的配置文件如[配置小节](#配置)所示，请将文件中默认端口9222(三处)改为与服务程序相同的端口号。
 
@@ -114,24 +118,6 @@ httpapi的配置文件如[配置小节](#配置)所示，请将文件中默认�
 * 账号在短时间内加了大量的群（可以慢慢加，最好不超过10个群）
 * 大量高危账号在同一个ip登录（可以慢慢加，一台服务器最好不超过5个账号）
 
-如果文中下载链接失效，可以使用[备用网盘](https://www.lanzous.com/b00n6dnqh)
+## 开始 web 模式
 
-## 感谢
-
-* 感谢 **@Ice咖啡丨福** 在技术上的帮助
-* 感谢 **@ヒカリ** 提供的竞技场数据
-* 感谢 **@超威懒猫** 提供的活动日程数据
-* 感谢 **@黑白君** 提供的酷Q Pro账户
-* 感谢 **@sana** 对beta版本的测试与bug报告
-
-### 开源软件许可
-
-* HoshinoBot: [https://github.com/Ice-Cirno/HoshinoBot](https://github.com/Ice-Cirno/HoshinoBot)
-* aiocqhttp: [https://github.com/richardchien/python-aiocqhttp](https://github.com/richardchien/python-aiocqhttp)
-* requests: [https://pypi.org/project/requests](https://pypi.org/project/requests)
-* beautifulsoup4: [http://www.crummy.com/software/BeautifulSoup/](http://www.crummy.com/software/BeautifulSoup/)
-* pillow: [http://python-pillow.org/](http://python-pillow.org/)
-* json5: [https://github.com/json5/json5](https://github.com/json5/json5)
-* opencc-python: [https://github.com/yichen0831/opencc-python](https://github.com/yichen0831/opencc-python)
-* feedparser: [https://github.com/kurtmckee/feedparser](https://github.com/kurtmckee/feedparser)
-* ics-python: [https://github.com/C4ptainCrunch/ics.py](https://github.com/C4ptainCrunch/ics.py)
+[开启方法](../usage/web-mode.md)

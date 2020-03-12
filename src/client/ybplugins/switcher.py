@@ -144,6 +144,10 @@ class Switcher:
 
         cmd = msg["raw_message"]
         if match_num == 0x300:
+            if not self.setting["web_mode_hint"]:
+                return urljoin(
+                    self.setting['public_address'],
+                    '{}admin/setting/'.format(self.setting['public_basepath']))
             keys = ("super-admin", "black-list", "setting-restrict", "auto_update",
                     "update-time", "show_jjc_solution", "gacha_on", "gacha_private_on",
                     "preffix_on", "preffix_string", "zht_in", "zht_out", "zht_out_style",
@@ -193,6 +197,8 @@ class Switcher:
                         "calender_on", "calender_time", "calender_region")
                 reply = self.dump_url(keys, "news")
             elif cmd == "设置boss":
+                if self.setting["clan_battle_mode"] != "chat":
+                    return '请机器人管理员在后台设置中进行boss设置'
                 with open(os.path.join(self.setting["dirname"], "boss3.json")) as f:
                     content = json.load(f)
                 query = json.dumps(content, separators=(',', ':'))

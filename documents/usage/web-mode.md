@@ -95,3 +95,9 @@ server {
 向机器人私聊发送“登录”即可
 
 开启 Web 模式后，可以使用[新版公会战](./web-clanbattle.md)
+
+## 不使用 Web 模式
+
+web 模式需要服务器有公网地址或端口映射，如果机器人无法使用 web 模式，可以将公会战统计模式切换为旧版方式。
+
+在[配置文件](./configuration.md)中，将 `clan_battle_mode` 字段修改为 `chat`

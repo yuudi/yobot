@@ -53,6 +53,13 @@ yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊�
 机器人主动发送游戏新闻与活动提醒
 
 ![游戏活动提醒](./imgs/5bd8d1f5ac68ffde.jpg)
+![数据面板](./imgs/HOh17P.jpg)
+
+### 日程查询
+
+机器人主动发送游戏新闻与活动提醒
+
+![游戏活动提醒](./imgs/J04GEB.jpg)
 
 ### 模拟抽卡
 
@@ -65,7 +72,7 @@ yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊�
 
 ### 更多功能
 
-更多功能请参照[指令表](/features/)。
+更多功能请参照[指令表](/features.md)。
 
 ## 源码
 

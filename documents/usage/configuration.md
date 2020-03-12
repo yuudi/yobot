@@ -1,14 +1,28 @@
 # 配置文件说明
 
+## 配置文件位置
+
+运行包版：在 `yobot.exe` 同目录下的 `yobot_config.json`
+
+源码版：在 `src/client/yobot_config.json`
+
+插件版：在 `<插件目录>/yobot/src/client/yobot_data/yobot_config.json`
+
+## 配置项
+
 `host` 服务绑定的地址，默认值`0.0.0.0`
 
 `port` 服务绑定的地址，默认值 `9222`
 
-`public_on` 开启 web 模式，默认值 ``true``
+`public_priority` 已移除
 
-`public_addr` web 模式可以被访问的地址（如 nginx 代理后的地址），如`https://192.168.3.13:9222/yobot/`，默认自动检测
+`public_address` web 模式可以被访问的地址（如 nginx 代理后的地址），如`https://192.168.3.13:9222/yobot/`，默认自动检测
 
-`public_basepath` web 模式使用的目录（防止与其他应用冲突），如 `/yobot/`，默认值`/`
+`public_basepath` web 模式使用的目录（防止与其他应用冲突），如 `/`，默认值`/yobot/`
+
+`web_mode_hint` web 模式使用提示，默认值 `true`，在 web 模式下进行一次设置后自动修改为 `false`
+
+`clan_battle_mode` 公会战统计方式，可选`web` `chat`，默认值 `web`
 
 `access_token` 与 httpapi 通信的 token，默认值 `null`
 
@@ -22,13 +36,13 @@
 
 `update-time` 自动更新时间，默认值 `03:30`
 
-`show_jjc_solution` jjc查询结果显示方式，可选`text` `url`，默认值 `url`
+`show_jjc_solution` 已移除
 
-`jjc_auth_key` jjc查询授权码，默认值 `null`
+`jjc_auth_key` 已移除
 
-`gacha_on` 开启群聊抽卡功能，默认值 `true`
+`gacha_on` 开启群聊抽卡功能，默认值 `false`
 
-`gacha_private_on` 开启私聊抽卡功能，默认值 `true`
+`gacha_private_on` 开启私聊抽卡功能，默认值 `false`
 
 `news_jp_official` 开启日服官网新闻推送，默认值 `true`
 

@@ -22,12 +22,6 @@ themeConfig:
         link: /usage/web-mode.md
       - text: Web模式 - 公会战
         link: /usage/web-clanbattle.md
-    - text: 工具
-      items:
-        - text: 十连抽
-          link: https://yobot.xyz/p/411/
-        - text: 随机图片
-          link: https://api.v3.yobot.xyz/setu/
     - text: 源码
       items:
         - text: GitHub

@@ -2,7 +2,7 @@
 
 ## 准备服务器
 
-选项 1：租一个服务器，[服务器选择参考](https://yobot.xyz/p/9/)
+选项 1：租一个服务器
 
 选项 2：在自己电脑运行
 
@@ -31,7 +31,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 由于新装的 httpapi 启动时有时候会重置配置文件，所以如果 httpapi 启动后与下图不符请手动配置一下文件
 
-配置文件位于：`<酷Q运行目录>data\app\io.github.richardchien.coolqhttpapi\config\general.json`或 *QQ号.json* ，将其修改为[这里](https://gitee.com/yobot/codes/9wae4oc8str13huky7g2j56)的配置。
+配置文件位于：`<酷Q运行目录>data\app\io.github.richardchien.coolqhttpapi\config\general.json`或 *QQ号.json* ，将其修改为[这里](./config.md)的配置。
 
 配置正确后，启动 httpapi 插件后会反复出现如下的提示
 
@@ -90,22 +90,6 @@ httpapi的配置文件如[配置小节](#配置)所示，请将文件中默认�
 
 如果文中下载链接失效，可以使用[备用网盘](https://www.lanzous.com/b00n6dnqh)
 
-## 感谢
+## 开始 web 模式
 
-* 感谢 **@Ice咖啡丨福** 在技术上的帮助
-* 感谢 **@ヒカリ** 提供的竞技场数据
-* 感谢 **@超威懒猫** 提供的活动日程数据
-* 感谢 **@黑白君** 提供的酷Q Pro账户
-* 感谢 **@sana** 对beta版本的测试与bug报告
-
-### 开源软件许可
-
-* HoshinoBot: [https://github.com/Ice-Cirno/HoshinoBot](https://github.com/Ice-Cirno/HoshinoBot)
-* aiocqhttp: [https://github.com/richardchien/python-aiocqhttp](https://github.com/richardchien/python-aiocqhttp)
-* requests: [https://pypi.org/project/requests](https://pypi.org/project/requests)
-* beautifulsoup4: [http://www.crummy.com/software/BeautifulSoup/](http://www.crummy.com/software/BeautifulSoup/)
-* pillow: [http://python-pillow.org/](http://python-pillow.org/)
-* json5: [https://github.com/json5/json5](https://github.com/json5/json5)
-* opencc-python: [https://github.com/yichen0831/opencc-python](https://github.com/yichen0831/opencc-python)
-* feedparser: [https://github.com/kurtmckee/feedparser](https://github.com/kurtmckee/feedparser)
-* ics-python: [https://github.com/C4ptainCrunch/ics.py](https://github.com/C4ptainCrunch/ics.py)
+[开启方法](../usage/web-mode.md)
