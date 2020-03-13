@@ -15,7 +15,7 @@ themeConfig:
     - text: 安装方法
       link: /install/
     - text: 功能列表
-      link: /features.md
+      link: /features/
     - text: 高级
       items:
       - text: 开启Web模式
@@ -30,3 +30,8 @@ themeConfig:
           link: https://gitee.com/yobot/yobot
     - text: 关于
       link: /about.md
+plugins:
+  - - vuepress-plugin-clean-urls
+    - normalSuffix: "/"
+      indexSuffix: "/"
+      notFoundPath: "/404.html"
