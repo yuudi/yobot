@@ -10,6 +10,7 @@ src/client/*.json
 !src/client/default_*
 src/client/*.csv
 src/client/*.db
+src/client/*.db-*
 src/client/*.ics
 src/client/*.pid
 src/client/*.spec

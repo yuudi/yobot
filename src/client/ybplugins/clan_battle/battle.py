@@ -116,7 +116,7 @@ class ClanBattle:
     def _get_nickname_by_qqid(self, qqid) -> Union[str, None]:
         user = User.get_or_create(qqid=qqid)[0]
         if user.nickname is None:
-            asyncio.create_task(self._update_user_nickname_async(
+            asyncio.ensure_future(self._update_user_nickname_async(
                 qqid=qqid,
                 group_id=None,
             ))
@@ -163,7 +163,7 @@ class ClanBattle:
             group_member_list = await self.api.get_group_member_list(group_id=group_id)
         except Exception as e:
             _logger.exception('获取群成员列表错误'+str(type(e))+str(e))
-            asyncio.create_task(self.api.send_group_msg(
+            asyncio.ensure_future(self.api.send_group_msg(
                 group_id=group_id, message='获取群成员错误，请查看日志'))
             return []
         return group_member_list
@@ -224,7 +224,7 @@ class ClanBattle:
         self._boss_status[group_id] = asyncio.Future()
 
         # refresh group list
-        asyncio.create_task(self._update_group_list_async())
+        asyncio.ensure_future(self._update_group_list_async())
 
     def bind_group(self, group_id, qqid, nickname):
         """
@@ -246,7 +246,7 @@ class ClanBattle:
         # refresh
         self.get_member_list(group_id, nocache=True)
         if nickname is None:
-            asyncio.create_task(self._update_user_nickname_async(
+            asyncio.ensure_future(self._update_user_nickname_async(
                 qqid=qqid,
                 group_id=group_id,
             ))
@@ -605,7 +605,7 @@ class ClanBattle:
         message = ' '.join((
             atqq(qqid) for qqid in member_list
         ))
-        asyncio.create_task(self.api.send_group_msg(
+        asyncio.ensure_future(self.api.send_group_msg(
             group_id=group_id,
             message=message+'\n=======\n请及时完成今日出刀',
         ))
@@ -709,7 +709,7 @@ class ClanBattle:
             notice.append(atqq(subscribe.qqid))
             subscribe.delete_instance()
         if notice:
-            asyncio.create_task(self.api.send_group_msg(
+            asyncio.ensure_future(self.api.send_group_msg(
                 group_id=group_id,
                 message='boss已被击败\n'+'\n'.join(notice),
             ))
@@ -864,10 +864,10 @@ class ClanBattle:
     def jobs(self):
         trigger = CronTrigger(hour=5)
 
-        def create_task_update_all_group_members():
-            asyncio.create_task(self._update_group_list_async())
+        def ensure_future_update_all_group_members():
+            asyncio.ensure_future(self._update_group_list_async())
 
-        return ((trigger, create_task_update_all_group_members),)
+        return ((trigger, ensure_future_update_all_group_members),)
 
     def match(self, cmd):
         if self.setting['clan_battle_mode'] != 'web':
@@ -902,7 +902,7 @@ class ClanBattle:
                 if ctx['sender']['role'] == 'member':
                     return '只有管理员才可以加入全部成员'
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-                asyncio.create_task(
+                asyncio.ensure_future(
                     self._update_all_group_members_async(group_id))
                 return '本群所有成员已添加记录'
             match = re.match(r'^加入公会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
@@ -1259,7 +1259,7 @@ class ClanBattle:
                         _logger.info('网页 成功 {} {} {}'.format(
                             user_id, group_id, action))
                         if group.notification & 0x01:
-                            asyncio.create_task(
+                            asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message=str(status),
@@ -1297,7 +1297,7 @@ class ClanBattle:
                         _logger.info('网页 成功 {} {} {}'.format(
                             user_id, group_id, action))
                         if group.notification & 0x01:
-                            asyncio.create_task(
+                            asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message=str(status),
@@ -1332,7 +1332,7 @@ class ClanBattle:
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
                     if group.notification & 0x02:
-                        asyncio.create_task(
+                        asyncio.ensure_future(
                             self.api.send_group_msg(
                                 group_id=group_id,
                                 message=str(status),
@@ -1367,7 +1367,7 @@ class ClanBattle:
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
                     if group.notification & 0x04:
-                        asyncio.create_task(
+                        asyncio.ensure_future(
                             self.api.send_group_msg(
                                 group_id=group_id,
                                 message='{}已开始挑战boss'.format(user.nickname),
@@ -1402,7 +1402,7 @@ class ClanBattle:
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
                     if group.notification & 0x08:
-                        asyncio.create_task(
+                        asyncio.ensure_future(
                             self.api.send_group_msg(
                                 group_id=group_id,
                                 message='boss挑战已可申请',
@@ -1449,7 +1449,7 @@ class ClanBattle:
                     if boss_num == 0:
                         notice = '挂树成功'
                         if group.notification & 0x10:
-                            asyncio.create_task(
+                            asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message='{}已挂树'.format(user.nickname),
@@ -1458,7 +1458,7 @@ class ClanBattle:
                     else:
                         notice = '预约成功'
                         if group.notification & 0x40:
-                            asyncio.create_task(
+                            asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message='{}已预约{}号boss'.format(
@@ -1484,7 +1484,7 @@ class ClanBattle:
                     if boss_num == 0:
                         notice = '取消挂树成功'
                         if group.notification & 0x20:
-                            asyncio.create_task(
+                            asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message='{}已取消挂树'.format(
@@ -1494,7 +1494,7 @@ class ClanBattle:
                     else:
                         notice = '取消预约成功'
                         if group.notification & 0x80:
-                            asyncio.create_task(
+                            asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
                                     message='{}已取消预约{}号boss'.format(
@@ -1520,7 +1520,7 @@ class ClanBattle:
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
                     if group.notification & 0x100:
-                        asyncio.create_task(
+                        asyncio.ensure_future(
                             self.api.send_group_msg(
                                 group_id=group_id,
                                 message=str(status),

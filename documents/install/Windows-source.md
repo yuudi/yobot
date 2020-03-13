@@ -49,6 +49,8 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 源码运行需要使用git作为版本管理和更新工具，如果没有使用过git可以阅读：[git官网](https://git-scm.com/)，[git教程](https://www.runoob.com/git/git-tutorial.html)
 
+确保python版本至少为3.6
+
 下载源码 `git clone https://github.com/yuudi/yobot.git`
 
 或者使用国内源 `git clone https://gitee.com/yobot/yobot.git`
