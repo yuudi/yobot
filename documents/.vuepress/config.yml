@@ -28,3 +28,5 @@ themeConfig:
           link: https://github.com/yuudi/yobot
         - text: Gitee
           link: https://gitee.com/yobot/yobot
+    - text: 关于
+      link: /about.md

@@ -31,8 +31,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.11]"
-    Commit = {"yuudi": 55, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.12]"
+    Commit = {"yuudi": 56, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,

@@ -2,7 +2,7 @@
 
 ## 介绍
 
-yobot 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊机器人，开源、免费。
+[yobot](./about.md) 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊机器人，开源、免费。
 
 ## 试用
 

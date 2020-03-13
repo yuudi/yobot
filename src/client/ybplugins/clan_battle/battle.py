@@ -94,6 +94,12 @@ class ClanBattle:
         for group in Clan_group.select():
             self._boss_status[group.group_id] = asyncio.Future()
 
+        # super-admin initialize
+        for sa_id in self.setting['super-admin']:
+            sa = User.get_or_create(qqid=sa_id)[0]
+            sa.authority_group = 1
+            sa.save()
+
     def _level_by_cycle(self, cycle, *, level_4=None, game_server=None):
         if cycle <= 3:
             return 0
