@@ -189,8 +189,12 @@ class Switcher:
             if cmd == "设置卡池":
                 reply = self.get_setting_pool_url()
             elif cmd == "设置邮箱":
+                if self.setting["clan_battle_mode"] != "chat":
+                    return '此设置不再可用'
                 reply = self.setting_url["mail"]
             elif cmd == "设置新闻" or cmd == "设置日程":
+                if self.setting["clan_battle_mode"] != "chat":
+                    return '请机器人管理员在后台设置中进行boss设置'
                 keys = ("news_jp_official", "news_jp_twitter", "news_tw_official",
                         "news_tw_facebook", "news_cn_official", "news_cn_bilibili",
                         "news_interval_minutes", "notify_groups", "notify_privates",

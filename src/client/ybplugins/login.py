@@ -71,7 +71,7 @@ class Login:
 
         newurl = urljoin(
             self.setting['public_address'],
-            '{}login?qqid={}&key={}'.format(
+            '{}login/?qqid={}&key={}'.format(
                 self.setting['public_basepath'],
                 user.qqid,
                 login_code,
