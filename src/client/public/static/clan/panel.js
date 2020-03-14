@@ -158,6 +158,7 @@ var vm = new Vue({
                 action: 'addrecord',
                 defeat: this.defeat,
                 behalf: this.behalf,
+                damage: this.damage,
             });
             this.recordBehalfVisible = false;
         },

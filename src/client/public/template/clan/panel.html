@@ -75,13 +75,14 @@
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="出刀成员" label-width="120">
-                <el-input placeholder="QQ号（选择提示以后再开发）" v-model="behalf">
-                  <!-- TODO: 选择时显示建议 -->
-                </el-input>
+                <el-select v-model="behalf" filterable placeholder="出刀成员">
+                  <el-option v-for="item in members" :key="item.qqid" :label="item.nickname" :value="item.qqid">
+                  </el-option>
+                </el-select>
               </el-form-item>
               <el-form-item label="伤害值" label-width="120">
                 <el-input v-model.number="damage" :disabled="defeat">
-                  <template slot="append">[[ damageHint ]]</template>
+                  <template slot="prepend">[[ damageHint ]]</template>
                 </el-input>
               </el-form-item>
             </el-form>
