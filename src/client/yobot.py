@@ -31,8 +31,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.15]"
-    Commit = {"yuudi": 60, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.16]"
+    Commit = {"yuudi": 61, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
@@ -84,11 +84,12 @@ class Yobot:
         if verinfo is None:
             verinfo = updater.get_version(self.Version, self.Commit)
 
+        modified = False
+
         # initialize database
         ybdata.init(os.path.join(dirname, 'yobotdata.db'))
 
         # initialize web path
-        modified = False
         if not self.glo_setting.get("public_address"):
             try:
                 res = requests.get("http://members.3322.org/dyndns/getip")
@@ -112,6 +113,16 @@ class Yobot:
         if not self.glo_setting["public_basepath"].endswith("/"):
             self.glo_setting["public_basepath"] += "/"
             modified = True
+
+        # initialize update time
+        if self.glo_setting["update-time"] == "random":
+            self.glo_setting["update-time"] = "{}:{}".format(
+                random.randint(2, 4),
+                random.randint(0, 59)
+            )
+            modified = True
+
+        # save initialization
         if modified:
             with open(config_f_path, "w", encoding="utf-8") as config_file:
                 json.dump(self.glo_setting, config_file,

@@ -28,7 +28,7 @@ class Consult:
     Passive = True
     Active = False
     Request = False
-    URL = "http://api.yobot.xyz/v2/nicknames/?type=csv"
+    URL = "http://api.yobot.xyz/v3/nickname/old.csv"
     Feedback_URL = "http://api.yobot.xyz/v2/nicknames/?type=feedback&name="
     Nicknames_repo = "https://gitee.com/yobot/pcr-nickname/blob/master/nicknames.csv"
 
@@ -120,6 +120,7 @@ class Consult:
             'jjc-solution.html',
             len=len,
             solution=solution,
+            def_lst=def_lst,
             jpname2id=self.jpname2id,
             parse_team=_parse_team,
             public_base=self.setting["public_basepath"],
@@ -137,7 +138,7 @@ class Consult:
                 self.setting['public_basepath'], num, filename))
         reply = '找到{}条解法：{}'.format(len(solution), addr)
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/usage/web-mode.html'
+            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/usage/web-mode/'
         return reply
 
     @staticmethod

@@ -7,15 +7,15 @@
 
 ## 准备服务器
 
-选项 1：租一个服务器
+虽然在自己电脑运行也可以，不过最好能租一个服务器，以便长期挂机和提供web服务
 
-选项 2：在自己电脑运行
+[服务器推荐](./server.md)
 
 ## 安装
 
 ### 第一步
 
-点击下载[酷Q-httpapi 整合包](https://ybdown.zimingdh.com/CoolQ_With_Httpapi.7z)
+点击下载[酷Q-httpapi 整合包](https://x.jingzhidh.com/CoolQ_With_Httpapi.7z)
 
 解压后双击“CQA.exe”，输入账号密码（注意账号风险，请勿使用重要的QQ号）
 
@@ -54,3 +54,7 @@
 * 关闭所有插件，机器人挂机一段时间
 * 在远程主机上使用一下QQ网页服务（比如QQ邮箱、QQ安全中心等）
 * 下载QQ安全中心，确认异地登录
+
+## 开始 web 模式
+
+[开启方法](../usage/web-mode.md)

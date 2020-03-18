@@ -61,7 +61,7 @@ class Clan_group(_BaseModel):
     boss_num = SmallIntegerField(default=1)
     boss_health = BigIntegerField(default=6000000)
     challenging_member_qq_id = IntegerField(null=True)
-    challenging_start_time = TimestampField(default=0)
+    challenging_start_time = BigIntegerField(default=0)
     challenging_comment = TextField(null=True)
 
 

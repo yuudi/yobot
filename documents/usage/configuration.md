@@ -34,7 +34,7 @@
 
 `auto_update` 自动更新，默认值 `true`
 
-`update-time` 自动更新时间，默认值 `03:30`
+`update-time` 自动更新时间，如 `03:30`，默认为随机的凌晨时间
 
 `show_jjc_solution` 已移除
 

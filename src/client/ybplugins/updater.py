@@ -131,6 +131,7 @@ class Updater:
             return "已经是最新版本"
         git_dir = os.path.dirname(os.path.dirname(self.path))
         os.system(f'cd "{git_dir}" ; git pull')
+        open('.YOBOT_RESTART', 'w').close()
         sys.exit(10)
 
     def check_commit(self):
@@ -165,6 +166,7 @@ class Updater:
         else:
             if self.evn == "nonebot-plugin":
                 return "作为插件无法这么做"
+            open('.YOBOT_RESTART', 'w').close()
             sys.exit(10)
 
     @staticmethod

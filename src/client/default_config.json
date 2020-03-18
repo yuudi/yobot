@@ -10,7 +10,7 @@
     "black-list": [],
     "setting-restrict": 3,
     "auto_update": true,
-    "update-time": "03:30",
+    "update-time": "random",
     "clan_battle_mode": "web",
     "show_jjc_solution": "url",
     "jjc_search_url": "https://api.pcrdfans.com/x/v1/search",

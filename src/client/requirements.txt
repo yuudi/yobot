@@ -8,5 +8,6 @@ pillow~=6.2.1
 arrow
 peewee~=3.13.1
 expiringdict~=1.2.0
-aiocqhttp>=0.6.8
-quart~=0.6
+aiocqhttp~=0.6.8
+quart~=0.6.15
+jinja2~=2.10.3

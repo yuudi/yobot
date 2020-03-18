@@ -92,7 +92,7 @@ class ClanBattle:
         self._boss_status: Dict[str, asyncio.Future] = {}
 
         for group in Clan_group.select():
-            self._boss_status[group.group_id] = asyncio.Future()
+            self._boss_status[group.group_id] = asyncio.get_event_loop().create_future()
 
         # super-admin initialize
         for sa_id in self.setting['super-admin']:
@@ -221,7 +221,7 @@ class ClanBattle:
             game_server=game_server,
             boss_health=self.bossinfo[game_server][0][0],
         )
-        self._boss_status[group_id] = asyncio.Future()
+        self._boss_status[group_id] = asyncio.get_event_loop().create_future()
 
         # refresh group list
         asyncio.ensure_future(self._update_group_list_async())
@@ -376,7 +376,7 @@ class ClanBattle:
             ),
         )
         self._boss_status[group_id].set_result(status)
-        self._boss_status[group_id] = asyncio.Future()
+        self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
     def defeat(self, group_id, qqid, behalfed=None, comment={}) -> BossStatus:
@@ -461,7 +461,7 @@ class ClanBattle:
             ),
         )
         self._boss_status[group_id].set_result(status)
-        self._boss_status[group_id] = asyncio.Future()
+        self._boss_status[group_id] = asyncio.get_event_loop().create_future()
 
         self.notify_subscribe(group_id, group.boss_num)
 
@@ -505,7 +505,7 @@ class ClanBattle:
             f'{nik}的出刀记录已被撤销',
         )
         self._boss_status[group_id].set_result(status)
-        self._boss_status[group_id] = asyncio.Future()
+        self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
     def modify(self, group_id, cycle=None, boss_num=None, boss_health=None):
@@ -550,7 +550,7 @@ class ClanBattle:
             'boss状态已修改',
         )
         self._boss_status[group_id].set_result(status)
-        self._boss_status[group_id] = asyncio.Future()
+        self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
     def change_game_server(self, group_id, game_server):
@@ -747,7 +747,7 @@ class ClanBattle:
             f'{nik}已开始挑战boss',
         )
         self._boss_status[group_id].set_result(status)
-        self._boss_status[group_id] = asyncio.Future()
+        self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
     def cancel_application(self, group_id, qqid) -> BossStatus:
@@ -791,7 +791,7 @@ class ClanBattle:
             'boss挑战已可申请',
         )
         self._boss_status[group_id].set_result(status)
-        self._boss_status[group_id] = asyncio.Future()
+        self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
     @timed_cached_func(max_len=64, max_age_seconds=60, ignore_self=True)
@@ -905,7 +905,7 @@ class ClanBattle:
                 asyncio.ensure_future(
                     self._update_all_group_members_async(group_id))
                 return '本群所有成员已添加记录'
-            match = re.match(r'^加入公会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
+            match = re.match(r'^加入[公工]会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
             if match:
                 if match.group(1):
                     if ctx['sender']['role'] == 'member':
@@ -917,7 +917,7 @@ class ClanBattle:
                                 or ctx['sender'].get('nickname'))
                 self.bind_group(group_id, user_id, nickname)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-                return '{}已加入本公会' .format(atqq(user_id))
+                return '{}已加入本公会'.format(atqq(user_id))
         elif match_num == 3:  # 状态
             if cmd != '状态':
                 return

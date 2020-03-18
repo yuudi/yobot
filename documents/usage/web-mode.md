@@ -20,7 +20,7 @@
 
 ### 方法 2：使用 Nginx 代理（推荐）
 
-如果需要为网页添加日志记录、HTTPS支持、安全限制等，可以使用 Nginx、Apache 之类的服务器软件
+如果需要为网页添加日志记录、HTTPS支持、安全限制等，或者需要同时部署其他站点，可以使用 Nginx、Apache 之类的服务器软件
 
 请根据服务器实际情况设定 Nginx 代理，这里给出一个示例，**不要直接复制**，如果不懂请用工具生成或请熟悉的人代劳
 
@@ -33,8 +33,8 @@ server {
   listen 443 ssl http2;
   listen [::]:443 ssl http2;
 
-  ssl_certificate /path/to/ssl_certificate.crt;  # 你的证书路径
-  ssl_certificate_key /path/to/ssl_certificate.key;  # 你的私钥路径
+  ssl_certificate /home/www/ssl/ssl_certificate.crt;  # 你的证书路径
+  ssl_certificate_key /home/www/ssl/ssl_certificate.key;  # 你的私钥路径
 
   server_name io.yobot.xyz;  # 你的域名
 
@@ -45,7 +45,7 @@ server {
 
   ## 静态文件直接访问（可选，性能）
   #location /assets/ {
-  #  alias /home/yobot/src/client/public/assets/;  # 你的静态文件目录
+  #  alias /home/yobot/src/client/public/static/;  # 你的静态文件目录
   #  expires 30d;
   #}
 
@@ -74,19 +74,21 @@ server {
 
 ```apacheconf
 <VirtualHost *:80>
-    Servername io.yobot.xyz
-        ProxyRequests Off
-        ProxyPass http://localhost:9222/
-        ProxyPassReverse http://localhost:9222/
-        <Proxy *>
-            Order Deny, Allow
-            Allow from All
-        </Proxy>
-        <Location "/ws/">
-        AllowOverride None
-            Order Deny, Allow
-            Deny from All
-        </Location>
+  Servername io.yobot.xyz
+  ProxyRequests Off
+  <Proxy *>
+    Order Deny, Allow
+    Allow from All
+  </Proxy>
+  <Location />
+    ProxyPass http://localhost:9222/
+    ProxyPassReverse http://localhost:9222/
+  </Location>
+  <Location "/ws/">
+  AllowOverride None
+    Order Deny, Allow
+    Deny from All
+  </Location>
 </VirtualHost>
 ```
 

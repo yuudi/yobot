@@ -6,6 +6,7 @@ src/client/*/
 !src/client/ybplugins/
 !src/client/yybplugins/
 !src/client/public/
+src/client/.*
 src/client/*.json
 !src/client/default_*
 src/client/*.csv

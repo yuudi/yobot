@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>jjc解法</title>
+    <title>竞技场解法</title>
     <style>
         #mark {
             float: left;
@@ -50,7 +50,13 @@
 </head>
 
 <body>
-    <h1>解法</h1>
+    <h1>竞技场解法</h1>
+    <p>防守队伍：</p>
+    <div>
+        {% for chara in def_lst -%}
+        <img src="{{ public_base }}resource/icon/unit/{{ jpname2id[chara] + 30 }}.jpg">
+        {% endfor -%}
+    </div>
     <p>查找到{{ len(solution) }}条解法</p>
     <table border="0">
         <tbody>

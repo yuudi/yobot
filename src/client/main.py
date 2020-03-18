@@ -3,29 +3,33 @@
 """
 
 import platform
+import os
 import sys
 
-if platform.system() == "Linux" and "-g" not in sys.argv[1:]:
-    with open("yobotg.sh", "w") as g:
-        g.write("""
+if platform.system() == "Linux":
+    if "-g" not in sys.argv[1:]:
+        with open("yobotg.sh", "w") as g:
+            g.write("""
 echo $$ > yobotg.pid
 loop=true
 while $loop
 do
     loop=false
     python3 main.py -g
-    if [ $? == 10 ]
+    if [ -f .YOBOT_RESTART ]
     then
         loop=true
+        rm .YOBOT_RESTART
     fi
 done
 """)
-    print('请通过"sh yobotg.sh"启动')
-    sys.exit()
+        print('请通过"sh yobotg.sh"启动')
+        sys.exit()
+    if os.path.exists('.YOBOT_RESTART'):
+        os.remove('.YOBOT_RESTART')
 
 import asyncio
 import json
-import os
 
 from aiocqhttp import CQHttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
