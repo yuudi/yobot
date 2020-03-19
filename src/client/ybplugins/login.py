@@ -116,6 +116,7 @@ class Login:
                         # 登录码有效
                         new_key = _rand_string(32)
                         session['yobot_user'] = qqid
+                        session['csrf_token'] = _rand_string(16)
                         user.login_code_available = False
                         user.last_login_time = now
                         user.last_login_ipaddr = request.headers.get(
@@ -151,6 +152,7 @@ class Login:
                             if user.auth_cookie_expire_time > now:
                                 # cookie有效
                                 session['yobot_user'] = qqid
+                                session['csrf_token'] = _rand_string(16)
                                 user.last_login_time = now
                                 user.last_login_ipaddr = request.remote_addr
                                 user.save()

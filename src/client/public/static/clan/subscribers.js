@@ -1,7 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
-        bosstag:['挂树','预约1','预约2','预约3','预约4','预约5'],
+        bosstag: ['挂树', '预约1', '预约2', '预约3', '预约4', '预约5'],
         subscribers: [
             [], [], [], [], [], [],
         ],
@@ -11,9 +11,12 @@ var vm = new Vue({
     },
     mounted() {
         var thisvue = this;
-        axios.post('../api/', { action: 'get_subscribers' }).then(function (res) {
+        axios.post('../api/', {
+            action: 'get_subscribers',
+            csrf_token: csrf_token,
+        }).then(function (res) {
             if (res.data.code == 0) {
-                for (sub of res.data.subscribers){
+                for (sub of res.data.subscribers) {
                     thisvue.subscribers[sub.boss].push(sub);
                 }
                 thisvue.group_name = res.data.group_name;
@@ -24,7 +27,10 @@ var vm = new Vue({
         }).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');
         });
-        axios.post('../api/', { action: 'get_member_list' }).then(function (res) {
+        axios.post('../api/', {
+            action: 'get_member_list',
+            csrf_token: csrf_token,
+        }).then(function (res) {
             if (res.data.code == 0) {
                 thisvue.members = res.data.members;
             } else {

@@ -14,10 +14,12 @@ var vm = new Vue({
         axios.all([
             axios.post('../api/', {
                 action: 'get_challenge',
+                csrf_token: csrf_token,
                 ts: null,
             }),
             axios.post('../api/', {
-                action: 'get_member_list'
+                action: 'get_member_list',
+                csrf_token: csrf_token,
             }),
         ]).then(axios.spread(function (res, memres) {
             if (res.data.code != 0) {
@@ -75,6 +77,7 @@ var vm = new Vue({
             var thisvue = this;
             axios.post('../api/', {
                 action: 'get_challenge',
+                csrf_token: csrf_token,
                 ts: (thisvue.reportDate.getTime() / 1000) + 43200,
             }).then(function (res) {
                 if (res.data.code != 0) {
@@ -141,9 +144,9 @@ var vm = new Vue({
                 icons[0].remove();
             }
             var uri = 'data:application/vnd.ms-excel;base64,';
-            var ctx = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>'+document.getElementsByTagName('thead')[0].innerHTML+document.getElementsByTagName('tbody')[0].innerHTML+'</table></body></html>';
+            var ctx = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>' + document.getElementsByTagName('thead')[0].innerHTML + document.getElementsByTagName('tbody')[0].innerHTML + '</table></body></html>';
             window.location.href = uri + window.btoa(unescape(encodeURIComponent(ctx)));
-            document.documentElement.innerHTML='请在Excel中查看（如果无法打开，请安装最新版本Excel）';
+            document.documentElement.innerHTML = '请在Excel中查看（如果无法打开，请安装最新版本Excel）';
         },
         handleTitleSelect(key, keyPath) {
             switch (key) {
@@ -184,6 +187,7 @@ var vm = new Vue({
             var thisvue = this;
             axios.post('../api/', {
                 action: action,
+                csrf_token: csrf_token,
                 memberlist: memberlist,
             }).then(function (res) {
                 if (res.data.code != 0) {

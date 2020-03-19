@@ -30,7 +30,10 @@ var vm = new Vue({
         },
         refresh: function (event) {
             var thisvue = this;
-            axios.post(api_path, { action: 'get_data' }).then(function (res) {
+            axios.post(api_path, {
+                action: 'get_data',
+                csrf_token: csrf_token,
+            }).then(function (res) {
                 if (res.data.code == 0) {
                     thisvue.userData = res.data.data;
                 } else {
@@ -44,6 +47,7 @@ var vm = new Vue({
             var thisvue = this;
             axios.post(api_path, {
                 action: 'modify_user',
+                csrf_token: csrf_token,
                 data: {
                     qqid: scope.row.qqid,
                     authority_group: scope.row.authority_group,

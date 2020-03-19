@@ -37,7 +37,10 @@
         </el-table>
     </div>
 </body>
-<script>var api_path = "{{ url_for('yobot_users_api') }}";</script>
+<script>
+    var api_path = "{{ url_for('yobot_users_api') }}";
+    var csrf_token = "{{ session['csrf_token'] }}";
+</script>
 <script src="{{ url_for('yobot_static', filename='admin/users.js') }}"></script>
 
 </html>

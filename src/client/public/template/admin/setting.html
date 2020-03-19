@@ -221,7 +221,10 @@
     {%- endif %}
 </body>
 {% if user.authority_group < 10 -%}
-<script>var api_path = "{{ url_for('yobot_setting_api') }}";</script>
+<script>
+    var api_path = "{{ url_for('yobot_setting_api') }}";
+    var csrf_token = "{{ session['csrf_token'] }}";
+</script>
 <script src="{{ url_for('yobot_static', filename='admin/setting.js') }}"></script>
 {%- endif %}
 

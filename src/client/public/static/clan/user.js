@@ -2,7 +2,7 @@ var gs_offset = { jp: 4, tw: 5, kr: 4, cn: 5 };
 function ts2ds(timestamp) {
     var d = new Date();
     d.setTime(timestamp * 1000);
-    return d.getFullYear() + '/' + d.getMonth() + '/' + d.getDate();
+    return d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate();
 }
 var vm = new Vue({
     el: '#app',
@@ -18,6 +18,7 @@ var vm = new Vue({
         thisvue.qqid = parseInt(pathname[pathname.length - 2]);
         axios.post('../api/', {
             action: 'get_user_challenge',
+            csrf_token: csrf_token,
             qqid: thisvue.qqid,
         }).then(function (res) {
             if (res.data.code != 0) {

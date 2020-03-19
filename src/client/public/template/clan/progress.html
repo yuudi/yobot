@@ -39,6 +39,7 @@
       </span>
     </el-dialog>
     <template v-if="progressData.length > 0">
+      共[[ members.length ]]人，共[[ progressData.reduce((s,i)=>s+i.finished,0) ]]刀
       <el-table :data="progressData" :span-method="arraySpanMethod" style="width: 1430" ref="multipleTable"
         @selection-change="handleSelectionChange" stripe>
         <el-table-column type="selection" width="55"></el-table-column>
@@ -118,6 +119,7 @@
     </template>
   </div>
 </body>
+<script>var csrf_token = "{{ session['csrf_token'] }}";</script>
 <script src="{{ url_for('yobot_static', filename='clan/progress.js') }}"></script>
 
 </html>

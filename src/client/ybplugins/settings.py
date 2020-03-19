@@ -60,7 +60,13 @@ class Setting:
                     settings=settings,
                 )
             elif request.method == 'PUT':
-                new_setting = await request.get_json()
+                req = await request.get_json()
+                if req.get('csrf_token') != session['csrf_token']:
+                    return jsonify(
+                        code=15,
+                        message='Invalid csrf_token',
+                    )
+                new_setting = req.get('setting')
                 if new_setting is None:
                     return jsonify(
                         code=30,
@@ -115,6 +121,11 @@ class Setting:
                     return jsonify(
                         code=30,
                         message='Invalid payload',
+                    )
+                if req.get('csrf_token') != session['csrf_token']:
+                    return jsonify(
+                        code=15,
+                        message='Invalid csrf_token',
                     )
                 action = req['action']
                 if action == 'get_data':
@@ -178,6 +189,11 @@ class Setting:
                         code=30,
                         message='Invalid payload',
                     )
+                if req.get('csrf_token') != session['csrf_token']:
+                    return jsonify(
+                        code=15,
+                        message='Invalid csrf_token',
+                    )
                 action = req['action']
                 if action == 'get_data':
                     groups = []
@@ -188,13 +204,6 @@ class Setting:
                             'game_server': group.game_server,
                         })
                     return jsonify(code=0, data=groups)
-                elif action == 'modify_user':
-                    data = req['data']
-                    user = User.get_or_none(qqid=data['qqid'])
-                    for key in data.keys():
-                        setattr(user, key, data[key])
-                    user.save()
-                    return jsonify(code=0, message='success')
                 else:
                     return jsonify(code=32,message='unknown action')
             except KeyError as e:

@@ -9,7 +9,10 @@ var vm = new Vue({
     methods: {
         refresh: function (event) {
             var thisvue = this;
-            axios.post(api_path, { action: 'get_data' }).then(function (res) {
+            axios.post(api_path, {
+                action: 'get_data',
+                csrf_token: csrf_token,
+            }).then(function (res) {
                 if (res.data.code == 0) {
                     thisvue.groupData = res.data.data;
                 } else {

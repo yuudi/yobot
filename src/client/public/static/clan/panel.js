@@ -21,7 +21,10 @@ var vm = new Vue({
     },
     mounted() {
         var thisvue = this;
-        axios.post("./api/", { action: 'get_data' }).then(function (res) {
+        axios.post("./api/", {
+            action: 'get_data',
+            csrf_token: csrf_token,
+        }).then(function (res) {
             if (res.data.code == 0) {
                 thisvue.groupData = res.data.groupData;
                 thisvue.bossData = res.data.bossData;
@@ -34,7 +37,10 @@ var vm = new Vue({
         }).catch(function (error) {
             thisvue.$alert(error, '加载数据错误');
         });
-        axios.post("./api/", { action: 'get_member_list' }).then(function (res) {
+        axios.post("./api/", {
+            action: 'get_member_list',
+            csrf_token: csrf_token,
+        }).then(function (res) {
             if (res.data.code == 0) {
                 thisvue.members = res.data.members;
             } else {
@@ -79,6 +85,7 @@ var vm = new Vue({
             axios.post("./api/", {
                 action: 'update_boss',
                 timeout: 30,
+                csrf_token: csrf_token,
             }, {
                 timeout: 40000,
             }).then(function (res) {
@@ -118,6 +125,7 @@ var vm = new Vue({
         },
         callapi: function (payload) {
             var thisvue = this;
+            payload.csrf_token = csrf_token;
             axios.post("./api/", payload).then(function (res) {
                 if (res.data.code == 0) {
                     if (res.data.bossData) {

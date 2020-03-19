@@ -1157,6 +1157,11 @@ class ClanBattle:
                         code=30,
                         message='Invalid payload',
                     )
+                if payload.get('csrf_token') != session['csrf_token']:
+                    return jsonify(
+                        code=15,
+                        message='Invalid csrf_token',
+                    )
                 action = payload['action']
                 if action == 'get_member_list':
                     return jsonify(
@@ -1655,6 +1660,11 @@ class ClanBattle:
                     return jsonify(
                         code=30,
                         message='Invalid payload',
+                    )
+                if payload.get('csrf_token') != session['csrf_token']:
+                    return jsonify(
+                        code=15,
+                        message='Invalid csrf_token',
                     )
                 action = payload['action']
                 if action == 'get_setting':

@@ -21,7 +21,10 @@ var vm = new Vue({
     },
     mounted() {
         var thisvue = this;
-        axios.post('./api/', { action: 'get_setting' }).then(function (res) {
+        axios.post('./api/', {
+            action: 'get_setting',
+            csrf_token: csrf_token,
+        }).then(function (res) {
             if (res.data.code == 0) {
                 thisvue.groupData = res.data.groupData;
                 thisvue.form.game_server = res.data.groupData.game_server;
@@ -44,11 +47,12 @@ var vm = new Vue({
             var notify_code = 0;
             var magnitude = 1;
             for (key in thisvue.form.notify) {
-                notify_code += thisvue.form.notify[key]*magnitude;
+                notify_code += thisvue.form.notify[key] * magnitude;
                 magnitude <<= 1;
             }
             axios.post('./api/', {
                 action: 'put_setting',
+                csrf_token: csrf_token,
                 game_server: thisvue.form.game_server,
                 notification: notify_code,
             }).then(function (res) {
@@ -71,6 +75,7 @@ var vm = new Vue({
             var thisvue = this;
             axios.post('./api/', {
                 action: 'restart',
+                csrf_token: csrf_token,
             }).then(function (res) {
                 if (res.data.code == 0) {
                     thisvue.$notify({

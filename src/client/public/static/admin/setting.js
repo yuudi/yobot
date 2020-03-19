@@ -26,7 +26,10 @@ var vm = new Vue({
             this.setting.web_mode_hint = false;
             axios.put(
                 api_path,
-                this.setting,
+                {
+                    setting: this.setting,
+                    csrf_token: csrf_token,
+                },
             ).then(function (res) {
                 if (res.data.code == 0) {
                     alert('设置成功，重启机器人后生效');

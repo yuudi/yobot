@@ -40,6 +40,7 @@
         </el-tabs>
     </div>
 </body>
+<script>var csrf_token = "{{ session['csrf_token'] }}";</script>
 <script src="{{ url_for('yobot_static', filename='clan/subscribers.js') }}"></script>
 
 </html>
