@@ -2,23 +2,22 @@
 
 ## RSS订阅
 
-在![push_news.py](https://github.com/yuudi/yobot/tree/master/src/client/plugins/push_news.py)文件里可以添加RSS订阅源
+在[push_news.py](../push_news.py)文件里可以添加RSS订阅源
 
 在`self.rss`里添加订阅，格式如下
 
 ```python
-"news_jp_official": # 订阅名称，在yobot_config.json文件中控制开关的名称相同
-{
-    "name": "日服官网", # 可读的名称
-    "source": "https://priconne-redive.jp/news/feed/", # 订阅地址
-    "pattern": "标题：{title}\n链接：{link}\n{summary}", # 转化为字符串的方法
-    "last_id": None # 此项必须为 None
+"news_jp_official": {  # 订阅名称，在yobot_config.json文件中控制开关的名称相同
+    "name": "日服官网",  # 可读的名称
+    "source": "https://priconne-redive.jp/news/feed/",  # 订阅地址
+    "pattern": "标题：{title}\n链接：{link}\n{summary}",  # 转化为字符串的方法
+    "last_id": None,  # 此项必须为 None
 }
 ```
 
 ## 网页抓取
 
-在![spider](https://github.com/yuudi/yobot/tree/master/src/client/plugins/spider)文件夹中可以添加爬虫
+在[spider](../spider/)文件夹中可以添加爬虫
 
 导入父类，创建一个子类
 
@@ -55,7 +54,7 @@ class Spider_ostw(Base_spider):
         ]
 ```
 
-加入订阅（在![__init__.py](https://github.com/yuudi/yobot/tree/master/src/client/plugins/spider/__init__.py)文件里）
+加入订阅（在[__init__.py](./__init__.py)文件里）
 
 ```python
 # import新编写的子类

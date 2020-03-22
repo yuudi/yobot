@@ -56,6 +56,8 @@
 
 `news_cn_bilibili` 开启国服 Bilibili 动态新闻推送，默认值 `true`
 
+`news_interval_auto` 自动优化新闻推送检测时间，默认值 `true`
+
 `news_interval_minutes` 新闻推送检测间隔分钟，默认值 30
 
 `calender_region` 日程表地区，可选`jp` `tw` `cn`

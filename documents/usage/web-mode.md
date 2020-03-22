@@ -38,19 +38,25 @@ server {
 
   server_name io.yobot.xyz;  # 你的域名
 
+  location /yobot/  # 如果你修改了`public_basepath`，请同时修改这里的`location`
+  {
+    proxy_pass http://localhost:9222/;  # 反向代理
+    proxy_set_header X-Real-IP $remote_addr;  # 传递用户IP
+  }
+
   ## 强制使用https加密通信（可选，安全）
   #if ($server_port !~ 443){
   #  rewrite ^(/.*)$ https://$host$1 permanent;
   #}
 
   ## 静态文件直接访问（可选，性能）
-  #location /assets/ {
+  #location /yobot/assets/ {
   #  alias /home/yobot/src/client/public/static/;  # 你的静态文件目录
   #  expires 30d;
   #}
 
   ## 输出文件直接访问（可选，性能）
-  #location /output/ {
+  #location /yobot/output/ {
   #  alias /home/yobot/src/client/output/;  # 你的输出文件目录
   #  expires 30d;
   #}
@@ -59,11 +65,6 @@ server {
   location /ws/ {
     # allow 172.16.0.0/12;  # 允许酷Q通过（yobot与酷Q不在同一个服务器上时使用）
     deny all;
-  }
-
-  location / {
-    proxy_pass http://localhost:9222/;
-    proxy_set_header X-Real-IP $remote_addr;
   }
 }
 ```
@@ -80,15 +81,16 @@ server {
     Order Deny, Allow
     Allow from All
   </Proxy>
-  <Location />
+  <Location /yobot/>  # 反向代理，如果你修改了`public_basepath`，请同时修改这里的`location`
     ProxyPass http://localhost:9222/
     ProxyPassReverse http://localhost:9222/
   </Location>
-  <Location "/ws/">
+  <Location "/ws/">  # 阻止酷Q接口被访问
   AllowOverride None
     Order Deny, Allow
     Deny from All
   </Location>
+  RemoteIPHeader X-Real-IP  # 传递用户IP
 </VirtualHost>
 ```
 

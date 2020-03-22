@@ -142,9 +142,13 @@
             <el-checkbox v-model="setting.news_cn_official">国服官网</el-checkbox>
             <el-checkbox v-model="setting.news_cn_bilibili">国服Bilibili动态</el-checkbox>
             <el-row>
-                <el-col :span="4">检测间隔（分钟）</el-col>
-                <el-col :span="20">
-                    <el-slider v-model.number="setting.news_interval_minutes" :min="10" :max="60" show-input>
+                <el-col :span="5">
+                    <el-checkbox v-model="setting.news_interval_auto">自动选择检测时间</el-checkbox>
+                </el-col>
+                <el-col :span="3">检测间隔（分钟）</el-col>
+                <el-col :span="16">
+                    <el-slider v-model.number="setting.news_interval_minutes" :min="10" :max="60"
+                        :disabled="setting.news_interval_auto" show-input>
                     </el-slider>
                 </el-col>
             </el-row>

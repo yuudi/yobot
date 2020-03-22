@@ -1,10 +1,14 @@
 import asyncio
 import datetime
 import time
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from email.utils import parsedate_tz
+from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 
 import aiohttp
 import feedparser
+from aiocqhttp.api import Api
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
 from .spider import Spiders
@@ -15,9 +19,17 @@ class News:
     Active = True
     Request = False
 
-    def __init__(self, glo_setting: dict, *args, **kwargs):
+    def __init__(self,
+                 glo_setting: Dict[str, Any],
+                 scheduler: AsyncIOScheduler,
+                 bot_api: Api,
+                 *args, **kwargs):
         self.setting = glo_setting
+        self.news_interval_auto = glo_setting['news_interval_auto']
         self.spiders = Spiders()
+        self.scheduler = scheduler
+        self.api = bot_api
+        self._rssjob = {}
         self.rss = {
             "news_jp_twitter": {
                 "name": "日服推特",
@@ -68,6 +80,24 @@ class News:
         if feed["bozo"]:
             print("rss源解析错误："+rss_source["name"])
             return None
+        if self.news_interval_auto:
+            updated = feed.feed.updated
+            if updated is not None:
+                # 获取rss上次刷新时间
+                lastBuildDate = parsedate_tz(updated)
+                nt = datetime.datetime.fromtimestamp(
+                    time.mktime(lastBuildDate[:-1])
+                    - lastBuildDate[-1]
+                    + 28800)
+                nt += datetime.timedelta(minutes=25)
+                after10min = datetime.datetime.now()+datetime.timedelta(minutes=10)
+                if nt > after10min:
+                    # 执行时间改为上次刷新后25分钟
+                    self.scheduler.reschedule_job(
+                        job_id=source,
+                        jobstore='default',
+                        trigger=DateTrigger(nt),
+                    )
         last_id = rss_source["last_id"]
         rss_source["last_id"] = feed["entries"][0]["id"]
         if last_id is None:
@@ -84,8 +114,6 @@ class News:
         else:
             return None
 
-    async def from_spider_async(self, rss_source) -> str: ...
-
     async def get_news_async(self) -> List[str]:
         '''
         返回最新消息
@@ -93,14 +121,14 @@ class News:
         tasks = []
 
         # RSS
-        subscripts = [s for s in self.rss.keys() if self.setting.get(s, True)]
-        for source in subscripts:
+        subscribes = [s for s in self.rss.keys() if self.setting.get(s, True)]
+        for source in subscribes:
             tasks.append(self.from_rss_async(source))
 
         # spider
-        subscripts = [s for s in self.spiders.sources()
+        subscribes = [s for s in self.spiders.sources()
                       if self.setting.get(s, True)]
-        for source in subscripts:
+        for source in subscribes:
             tasks.append(self.spiders[source].get_news_async())
 
         if not tasks:
@@ -150,8 +178,84 @@ class News:
         sub_users = self.setting.get("notify_privates", [])
         if not (sub_groups or sub_users):
             return tuple()
+        if self.news_interval_auto:
+            # 如果设置为自动
+            self.auto_job()
+            return tuple()
         interval = self.setting.get("news_interval_minutes", 30)
         trigger = IntervalTrigger(
             minutes=interval, start_date=datetime.datetime.now()+datetime.timedelta(seconds=60))
         job = (trigger, self.send_news_async)
         return (job,)
+
+    def auto_job(self):
+        after_60s = datetime.datetime.now()+datetime.timedelta(seconds=60)
+
+        # spider 为20分钟间隔
+        self.scheduler.add_job(
+            self.send_spider_news_async,
+            trigger=IntervalTrigger(minutes=20, start_date=after_60s),
+            misfire_grace_time=60,
+            coalesce=True,
+            max_instances=1,
+        )
+
+        # 每个 rss 启动第一个任务
+        subscribes = [s for s in self.rss.keys() if self.setting.get(s, True)]
+        for source in subscribes:
+            self.scheduler.add_job(
+                self.send_rss_news_async,
+                args=(source,),
+                id=source,
+                trigger=DateTrigger(after_60s),
+                misfire_grace_time=60,
+                coalesce=True,
+                max_instances=1,
+            )
+
+    async def send_spider_news_async(self):
+        tasks = [
+            self.spiders[s].get_news_async()
+            for s in self.spiders.sources()
+            if self.setting.get(s, True)
+        ]
+        res = await asyncio.gather(*tasks, return_exceptions=True)
+        await self.send_news_msg_async(res)
+
+    async def send_rss_news_async(self, source):
+        # 执行时间改为5分钟后
+        self.scheduler.add_job(
+            self.send_rss_news_async,
+            args=(source,),
+            id=source,
+            jobstore='default',
+            misfire_grace_time=60,
+            coalesce=True,
+            max_instances=1,
+            trigger=DateTrigger(
+                datetime.datetime.now()+datetime.timedelta(minutes=5)
+            ),
+        )
+        res = await self.from_rss_async(source)
+        await self.send_news_msg_async([res])
+
+    async def send_news_msg_async(self, res: List[Union[Exception, str, None]]):
+        sub_groups = self.setting.get("notify_groups", [])
+        sub_users = self.setting.get("notify_privates", [])
+        for new_message in res:
+            if new_message is None:
+                continue
+            elif isinstance(new_message, Exception):
+                print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                      + " Exception: " + str(new_message))
+                continue
+            for group in sub_groups:
+                await self.api.send_group_msg(
+                    group_id=group,
+                    message=new_message,
+                )
+            for user in sub_users:
+                await self.api.send_private_msg(
+                    user_id=user,
+                    message=new_message,
+                )
