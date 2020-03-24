@@ -13,6 +13,8 @@ _tz_beijing = datetime.timezone(datetime.timedelta(hours=8))
 
 
 def from_timestamp(timestamp):
+    if timestamp is None:
+        return '未知'
     dt = datetime.datetime.fromtimestamp(timestamp, _tz_beijing)
     return dt.strftime('%Y{}%m{}%d{} %H:%M:%S').format(*'年月日')
 

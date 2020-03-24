@@ -54,7 +54,7 @@
     <p>防守队伍：</p>
     <div>
         {% for chara in def_lst -%}
-        <img src="{{ public_base }}resource/icon/unit/{{ jpname2id[chara] + 30 }}.jpg">
+        <img src="{{ public_base }}resource/icon/unit/{{ jpname2id.get(chara,0) + 30 }}.jpg">
         {% endfor -%}
     </div>
     <p>查找到{{ len(solution) }}条解法</p>
@@ -64,7 +64,7 @@
             <tr>
                 {% for chara in parse_team(team) -%}
                 <td valign="top">
-                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id[chara[0]] + (60 if chara[1]==6 else 30) }}.jpg">
+                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id.get(chara,0) + (60 if chara[1]==6 else 30) }}.jpg">
                     <div class="detail">
                         {% if chara[1] == 6 -%}
                         <div class="star" id="mark"></div>

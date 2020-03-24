@@ -17,13 +17,13 @@ from opencc import OpenCC
 from quart import Quart, send_file
 
 if __package__:
-    from .ybplugins import (boss_dmg, calender, char_consult, clan_battle,
+    from .ybplugins import (boss_dmg, calender, clan_battle,
                             gacha, homepage, jjc_consult, login, marionette,
                             push_news, settings, switcher, updater, web_util,
                             yobot_msg, ybdata)
     from .yybplugins import custom
 else:
-    from ybplugins import (boss_dmg, calender, char_consult, clan_battle,
+    from ybplugins import (boss_dmg, calender, clan_battle,
                            gacha, homepage, jjc_consult, login, marionette,
                            push_news, settings, switcher, updater, web_util,
                            yobot_msg, ybdata)
@@ -31,8 +31,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.18]"
-    Commit = {"yuudi": 63, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.19]"
+    Commit = {"yuudi": 64, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
@@ -180,7 +180,6 @@ class Yobot:
             switcher.Switcher(**kwargs),
             yobot_msg.Message(**kwargs),
             gacha.Gacha(**kwargs),
-            char_consult.Char_consult(**kwargs),
             jjc_consult.Consult(**kwargs),
             boss_dmg.Boss_dmg(**kwargs),
             push_news.News(**kwargs),
@@ -277,7 +276,8 @@ class Yobot:
                     break
                 if res is None:
                     break
-                replys.append(res["reply"])
+                if res["reply"]:
+                    replys.append(res["reply"])
                 if res["block"]:
                     break
         reply_msg = "\n".join(replys)

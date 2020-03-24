@@ -40,7 +40,7 @@ server {
 
   location /yobot/  # 如果你修改了`public_basepath`，请同时修改这里的`location`
   {
-    proxy_pass http://localhost:9222/;  # 反向代理
+    proxy_pass http://localhost:9222;  # 反向代理
     proxy_set_header X-Real-IP $remote_addr;  # 传递用户IP
   }
 

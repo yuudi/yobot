@@ -1,4 +1,3 @@
-import csv
 import json
 import os
 import random
@@ -46,8 +45,9 @@ class Consult:
             with open(nickfile, "w", encoding="utf-8-sig") as f:
                 f.write(res.text)
         with open(nickfile, encoding="utf-8-sig") as f:
-            f_csv = csv.reader(f)
-            for row in f_csv:
+            csv = f.read()
+            for line in csv.split():
+                row = line.split(",")
                 for col in row[1:]:
                     self.name2jp[col] = row[2]
                 self.jpname2id[row[2]] = int(row[0])

@@ -4,18 +4,17 @@
     <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
     <title>yobot用户面板</title>
     <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+    <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
     <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
     <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
 <body>
     <h1>yobot用户面板</h1>
-    <div class="greeting">
-        <p>欢迎{{ user.nickname }}</p>
-        <div class="last-login">上次登录：{{ from_timestamp(user.last_login_time) }} at {{ user.last_login_ipaddr }}
-        </div>
-    </div>
     <div id="app">
+        <p>欢迎{{ user.nickname }}</p>
+        <div>上次登录：{{ from_timestamp(session.get('last_login_time')) }} at {{ session.get('last_login_ipaddr') }}（[[ addr.join('') ]]）
+        </div>
         {% if user.authority_group < 100 -%}
         <el-row>
             <a href="{{ url_for('yobot_setting') }}">
@@ -48,7 +47,22 @@
     </div>
 </body>
 <script>
-    new Vue().$mount('#app');
+    new Vue({
+        el: '#app',
+        data: {
+            addr: [],
+        },
+        mounted() {
+            var thisvue = this;
+            axios.get('{{ url_for("yobot_api_iplocation", ip=session["last_login_ipaddr"]) }}').then(function (res) {                
+                thisvue.addr = res.data;
+            }).catch(function (error) {
+                console.log(error);
+                thisvue.addr = ['未知'];
+            });
+        },
+        delimiters: ['[[', ']]'],
+    })
 </script>
 
 </html>

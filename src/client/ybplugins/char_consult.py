@@ -1,8 +1,3 @@
-# coding=utf-8
-
-# 已按照3.0标准编写或注释
-
-import csv
 import json
 import os
 
@@ -28,8 +23,9 @@ class Char_consult:
             with open(nickfile, "w", encoding="utf-8-sig") as f:
                 f.write(res.text)
         with open(nickfile, encoding="utf-8-sig") as f:
-            f_csv = csv.reader(f)
-            for row in f_csv:
+            csv = f.read()
+            for line in csv.split():
+                row = line.split(",")
                 for col in row[1:]:
                     self.nickname[col] = row[0]
                 self.number[int(row[0])] = row[1]

@@ -10,8 +10,6 @@
 如果使用git，记得`git commit -a`
 """
 
-from .yobot import Yobot
-import asyncio
 import sys
 
 if __name__ == "__main__":
@@ -33,6 +31,8 @@ if __name__ == "__main__":
 
     sys.exit()
 
+from .yobot import Yobot
+import asyncio
 
 if "nonebot" in sys.modules:
     from nonebot import get_bot, scheduler
@@ -87,3 +87,6 @@ if jobs:
             max_instances=1,
             misfire_grace_time=60,
         )
+
+__plugin_name__ = 'yobot'
+__plugin_usage__ = 'pcr assistant bot'

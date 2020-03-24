@@ -13,15 +13,15 @@ themeConfig:
     - text: 首页
       link: /
     - text: 安装方法
-      link: /install/
+      link: /install/cq/
     - text: 功能列表
       link: /features/
     - text: 高级
       items:
       - text: 开启Web模式
-        link: /usage/web-mode.md
+        link: /usage/web-mode/
       - text: Web模式 - 公会战
-        link: /usage/web-clanbattle.md
+        link: /usage/web-clanbattle/
     - text: 源码
       items:
         - text: GitHub
@@ -29,7 +29,7 @@ themeConfig:
         - text: Gitee
           link: https://gitee.com/yobot/yobot
     - text: 关于
-      link: /about.md
+      link: /about/
 plugins:
   - - vuepress-plugin-clean-urls
     - normalSuffix: "/"

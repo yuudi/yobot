@@ -26,8 +26,7 @@
       <el-menu-item index="5">我的</el-menu-item>
     </el-menu>
     <h1 style="text-align:center">出刀记录</h1>
-    <el-date-picker v-model="reportDate" type="date" placeholder="选择日期"></el-date-picker>
-    <el-button type="primary" @click="report_day" icon="el-icon-search" circle></el-button>
+    <el-date-picker v-model="reportDate" type="date" placeholder="选择日期" @change="report_day"></el-date-picker>
     <el-button type="primary" @click="selectUnfinished">选中未完成</el-button>
     <el-button type="warning" @click="sendRequest('send_remind')">提醒出刀</el-button>
     <el-button type="danger" @click="dropMemberVisible = true">删除成员</el-button>

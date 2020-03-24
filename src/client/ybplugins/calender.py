@@ -67,10 +67,16 @@ class Event:
         if rg is None:
             rg = self.setting.get("calender_region", "default")
         if rg == "jp":
-            self.timeline = await self.load_timeline_jp_async()
+            timeline = await self.load_timeline_jp_async()
+            if timeline is None:
+                return
+            self.timeline = timeline
             print("刷新日服日程表成功")
         elif rg == "tw":
-            self.timeline = await self.load_timeline_tw_async()
+            timeline = await self.load_timeline_tw_async()
+            if timeline is None:
+                return
+            self.timeline = timeline
             print("刷新台服日程表成功")
         else:
             self.timeline = None
@@ -109,10 +115,14 @@ class Event:
 
     async def load_timeline_jp_async(self):
         event_source = "https://gamewith.jp/pricone-re/article/show/93857"
-        async with aiohttp.request("GET", url=event_source) as response:
-            if response.status != 200:
-                raise ServerError(f"服务器状态错误：{response.status}")
-            res = await response.text()
+        try:
+            async with aiohttp.request("GET", url=event_source) as response:
+                if response.status != 200:
+                    raise ServerError(f"服务器状态错误：{response.status}")
+                res = await response.text()
+        except aiohttp.client_exceptions.ClientError:
+            print("日程表加载失败")
+            return
         soup = BeautifulSoup(res, features="html.parser")
         events_ids = set()
         timeline = Event_timeline()

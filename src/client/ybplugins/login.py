@@ -117,6 +117,8 @@ class Login:
                         new_key = _rand_string(32)
                         session['yobot_user'] = qqid
                         session['csrf_token'] = _rand_string(16)
+                        session['last_login_time'] = user.last_login_time
+                        session['last_login_ipaddr'] = user.last_login_ipaddr
                         user.login_code_available = False
                         user.last_login_time = now
                         user.last_login_ipaddr = request.headers.get(
@@ -153,6 +155,8 @@ class Login:
                                 # cookie有效
                                 session['yobot_user'] = qqid
                                 session['csrf_token'] = _rand_string(16)
+                                session['last_login_time'] = user.last_login_time
+                                session['last_login_ipaddr'] = user.last_login_ipaddr
                                 user.last_login_time = now
                                 user.last_login_ipaddr = request.remote_addr
                                 user.save()
