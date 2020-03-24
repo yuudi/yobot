@@ -64,7 +64,7 @@
             <tr>
                 {% for chara in parse_team(team) -%}
                 <td valign="top">
-                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id.get(chara,0) + (60 if chara[1]==6 else 30) }}.jpg">
+                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id.get(chara[0],0) + (60 if chara[1]==6 else 30) }}.jpg">
                     <div class="detail">
                         {% if chara[1] == 6 -%}
                         <div class="star" id="mark"></div>

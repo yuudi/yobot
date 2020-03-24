@@ -7,11 +7,11 @@ import re
 import sqlite3
 import time
 from typing import List, Union
-from urllib.parse import quote
+from urllib.parse import urljoin
 
 import requests
 
-from .shorten_url import shorten_async
+from .templating import render_template
 from .yobot_exceptions import CodingError, ServerError
 
 
@@ -168,10 +168,24 @@ class Gacha:
             for item in more_colle:
                 line.append(str(item.get(char, 0)))
             showdata["body"].append(line)
-        tableurl = "http://yobot.gitee.io/webdisp/table/#"
-        tableurl += quote(json.dumps(showdata, separators=(',', ':')))
-        tableurl = await shorten_async(tableurl)
-        reply = (nickname + "的仓库：" + tableurl)
+        
+        page = await render_template(
+            'collection.html',
+            data=showdata,
+        )
+
+        output_foler = os.path.join(self.setting['dirname'], 'output')
+        num = len(os.listdir(output_foler)) + 1
+        os.mkdir(os.path.join(output_foler, str(num)))
+        filename = 'collection-{}.html'.format(random.randint(0, 999))
+        with open(os.path.join(output_foler, str(num), filename), 'w', encoding='utf-8') as f:
+            f.write(page)
+        reply = urljoin(
+            self.setting['public_address'],
+            '{}output/{}/{}'.format(
+                self.setting['public_basepath'], num, filename))
+        if self.setting['web_mode_hint']:
+            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/usage/web-mode/'
         return reply
 
     def check_ver(self) -> None:
