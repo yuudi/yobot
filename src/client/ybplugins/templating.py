@@ -1,4 +1,3 @@
-import datetime
 import os
 
 import jinja2
@@ -9,15 +8,6 @@ static_folder = os.path.abspath(os.path.join(
 template_folder = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../public/template'))
 
-_tz_beijing = datetime.timezone(datetime.timedelta(hours=8))
-
-
-def from_timestamp(timestamp):
-    if timestamp is None:
-        return '未知'
-    dt = datetime.datetime.fromtimestamp(timestamp, _tz_beijing)
-    return dt.strftime('%Y{}%m{}%d{} %H:%M:%S').format(*'年月日')
-
 
 _env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_folder),
@@ -25,7 +15,6 @@ _env = jinja2.Environment(
 )
 _env.globals['session'] = session
 _env.globals['url_for'] = url_for
-_env.globals['from_timestamp'] = from_timestamp
 
 
 async def render_template(template, **context):

@@ -13,7 +13,7 @@
     <h1>yobot用户面板</h1>
     <div id="app">
         <p>欢迎{{ user.nickname }}</p>
-        <div>上次登录：{{ from_timestamp(session.get('last_login_time')) }} at {{ session.get('last_login_ipaddr') }}（[[ addr.join('') ]]）
+        <div>上次登录：[[ from_ts({{ session.get('last_login_time') }}) ]] at {{ session.get('last_login_ipaddr') }}（[[ addr.join('') ]]）
         </div>
         {% if user.authority_group < 100 -%}
         <el-row>
@@ -60,6 +60,16 @@
                 console.log(error);
                 thisvue.addr = ['未知'];
             });
+        },
+        methods: {
+            from_ts: function(ts) {
+                if (ts == 0) {
+                    return '-';
+                }
+                var nd = new Date();
+                nd.setTime(ts * 1000);
+                return nd.toLocaleString('chinese', { hour12: false });
+            },
         },
         delimiters: ['[[', ']]'],
     })

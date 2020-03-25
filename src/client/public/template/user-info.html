@@ -23,7 +23,7 @@
     <p :hidden="!edit">用户名：<el-input v-model="nickname" placeholder="昵称"></el-input><el-button type="success" size="mini" icon="el-icon-check" @click="edit_nickname" circle></el-button></p>
     <p>用户权限：[[ authtype[{{ user.authority_group }}] ]]</p>
     <p>公会战所在群：{{ user.clan_group_id }}</p>
-    <p>上次登录时间：{{ from_timestamp(user.last_login_time) }}</p>
+    <p>上次登录时间：[[ from_ts({{ session.get('last_login_time') }}) ]]</p>
     <p>上次登录ip地址：{{ user.last_login_ipaddr }}（[[ addr.join('') ]]）</p>
 </div>
 </body>
@@ -59,6 +59,14 @@
                     alert('改名失败');
                     console.log(error);
                 })
+            },
+            from_ts: function(ts) {
+                if (ts == 0) {
+                    return '-';
+                }
+                var nd = new Date();
+                nd.setTime(ts * 1000);
+                return nd.toLocaleString('chinese', { hour12: false });
             },
         },
         delimiters: ['[[', ']]'],
