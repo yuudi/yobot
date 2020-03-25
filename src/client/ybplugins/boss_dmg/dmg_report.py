@@ -71,18 +71,7 @@ class Report():
     def _get_nick(self, data):
         nicks = []
         for m in self._rpt["mem_list"]:
-            if data[1][m][0] == m and m.isdigit():
-                # 使用老李api
-                res = requests.get("http://laoliapi.cn/king/qq.php?qq=" + m)
-                if res.status_code == 200:
-                    try:
-                        nicks.append(json.loads(res.text).get("name", m))
-                    except:
-                        nicks.append(data[1][m][0])
-                else:
-                    nicks.append(data[1][m][0])
-            else:
-                nicks.append(data[1][m][0])
+           nicks.append(data[1][m][0])
         return nicks
 
     def _bmean(self, bdata):

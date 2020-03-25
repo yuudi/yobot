@@ -33,25 +33,25 @@ class News:
         self.rss = {
             "news_jp_twitter": {
                 "name": "日服推特",
-                "source": "https://rsshub.app/twitter/user/priconne_redive",
+                "source": "https://rss.yobot.xyz/twitter/user/priconne_redive",
                 "pattern": "{title}\n链接：{link}",
                 "last_id": None
             },
             "news_jp_official": {
                 "name": "日服官网",
-                "source": "https://rsshub.app/pcr/news",
+                "source": "https://rss.yobot.xyz/pcr/news",
                 "pattern": "{title}\n{link}",
                 "last_id": None
             },
             "news_tw_facebook": {
                 "name": "台服FaceBook",
-                "source": "https://rsshub.app/facebook/page/SonetPCR",
+                "source": "https://rss.yobot.xyz/facebook/page/SonetPCR",
                 "pattern": "链接：{link}",
                 "last_id": None
             },
             "news_cn_bilibili": {
                 "name": "国服B站动态",
-                "source": "https://rsshub.app/bilibili/user/dynamic/353840826/",
+                "source": "https://rss.yobot.xyz/bilibili/user/dynamic/353840826/",
                 "pattern": "{title}\n{link}",
                 "last_id": None
             }
