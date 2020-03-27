@@ -69,7 +69,7 @@ class Marionette:
         newurl = self._gen_key()
         reply = '点击链接开始使用我：'+newurl
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/usage/web-mode.html'
+            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/web-mode.md'
         return {
             'reply': reply,
             'block': True

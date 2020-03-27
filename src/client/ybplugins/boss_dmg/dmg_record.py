@@ -96,7 +96,7 @@ class Record():
                 f.seek(0)
                 f.truncate()
                 json.dump(mailcfg, f, ensure_ascii=False, indent=2)
-            self.txt_list.append("本群第一次使用，数据已初始化，请仔细阅读说明http://h3.yobot.monster/")
+            self.txt_list.append("本群第一次使用，数据已初始化，请仔细阅读说明https://gitee.com/yobot/yobot/blob/master/documents/features/old.md")
         else:
             with open(os.path.join(self._path, "data", self._groupid+".dat"), "rb") as f:
                 self._data = pickle.load(f)

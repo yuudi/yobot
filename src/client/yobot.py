@@ -31,8 +31,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.22]"
-    Commit = {"yuudi": 67, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.23]"
+    Commit = {"yuudi": 68, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
@@ -78,8 +78,7 @@ class Yobot:
                     self.glo_setting[k] = cfg[k]
             config_file.seek(0)
             config_file.truncate()
-            json.dump(self.glo_setting, config_file,
-                      ensure_ascii=False, indent=4)
+            json.dump(self.glo_setting, config_file, indent=4)
 
         if verinfo is None:
             verinfo = updater.get_version(self.Version, self.Commit)
@@ -125,8 +124,7 @@ class Yobot:
         # save initialization
         if modified:
             with open(config_f_path, "w", encoding="utf-8") as config_file:
-                json.dump(self.glo_setting, config_file,
-                          ensure_ascii=False, indent=4)
+                json.dump(self.glo_setting, config_file, indent=4)
 
         # generate random secret_key
         if(quart_app.secret_key is None):
@@ -228,7 +226,7 @@ class Yobot:
         if self.glo_setting.get("zht_in", False):
             msg["raw_message"] = self.cct2s.convert(msg["raw_message"])
         if msg["sender"].get("card", "") == "":
-            msg["sender"]["card"] = msg["sender"]["nickname"]
+            msg["sender"]["card"] = msg["sender"].get("nickname", "无法获取昵称")
 
         # run new
         reply_msg = None

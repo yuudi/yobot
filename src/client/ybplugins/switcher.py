@@ -33,7 +33,7 @@ class Switcher:
         config_path = os.path.join(
             self.setting["dirname"], "yobot_config.json")
         with open(config_path, "w", encoding="utf-8") as f:
-            json.dump(save_setting, f, indent=4, ensure_ascii=False)
+            json.dump(save_setting, f, indent=4)
 
     def get_url_content(self, url: str) -> Union[int, str]:
         try:
@@ -194,7 +194,7 @@ class Switcher:
                 reply = self.setting_url["mail"]
             elif cmd == "设置新闻" or cmd == "设置日程":
                 if self.setting["clan_battle_mode"] != "chat":
-                    return '请机器人管理员在后台设置中进行boss设置'
+                    return '请机器人管理员在后台设置中进行设置'
                 keys = ("news_jp_official", "news_jp_twitter", "news_tw_official",
                         "news_tw_facebook", "news_cn_official", "news_cn_bilibili",
                         "news_interval_minutes", "notify_groups", "notify_privates",
@@ -202,7 +202,7 @@ class Switcher:
                 reply = self.dump_url(keys, "news")
             elif cmd == "设置boss":
                 if self.setting["clan_battle_mode"] != "chat":
-                    return '请机器人管理员在后台设置中进行boss设置'
+                    return '请机器人管理员后台设置中进行设置（boss设置在最下方折叠）'
                 with open(os.path.join(self.setting["dirname"], "boss3.json")) as f:
                     content = json.load(f)
                 query = json.dumps(content, separators=(',', ':'))

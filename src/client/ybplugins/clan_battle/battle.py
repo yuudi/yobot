@@ -1622,7 +1622,7 @@ class ClanBattle:
                     'unauthorized.html',
                     limit='本公会成员',
                     uath='无')
-            if (user.authority_group >= 10):
+            if (user.authority_group >= 100):
                 return await render_template(
                     'unauthorized.html',
                     limit='公会战管理员',

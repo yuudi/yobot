@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 from quart import Quart, jsonify, redirect, request, session, url_for
 
 from .templating import render_template
-from .ybdata import User,Clan_group
+from .ybdata import User, Clan_group
 
 
 class Setting:
@@ -79,11 +79,26 @@ class Setting:
                 config_path = os.path.join(
                     self.setting["dirname"], "yobot_config.json")
                 with open(config_path, "w", encoding="utf-8") as f:
-                    json.dump(save_setting, f, indent=4, ensure_ascii=False)
+                    json.dump(save_setting, f, indent=4)
                 return jsonify(
                     code=0,
                     message='Ok',
                 )
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'admin/pool-setting/'),
+            methods=['GET'])
+        async def yobot_pool_setting():
+            if 'yobot_user' not in session:
+                return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
+            if user.authority_group >= 10:
+                return await render_template(
+                    'unauthorized.html',
+                    limit='机器人管理员',
+                    uath=user.authority_group,
+                )
+            return await render_template('admin/pool-setting.html')
 
         @app.route(
             urljoin(self.setting['public_basepath'], 'admin/users/'),
@@ -148,7 +163,7 @@ class Setting:
                     user.save()
                     return jsonify(code=0, message='success')
                 else:
-                    return jsonify(code=32,message='unknown action')
+                    return jsonify(code=32, message='unknown action')
             except KeyError as e:
                 return jsonify(code=31, message=str(e))
 
@@ -205,6 +220,6 @@ class Setting:
                         })
                     return jsonify(code=0, data=groups)
                 else:
-                    return jsonify(code=32,message='unknown action')
+                    return jsonify(code=32, message='unknown action')
             except KeyError as e:
                 return jsonify(code=31, message=str(e))

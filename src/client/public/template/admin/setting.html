@@ -18,7 +18,7 @@
         <el-dialog title="申请yobot域名" :visible.sync="domainApply">
             <el-form>
                 <el-form-item label="域名" label-width="120">
-                    <el-input v-model="applyName" placeholder="字母、数字" maxlength="16" show-word-limit>
+                    <el-input v-model="applyName" placeholder="此域名已被QQ封禁，不再建议使用" maxlength="16" show-word-limit>
                         <template slot="append">.yobot.xyz</template>
                     </el-input>
                 </el-form-item>
@@ -35,6 +35,17 @@
             生成聊天链接：
             <el-radio v-model="setting.public_priority" label="self" disabled>使用此站点</el-radio>
             <el-radio v-model="setting.public_priority" label="monster">使用io.yobot.monster</el-radio>
+        </p>
+        <p>
+            <el-row>
+                <el-col :span="4">
+                    <el-checkbox v-model="setting.show_icp">主页展示备案号</el-checkbox>
+                </el-col>
+                <el-col :span="20">
+                    <el-input :disabled="!setting.show_icp" v-model="setting.icp_info" placeholder="#">
+                    </el-input>
+                </el-col>
+            </el-row>
         </p>
         <p>
             <el-row>

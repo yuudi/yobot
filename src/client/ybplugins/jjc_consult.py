@@ -138,7 +138,7 @@ class Consult:
                 self.setting['public_basepath'], num, filename))
         reply = '找到{}条解法：{}'.format(len(solution), addr)
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://yobot.xyz/usage/web-mode/'
+            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/web-mode.md'
         return reply
 
     @staticmethod

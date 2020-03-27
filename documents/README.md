@@ -1,3 +1,6 @@
+---
+editLink: false
+---
 # yobot 公主连接群聊机器人
 
 ## 介绍
@@ -37,8 +40,6 @@
 ![生成统计报表](./imgs/u1rTDe.png)
 
 ![每日出刀情况](./imgs/utk0Gq.png)
-
-![预约boss](./imgs/Kf2QPK.png)
 
 ### 公会战伤害统计助手（新版）
 

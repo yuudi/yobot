@@ -55,7 +55,7 @@
           <el-dialog title="上报伤害" :visible.sync="recordFormVisible">
             <el-form>
               <el-form-item label="伤害值" label-width="120">
-                <el-input v-model.number="damage">
+                <el-input v-model.number="damage"{# @keyup.enter.native="recordselfdamage" #}>
                   <template slot="prepend">[[ damageHint ]]</template>
                 </el-input>
               </el-form-item>
@@ -81,7 +81,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="伤害值" label-width="120">
-                <el-input v-model.number="damage" :disabled="defeat">
+                <el-input v-model.number="damage" :disabled="defeat"{#  @keyup.enter.native="recorddamage" #}>
                   <template slot="prepend">[[ damageHint ]]</template>
                 </el-input>
               </el-form-item>

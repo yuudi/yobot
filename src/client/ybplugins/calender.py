@@ -248,8 +248,7 @@ class Event:
                 reply = "日程表未初始化"
             return {"reply": reply, "block": True}
         if match_num == 1:
-            reply = "未知的日期，请参考http://h3.yobot.monster/"
-            return {"reply": reply, "block": True}
+            return {"reply": "", "block": True}
         # self.check_and_update()
         if match_num == 4:
             reply = self.get_week_events()

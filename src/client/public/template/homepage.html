@@ -16,6 +16,12 @@
     <div id="app">
         <a href="{{ url_for('yobot_login') }}"><el-button type="primary">登录</el-button></a>
     </div>
+    <p><a href="{{ url_for('yobot_about') }}">关于</a></p>
+    {% if show_icp -%}
+    <footer style="position: absolute;bottom: 0;left: 50%;transform: translate(-50%, -50%);">
+        <a href="http://beian.miit.gov.cn/">{{ icp_info }}</a>
+    </footer>
+    {% endif -%}
 </body>
 <script>
     new Vue().$mount('#app');

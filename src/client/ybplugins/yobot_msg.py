@@ -12,8 +12,10 @@ class Message:
             self.help_page = urljoin(
                 glo_setting["public_address"],
                 '{}help/'.format(glo_setting['public_basepath']))
+            if glo_setting['web_mode_hint']:
+                self.help_page += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/web-mode.md'
         else:
-            self.help_page = "http://h3.yobot.monster/"
+            self.help_page = "https://gitee.com/yobot/yobot/blob/master/documents/features/old.md"
 
     @staticmethod
     def match(cmd: str) -> int:

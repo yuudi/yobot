@@ -21,6 +21,17 @@ class Index:
             return await render_template(
                 "homepage.html",
                 verinfo=self.setting["verinfo"]["ver_name"],
+                show_icp=self.setting["show_icp"],
+                icp_info=self.setting["icp_info"],
+            )
+
+        @app.route(
+            urljoin(self.public_basepath, 'about/'),
+            methods=['GET'])
+        async def yobot_about():
+            return await render_template(
+                "about.html",
+                verinfo=self.setting["verinfo"]["ver_name"],
             )
 
         @app.route("/favicon.ico", ["GET"])

@@ -20,6 +20,10 @@
 
 `public_basepath` web 模式使用的目录（防止与其他应用冲突），如 `/`，默认值`/yobot/`
 
+`show_icp` 是否在主页显示 icp 备案信息，默认值`/false/`
+
+`icp_info` icp 备案信息
+
 `web_mode_hint` web 模式使用提示，默认值 `true`，在 web 模式下进行一次设置后自动修改为 `false`
 
 `clan_battle_mode` 公会战统计方式，可选`web` `chat`，默认值 `web`

@@ -180,6 +180,9 @@ var vm = new Vue({
             });
         },
         sendRequest(action) {
+            if (this.multipleSelection.length === 0) {
+                this.$alert('请先勾选成员', '失败');
+            }
             var memberlist = [];
             this.multipleSelection.forEach(row => {
                 memberlist.push(row.qqid);

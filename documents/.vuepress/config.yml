@@ -3,12 +3,20 @@ dest: ../docs
 title: yobot
 description: 公主链接群聊机器人
 head:
-  - [link, { rel: "icon", href: "/logo/logo.ico" }]
-  - [link, { rel: "apple-touch-icon", href: "/logo/logo.ico" }]
+  - - link
+    - rel: icon
+      href: /logo/logo.ico
+  - - link
+    - rel: apple-touch-icon
+      href: /logo/logo.ico
 themeConfig:
   logo: /logo/logo.png
   search: false
   smoothScroll: true
+  repo: https://github.com/yuudi/yobot
+  docsDir: documents
+  editLinks: true
+  editLinkText: 编辑此页面
   nav:
     - text: 首页
       link: /
@@ -18,10 +26,10 @@ themeConfig:
       link: /features/
     - text: 高级
       items:
-      - text: 开启Web模式
-        link: /usage/web-mode/
-      - text: Web模式 - 公会战
-        link: /usage/web-clanbattle/
+        - text: 开启Web模式
+          link: /usage/web-mode/
+        - text: Web模式 - 公会战
+          link: /usage/web-clanbattle/
     - text: 源码
       items:
         - text: GitHub
@@ -31,7 +39,7 @@ themeConfig:
     - text: 关于
       link: /about/
 plugins:
-  - - vuepress-plugin-clean-urls
-    - normalSuffix: "/"
-      indexSuffix: "/"
-      notFoundPath: "/404.html"
+  vuepress-plugin-clean-urls:
+    normalSuffix: /
+    indexSuffix: /
+    notFoundPath: /404.html

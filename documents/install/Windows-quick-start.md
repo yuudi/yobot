@@ -2,7 +2,7 @@
 
 ## 参考视频
 
-在 windows 下使用运行包安装可以参考[演示视频](../videos/Tutorial.mp4)
+在 windows 下使用运行包安装可以参考[演示视频](https://x.jingzhidh.com/3/Tutorial.mp4)  
 （视频中网站为旧版，不影响安装过程）
 
 ## 准备服务器
