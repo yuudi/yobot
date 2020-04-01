@@ -26,13 +26,15 @@
 
 `web_mode_hint` web 模式使用提示，默认值 `true`，在 web 模式下进行一次设置后自动修改为 `false`
 
-`clan_battle_mode` 公会战统计方式，可选`web` `chat`，默认值 `web`
+`clan_battle_mode` 公会战统计方式，可选`web` `chat` `none`，默认值 `web`
 
 `access_token` 与 httpapi 通信的 token，默认值 `null`
 
-`super-admin` 管理员 user_id 列表
+`super-admin` 管理员 qq号 列表
 
-`black-list` 黑名单 user_id 列表
+`black-list` 黑名单 qq号 列表
+
+`black-list-group` 黑名单 qq群 列表
 
 `setting-restrict` 权限控制，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 `3`
 

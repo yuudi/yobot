@@ -12,7 +12,9 @@
     <h1>yobot设置</h1>
     {% if user.authority_group < 10 -%}
     <div id="app">
-        <p><a href="{{ url_for('yobot_user') }}"><el-button type="primary" icon="el-icon-back" circle></el-button></a></p>
+        <p><a href="{{ url_for('yobot_user') }}">
+                <el-button type="primary" icon="el-icon-back" circle></el-button>
+            </a></p>
         此站点的公开地址：<el-input v-model="setting.public_address" placeholder="http://"></el-input>
         <el-button type="info" @click="domainApply = true">yobot 域名</el-button>
         <el-dialog title="申请yobot域名" :visible.sync="domainApply">
@@ -25,7 +27,8 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="domainApply = false">取消</el-button>
-                <el-button type="primary" @click="sendApply('{{ url_for('yobot_api_getdomain') }}')" :loading="loading">申请</el-button>
+                <el-button type="primary" @click="sendApply('{{ url_for('yobot_api_getdomain') }}')" :loading="loading">
+                    申请</el-button>
             </div>
         </el-dialog>
         <p>
@@ -93,7 +96,7 @@
             <el-button size="mini" icon="el-icon-remove-outline" @click="setting['super-admin'].pop()">删除 </el-button>
         </p>
         <p>
-            机器人黑名单：
+            机器人黑名单（QQ号）：
             <ul>
                 <li v-for="(black,i) in setting['black-list']">
                     <el-input v-model.number="setting['black-list'][i]" placeholder="QQ号"></el-input>
@@ -102,6 +105,18 @@
             <el-button size="mini" icon="el-icon-circle-plus-outline" @click="setting['black-list'].push(null)">添加
             </el-button>
             <el-button size="mini" icon="el-icon-remove-outline" @click="setting['black-list'].pop()">删除</el-button>
+        </p>
+        <p>
+            机器人黑名单（QQ群号）：
+            <ul>
+                <li v-for="(black,i) in setting['black-list-group']">
+                    <el-input v-model.number="setting['black-list-group'][i]" placeholder="QQ群号"></el-input>
+                    </lel-button>
+            </ul>
+            <el-button size="mini" icon="el-icon-circle-plus-outline" @click="setting['black-list-group'].push(null)">添加
+            </el-button>
+            <el-button size="mini" icon="el-icon-remove-outline" @click="setting['black-list-group'].pop()">删除
+            </el-button>
         </p>
         <p>
             <el-row>
@@ -126,8 +141,11 @@
         </p>
         <p>
             公会战记录：
-            <el-radio v-model="setting.clan_battle_mode" label="chat" @change="comfirm_change_clan_mode">使用旧版（仅聊天）</el-radio>
-            <el-radio v-model="setting.clan_battle_mode" label="web" @change="comfirm_change_clan_mode">使用新版（聊天+网站）</el-radio>
+            <el-radio v-model="setting.clan_battle_mode" label="chat" @change="comfirm_change_clan_mode">使用旧版（仅聊天）
+            </el-radio>
+            <el-radio v-model="setting.clan_battle_mode" label="web" @change="comfirm_change_clan_mode">使用新版（聊天+网站）
+            </el-radio>
+            <el-radio v-model="setting.clan_battle_mode" label="none">关闭</el-radio>
         </p>
         <p>
             <a @click="hide_jjckey+=1">模拟抽卡：</a>
@@ -221,7 +239,8 @@
                                 <tr v-for="level,k in area_health">
                                     <td>[[k+1]]阶段</td>
                                     <td v-for="health,b in level"><input v-model.number="area_health[k][b]"
-                                            placeholder="boss血量" type="number" v-bind="{step: (area=='eff')?0.1:1000000}" />
+                                            placeholder="boss血量" type="number"
+                                            v-bind="{step: (area=='eff')?0.1:1000000}" />
                                     </td>
                                 </tr>
                             </table><button @click="switch_levels(area)">切换阶段数</button>

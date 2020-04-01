@@ -31,8 +31,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.25]"
-    Commit = {"yuudi": 69, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.26]"
+    Commit = {"yuudi": 70, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
@@ -219,7 +219,9 @@ class Yobot:
                     msg["raw_message"][len(preffix):])
 
         # black-list
-        if msg["sender"]["user_id"] in self.glo_setting.get("black-list", list()):
+        if msg["sender"]["user_id"] in self.glo_setting["black-list"]:
+            return None
+        if msg["message_type"] == "group" and (msg["group_id"] in self.glo_setting["black-list-group"]):
             return None
 
         # zht-zhs convertion

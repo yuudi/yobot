@@ -8,7 +8,7 @@ class Message:
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.version = glo_setting["verinfo"]["ver_name"]
-        if glo_setting["clan_battle_mode"] == "web":
+        if glo_setting["clan_battle_mode"] != "chat":
             self.help_page = urljoin(
                 glo_setting["public_address"],
                 '{}help/'.format(glo_setting['public_basepath']))
