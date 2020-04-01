@@ -14,6 +14,7 @@ var vm = new Vue({
         recordFormVisible: false,
         recordBehalfVisible: false,
         subscribe: null,
+        message: '',
         subscribeFormVisible: false,
         subscribeCancelVisible: false,
         statusFormVisible: false,
@@ -197,10 +198,18 @@ var vm = new Vue({
                 boss_num: 0,
             });
         },
+        save_slot: function (event) {
+            this.callapi({
+                action: 'save_slot',
+            });
+        },
         addsubscribe: function (event) {
             this.callapi({
                 action: 'addsubscribe',
                 boss_num: parseInt(this.subscribe),
+                comment: {
+                    message: this.message,
+                }
             });
             this.subscribeFormVisible = false;
         },

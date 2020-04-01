@@ -21,21 +21,19 @@ themeConfig:
     - text: 首页
       link: /
     - text: 安装方法
-      link: /install/cq/
-    - text: 功能列表
-      link: /features/
-    - text: 高级
       items:
-        - text: 开启Web模式
+        - text: 使用酷Q安装
+          link: /install/cq/
+        - text: 使用mirai安装
+          link: /install/mirai/
+    - text: 使用方法
+      items:
+        - text: 功能表
+          link: /features/
+        - text: 开启 Web 模式
           link: /usage/web-mode/
-        - text: Web模式 - 公会战
+        - text: Web 模式公会战
           link: /usage/web-clanbattle/
-    - text: 源码
-      items:
-        - text: GitHub
-          link: https://github.com/yuudi/yobot
-        - text: Gitee
-          link: https://gitee.com/yobot/yobot
     - text: 关于
       link: /about/
 plugins:

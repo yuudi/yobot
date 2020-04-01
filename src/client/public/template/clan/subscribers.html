@@ -32,6 +32,9 @@
                 </span>
                 <p v-for="m in subscribers[bn-1]">
                     [[ find_name(m.qqid) ]]（[[ m.qqid ]]）
+                    <template v-if="m.comment.message">
+                        ：[[ m.comment.message ]]
+                    </template>
                 </p>
                 <p v-if="subscribers[bn-1].length == 0">
                     没有记录

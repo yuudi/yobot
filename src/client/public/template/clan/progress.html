@@ -2,7 +2,7 @@
 
 <head>
   <title>出刀记录</title>
-  <meta name='viewport' content='width=1430' charset="utf-8" />
+  <meta name='viewport' content='width=1485' charset="utf-8" />
   <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
   <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
   <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
@@ -39,7 +39,7 @@
     </el-dialog>
     <template v-if="progressData.length > 0">
       共[[ members.length ]]人，共[[ progressData.reduce((s,i)=>s+i.finished,0) ]]刀
-      <el-table :data="progressData" :span-method="arraySpanMethod" style="width: 1430" ref="multipleTable"
+      <el-table :data="progressData" :span-method="arraySpanMethod" style="width: 1485" ref="multipleTable"
         @selection-change="handleSelectionChange" stripe>
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="qqid" label="QQ号" width="120" sortable></el-table-column>
@@ -104,6 +104,15 @@
               </el-popover>
             </template>
           </el-table-column>
+        </el-table-column>
+        <el-table-column prop="sl" label="SL" width="55" sortable>
+          <template slot-scope="scope">
+            <template v-if="today==-1">-</template>
+            <template v-else>
+              <i v-if="scope.row.sl==today" class="el-icon-no-smoking" style="color:#F56C6C"></i>
+              <i v-else class="el-icon-smoking" style="color:#67C23A"></i>
+            </template>
+          </template>
         </el-table-column>
         <el-table-column label="历史" width="55">
           <template slot-scope="scope">

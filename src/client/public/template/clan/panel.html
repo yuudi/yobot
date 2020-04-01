@@ -105,6 +105,7 @@
               <el-radio-button label="4"></el-radio-button>
               <el-radio-button label="5"></el-radio-button>
             </el-radio-group>
+            <el-input v-model="message" placeholder="留言（选填）"></el-input>
             <div slot="footer" class="dialog-footer">
               <el-button @click="subscribeFormVisible = false">取消</el-button>
               <el-button type="primary" @click="addsubscribe">预约</el-button>
@@ -128,6 +129,9 @@
         <el-row>
           <el-col :span="6"><el-button type="warning" size="small" @click="addsuspend">&nbsp;&nbsp;挂树&nbsp;&nbsp;</el-button></el-col>
           <el-col :span="6"><el-button type="info" size="small" @click="cancelsuspend">取消挂树</el-button></el-col>
+          <el-col :span="6"><el-button type="warning" size="small" @click="save_slot">&nbsp;&nbsp;&nbsp;SL&nbsp;&nbsp;&nbsp;</el-button></el-col>
+        </el-row>
+        <el-row>
           <el-col :span="6"><el-button type="danger" size="small" @click="startmodify">修改状态</el-button></el-col>
           <el-col :span="6"><a href='./setting/'><el-button type="info" size="small" @click="leavePage=true">&nbsp;&nbsp;设置&nbsp;&nbsp;</el-button></a></el-col>
           <el-dialog title="修改状态" :visible.sync="statusFormVisible">

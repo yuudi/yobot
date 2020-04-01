@@ -8,6 +8,7 @@ var vm = new Vue({
         activeIndex: '3',
         multipleSelection: [],
         dropMemberVisible: false,
+        today: 0,
     },
     mounted() {
         var thisvue = this;
@@ -35,6 +36,7 @@ var vm = new Vue({
                 m.finished = 0;
                 m.detail = [];
             }
+            thisvue.today = res.data.today;
             thisvue.refresh(res.data.challenges);
         })).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');
@@ -88,6 +90,7 @@ var vm = new Vue({
             }).catch(function (error) {
                 thisvue.$alert(error, '获取记录失败');
             })
+            this.today = -1;
         },
         refresh: function (challenges) {
             this.progressData = [...this.members];

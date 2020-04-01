@@ -1,4 +1,6 @@
-# 使用的开源软件
+# 开源软件
+
+本项目使用或参考了下列开源软件与工具
 
 - aiocqhttp: <https://github.com/richardchien/python-aiocqhttp>
 - HoshinoBot: <https://github.com/Ice-Cirno/HoshinoBot>

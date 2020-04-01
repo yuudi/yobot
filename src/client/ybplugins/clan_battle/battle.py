@@ -48,6 +48,8 @@ class ClanBattle:
         '解锁': 14,
         '面板': 15,
         '后台': 15,
+        'sl': 16,
+        'SL': 16,
         '查树': 20,
         '查1': 21,
         '查2': 22,
@@ -92,7 +94,9 @@ class ClanBattle:
         self._boss_status: Dict[str, asyncio.Future] = {}
 
         for group in Clan_group.select():
-            self._boss_status[group.group_id] = asyncio.get_event_loop().create_future()
+            self._boss_status[group.group_id] = (
+                asyncio.get_event_loop().create_future()
+            )
 
         # super-admin initialize
         for sa_id in self.setting['super-admin']:
@@ -794,6 +798,28 @@ class ClanBattle:
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
+    def save_slot(self, group_id, qqid):
+        """
+        record today's save slot
+
+        Args:
+            group_id: group id
+            qqid: qqid of member who do the record
+        """
+        group = Clan_group.get_or_none(group_id=group_id)
+        if group is None:
+            raise GroupError('本群未初始化')
+        membership = Clan_member.get_or_none(
+            group_id=group_id, qqid=qqid)
+        if membership is None:
+            raise UserError('未加入公会，请先发送“加入公会”')
+        today, _ = pcr_datetime(group.game_server)
+        if membership.last_save_slot == today:
+            raise UserError('你今天已经存在SL记录了')
+        membership.last_save_slot = today
+        membership.save()
+        return
+
     @timed_cached_func(max_len=64, max_age_seconds=60, ignore_self=True)
     def get_report(self,
                    group_id: Groupid,
@@ -849,15 +875,19 @@ class ClanBattle:
             group_id: group id
         """
         member_list = []
-        for user in User.select().join(
+        for user in User.select(
+            User, Clan_member,
+        ).join(
             Clan_member,
-            on=(User.qqid == Clan_member.qqid)
+            on=(User.qqid == Clan_member.qqid),
+            attr='clan_member',
         ).where(
             Clan_member.group_id == group_id,
         ):
             member_list.append({
                 'qqid': user.qqid,
                 'nickname': user.nickname,
+                'sl': user.clan_member.last_save_slot,
             })
         return member_list
 
@@ -1005,12 +1035,16 @@ class ClanBattle:
             )
             return '请登录面板查看：'+url
         elif match_num == 10:  # 预约
-            match = re.match(r'^预约([1-5])$', cmd)
+            match = re.match(r'^预约([1-5])(.*)$', cmd)
             if not match:
                 return
             boss_num = int(match.group(1))
+            extra_msg = match.group(2).strip()
+            msg = {}
+            if extra_msg:
+                msg['message'] = extra_msg
             try:
-                self.add_subscribe(group_id, user_id, boss_num)
+                self.add_subscribe(group_id, user_id, boss_num, msg)
             except (GroupError, UserError) as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
@@ -1074,6 +1108,16 @@ class ClanBattle:
                 )
             )
             return f'公会战面板：\n{url}\n建议添加到浏览器收藏夹或桌面快捷方式'
+        elif match_num == 16:  # SL
+            if len(cmd) != 2:
+                return
+            try:
+                self.save_slot(group_id, user_id)
+            except (GroupError, UserError) as e:
+                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
+                return str(e)
+            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
+            return '已记录SL'
         elif 20 <= match_num <= 25:
             beh = '挂树' if match_num == 20 else '预约{}号boss'.format(match_num-20)
             subscribers = self.get_subscribe_list(group_id, match_num-20)
@@ -1081,6 +1125,7 @@ class ClanBattle:
                 return '没有人'+beh
             reply = beh+'的成员：\n' + '\n'.join(
                 self._get_nickname_by_qqid(m['qqid'])
+                + m['comment'].get('message', '')
                 for m in subscribers
             )
             return reply
@@ -1193,6 +1238,7 @@ class ClanBattle:
                         self_id=user_id,
                     )
                 elif action == 'get_challenge':
+                    d, _ = pcr_datetime(group.game_server)
                     report = self.get_report(
                         group_id,
                         None,
@@ -1200,7 +1246,8 @@ class ClanBattle:
                     )
                     return jsonify(
                         code=0,
-                        challenges=report
+                        challenges=report,
+                        today=d,
                     )
                 elif action == 'get_user_challenge':
                     report = self.get_report(
@@ -1428,6 +1475,27 @@ class ClanBattle:
                             ),
                         },
                     )
+                elif action == 'save_slot':
+                    try:
+                        self.save_slot(group_id, user_id)
+                    except (GroupError, UserError) as e:
+                        _logger.info('网页 失败 {} {} {}'.format(
+                            user_id, group_id, action))
+                        return jsonify(
+                            code=10,
+                            message=str(e),
+                        )
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
+                    if group.notification & 0x200:
+                        asyncio.ensure_future(
+                            self.api.send_group_msg(
+                                group_id=group_id,
+                                message=(self._get_nickname_by_qqid(user_id)
+                                         + '已使用SL'),
+                            )
+                        )
+                    return jsonify(code=0, notice='已记录SL')
                 elif action == 'get_subscribers':
                     subscribers = self.get_subscribe_list(group_id)
                     return jsonify(
@@ -1436,11 +1504,13 @@ class ClanBattle:
                         subscribers=subscribers)
                 elif action == 'addsubscribe':
                     boss_num = payload['boss_num']
+                    comment = payload.get('comment')
                     try:
                         self.add_subscribe(
                             group_id,
                             user_id,
                             boss_num,
+                            comment,
                         )
                     except UserError as e:
                         _logger.info('网页 失败 {} {} {}'.format(
@@ -1463,12 +1533,16 @@ class ClanBattle:
                     else:
                         notice = '预约成功'
                         if group.notification & 0x40:
+                            message = '{}已预约{}号boss'.format(
+                                user.nickname,
+                                boss_num,
+                            )
+                            if comment.get('message'):
+                                message += '\n留言：'+comment['message']
                             asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
-                                    message='{}已预约{}号boss'.format(
-                                        user.nickname,
-                                        boss_num),
+                                    message=message,
                                 )
                             )
                     return jsonify(code=0, notice=notice)

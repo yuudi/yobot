@@ -15,6 +15,7 @@ var vm = new Vue({
                 suspend: false,
                 cancelsuspend: false,
                 modify: false,
+                sl: false,
             }
         },
         confirmVisible: false,

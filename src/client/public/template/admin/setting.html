@@ -46,6 +46,9 @@
                     </el-input>
                 </el-col>
             </el-row>
+            <template v-if="setting.show_icp && setting.public_basepath!='/'">
+                <el-alert title="URL前缀不是“/”，备案号不会展示在主页" type="warning"></el-alert>
+            </template>
         </p>
         <p>
             <el-row>
