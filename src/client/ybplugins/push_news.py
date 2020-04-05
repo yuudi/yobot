@@ -33,25 +33,30 @@ class News:
         self.rss = {
             "news_jp_twitter": {
                 "name": "日服推特",
-                "source": "https://rss.yobot.xyz/twitter/user/priconne_redive",
+                "source": "http://rsshub.app.cdn.cloudflare.net/twitter/user/priconne_redive",
+                # headers: 可选，附加请求头
+                "headers": {"host": "rsshub.app"},
                 "pattern": "{title}\n链接：{link}",
                 "last_id": None
             },
             "news_jp_official": {
                 "name": "日服官网",
-                "source": "https://rss.yobot.xyz/pcr/news",
+                "source": "http://rsshub.app.cdn.cloudflare.net/pcr/news",
+                "headers": {"host": "rsshub.app"},
                 "pattern": "{title}\n{link}",
                 "last_id": None
             },
             "news_tw_facebook": {
                 "name": "台服FaceBook",
-                "source": "https://rss.yobot.xyz/facebook/page/SonetPCR",
+                "source": "http://rsshub.app.cdn.cloudflare.net/facebook/page/SonetPCR",
+                "headers": {"host": "rsshub.app"},
                 "pattern": "链接：{link}",
                 "last_id": None
             },
             "news_cn_bilibili": {
                 "name": "国服B站动态",
-                "source": "https://rss.yobot.xyz/bilibili/user/dynamic/353840826/",
+                "source": "http://rsshub.app.cdn.cloudflare.net/bilibili/user/dynamic/353840826",
+                "headers": {"host": "rsshub.app"},
                 "pattern": "{title}\n{link}",
                 "last_id": None
             }
@@ -63,7 +68,7 @@ class News:
               + "检查RSS源：{}".format(rss_source["name"]))
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(rss_source["source"]) as response:
+                async with session.get(rss_source["source"], headers=rss_source.get("headers")) as response:
                     code = response.status
                     if code != 200:
                         print("rss源错误：{}，返回值：{}".format(
