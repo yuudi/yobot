@@ -34,6 +34,8 @@ themeConfig:
           link: /usage/web-mode/
         - text: Web 模式公会战
           link: /usage/web-clanbattle/
+    - text: 常见问题
+      link: /usage/faq/
     - text: 关于
       link: /about/
 plugins:

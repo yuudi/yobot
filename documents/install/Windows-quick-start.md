@@ -23,7 +23,7 @@
 
 启动 httpapi 插件后会反复出现如下的提示
 
-![httpapi启用图片](../imgs/8ba6b840bab3ac25.jpg)
+![httpapi启用图片](https://x.jingzhidh.com/img/yobot/8ba6b840bab3ac25.jpg)
 
 ### 第二步
 
@@ -31,7 +31,11 @@
 
 解压后双击“yobot.exe”启动服务，双方通信成功后出现如下的提示
 
-![windows下正确yobot与httpapi成功通信](../imgs/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://x.jingzhidh.com/img/yobot/8179fdd1e46690b2.jpg)
+
+### 验证安装
+
+向机器人发送“version”，机器人会回复当前版本
 
 ## 使用
 

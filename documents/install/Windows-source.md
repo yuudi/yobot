@@ -43,7 +43,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 配置正确后，启动 httpapi 插件后会反复出现如下都提示
 
-![配置正确图片](../imgs/8ba6b840bab3ac25.jpg)
+![配置正确图片](https://x.jingzhidh.com/img/yobot/8ba6b840bab3ac25.jpg)
 
 ## 运行yobot服务
 
@@ -66,9 +66,13 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
 
-![windows下正确启动图](../imgs/aaf38d1a5cbc1c87.jpg)
+![windows下正确启动图](https://x.jingzhidh.com/img/yobot/aaf38d1a5cbc1c87.jpg)
 
-![windows下正确yobot与httpapi成功通信](../imgs/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://x.jingzhidh.com/img/yobot/8179fdd1e46690b2.jpg)
+
+### 验证安装
+
+向机器人发送“version”，机器人会回复当前版本
 
 ## 常见问题
 

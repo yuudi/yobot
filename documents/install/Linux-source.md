@@ -4,6 +4,8 @@
 
 由于wine与原生Windows差别较大，很多酷Q插件无法在wine中运行。
 
+~~Linux 用户建议使用[mirai](./mirai.md)部署。~~mirai现在还不够稳定，再等一两个月吧。
+
 **Linux运行存在问题较多，不推荐使用**，如果你坚持使用Linux来部署机器人，可以参考本文步骤。
 
 交流群：770947581
@@ -44,7 +46,7 @@
 
 配置正确后，启动 httpapi 插件后会反复出现如下都提示
 
-![配置正确图片](../imgs/8ba6b840bab3ac25.jpg)
+![配置正确图片](https://x.jingzhidh.com/img/yobot/8ba6b840bab3ac25.jpg)
 
 ## 运行 yobot 服务
 
@@ -81,9 +83,13 @@ sh yobotg.sh  # 如果python的路径不是python3，请手动修改这个脚本
 
 如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
 
-![windows下正确启动图](../imgs/aaf38d1a5cbc1c87.jpg)
+![windows下正确启动图](https://x.jingzhidh.com/img/yobot/aaf38d1a5cbc1c87.jpg)
 
-![windows下正确yobot与httpapi成功通信](../imgs/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://x.jingzhidh.com/img/yobot/8179fdd1e46690b2.jpg)
+
+### 验证安装
+
+向机器人发送“version”，机器人会回复当前版本
 
 ## 常见问题
 

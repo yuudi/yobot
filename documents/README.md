@@ -30,31 +30,31 @@ editLink: false
 - 申请出刀，提醒之后申请出刀的人有人正在出刀，防止意外撞刀
 - SL记录，记录每天的SL使用情况，方便指挥
 
-![统计成员伤害](./imgs/u1rouD.png)
+![统计成员伤害](https://x.jingzhidh.com/img/yobot/u1rouD.png)
 
-![生成统计报表](./imgs/u1rTDe.png)
+![生成统计报表](https://x.jingzhidh.com/img/yobot/u1rTDe.png)
 
-![每日出刀情况](./imgs/utk0Gq.png)
+![每日出刀情况](https://x.jingzhidh.com/img/yobot/utk0Gq.png)
 
 新版助手提供了一个网页面板，面板上可以进行更多操作
 
-![主面板](./imgs/poYvQO.jpg)
+![主面板](https://x.jingzhidh.com/img/yobot/poYvQO.jpg)
 
-![数据面板](./imgs/HOh17P.jpg)
+![数据面板](https://x.jingzhidh.com/img/yobot/HOh17P.jpg)
 
 ### 新闻推送
 
 机器人主动发送游戏新闻与活动提醒
 
-![游戏活动提醒](./imgs/5bd8d1f5ac68ffde.jpg)
+![游戏活动提醒](https://x.jingzhidh.com/img/yobot/5bd8d1f5ac68ffde.jpg)
 
-![数据面板](./imgs/HOh17P.jpg)
+![数据面板](https://x.jingzhidh.com/img/yobot/HOh17P.jpg)
 
 ### 日程查询
 
 机器人主动发送游戏新闻与活动提醒
 
-![游戏活动提醒](./imgs/J04GEB.jpg)
+![游戏活动提醒](https://x.jingzhidh.com/img/yobot/J04GEB.jpg)
 
 ### 模拟抽卡
 
@@ -63,19 +63,19 @@ editLink: false
 还可以自定义修改卡池
 （怕打扰可以关闭此功能）
 
-![模拟抽卡](./imgs/u4OLHH.png)
+![模拟抽卡](https://x.jingzhidh.com/img/yobot/u4OLHH.png)
 
 ### 更多功能
 
-更多功能请参照[指令表](/features/)。
+更多功能请参照[指令表](./features/README.md)。
 
 ## 源码
 
-<https://gitee.com/yobot/yobot>
+<https://github.com/yuudi/yobot>
 
 ## 开源协议
 
-本工具使用了[这些](./open-source.md)开源软件和工具
+本工具使用了[这些](./project/open-source.md)开源软件和工具
 
 使用时请遵循[GPL-3.0协议](https://www.gnu.org/licenses/gpl-3.0.html)，简单地说：
 

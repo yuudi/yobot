@@ -9,9 +9,11 @@
 
 [mirai 项目地址](https://github.com/mamoe/mirai)
 
+<!-- 
 ## 步骤
 
 1. 安装最新版 java
 1. 下载[mirai-console](https://github.com/mamoe/mirai-console/releases)，windows 用户也可以下载[mirai 运行包](https://x.jingzhidh.com/mirai/mirai-2.0.exe)
 1. 下载[httpapi.dll](https://x.jingzhidh.com/mirai/httpapi.dll)
 1. 参考酷Q方法完成剩余步骤
+-->
