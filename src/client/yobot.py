@@ -30,9 +30,14 @@ else:
     from yybplugins import custom
 
 
+# 本项目构建的框架非常粗糙且幼稚，不建议各位把时间浪费本项目上
+# 如果想开发自己的机器人，建议直接使用 nonebot 框架
+# https://nonebot.cqp.moe/
+
+
 class Yobot:
-    Version = "[v3.3.27]"
-    Commit = {"yuudi": 71, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.28]"
+    Commit = {"yuudi": 73, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
@@ -70,7 +75,15 @@ class Yobot:
             else:
                 default_boss_filepath = os.path.join(
                     os.path.dirname(__file__), "default_boss.json")
-            shutil.copyfile(default_boss_filepath, boss_filepath)
+        pool_filepath = os.path.join(dirname, "pool3.json")
+        if not os.path.exists(pool_filepath):
+            if is_packaged:
+                default_pool_filepath = os.path.join(
+                    sys._MEIPASS, "packedfiles", "default_pool.json")
+            else:
+                default_pool_filepath = os.path.join(
+                    os.path.dirname(__file__), "default_pool.json")
+            shutil.copyfile(default_pool_filepath, pool_filepath)
         with open(config_f_path, "r+", encoding="utf-8") as config_file:
             cfg = json.load(config_file)
             for k in self.glo_setting.keys():

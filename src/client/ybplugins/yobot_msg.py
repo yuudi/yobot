@@ -30,7 +30,7 @@ class Message:
         if match_num == 99:
             reply = self.version
         elif match_num == 98:
-            reply = "功能表："+self.help_page
+            reply = self.help_page
         elif match_num == 2:
             reply = "boss被击败后我会提醒下树"
         else:

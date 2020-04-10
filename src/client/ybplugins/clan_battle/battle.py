@@ -818,6 +818,10 @@ class ClanBattle:
             raise UserError('你今天已经存在SL记录了')
         membership.last_save_slot = today
         membership.save()
+
+        # refresh
+        self.get_member_list(group_id, nocache=True)
+
         return
 
     @timed_cached_func(max_len=64, max_age_seconds=60, ignore_self=True)

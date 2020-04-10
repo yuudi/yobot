@@ -37,28 +37,24 @@ class News:
                 # headers: 可选，附加请求头
                 "headers": {"host": "rsshub.app"},
                 "pattern": "{title}\n链接：{link}",
-                "last_id": None
             },
             "news_jp_official": {
                 "name": "日服官网",
                 "source": "http://rsshub.app.cdn.cloudflare.net/pcr/news",
                 "headers": {"host": "rsshub.app"},
                 "pattern": "{title}\n{link}",
-                "last_id": None
             },
             "news_tw_facebook": {
                 "name": "台服FaceBook",
                 "source": "http://rsshub.app.cdn.cloudflare.net/facebook/page/SonetPCR",
                 "headers": {"host": "rsshub.app"},
                 "pattern": "链接：{link}",
-                "last_id": None
             },
             "news_cn_bilibili": {
                 "name": "国服B站动态",
                 "source": "http://rsshub.app.cdn.cloudflare.net/bilibili/user/dynamic/353840826",
                 "headers": {"host": "rsshub.app"},
                 "pattern": "{title}\n{link}",
-                "last_id": None
             }
         }
 
@@ -103,7 +99,7 @@ class News:
                         jobstore='default',
                         trigger=DateTrigger(nt),
                     )
-        last_id = rss_source["last_id"]
+        last_id = rss_source.get("last_id")
         rss_source["last_id"] = feed["entries"][0]["id"]
         if last_id is None:
             print("rss初始化："+rss_source["name"])

@@ -270,6 +270,8 @@ class Event:
             await self.load_timeline_async()
         except Exception as e:
             print("刷新日程表失败，失败原因："+str(e))
+        if not self.setting['calender_on']:
+            return
         sub_groups = self.setting.get("notify_groups", [])
         sub_users = self.setting.get("notify_privates", [])
         if not (sub_groups or sub_users):

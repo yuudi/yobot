@@ -144,7 +144,7 @@ class Switcher:
 
         cmd = msg["raw_message"]
         if match_num == 0x300:
-            if not self.setting["web_mode_hint"]:
+            if self.setting["clan_battle_mode"] != "chat":
                 return urljoin(
                     self.setting['public_address'],
                     '{}admin/setting/'.format(self.setting['public_basepath']))
@@ -187,6 +187,10 @@ class Switcher:
                 reply = "设置码版本错误"
         elif match_num == 0x500:
             if cmd == "设置卡池":
+                if self.setting["clan_battle_mode"] != "chat":
+                    return urljoin(
+                        self.setting['public_address'],
+                        '{}admin/pool-setting/'.format(self.setting['public_basepath']))
                 reply = self.get_setting_pool_url()
             elif cmd == "设置邮箱":
                 if self.setting["clan_battle_mode"] != "chat":

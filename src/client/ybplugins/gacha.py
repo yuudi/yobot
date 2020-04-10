@@ -73,7 +73,7 @@ class Gacha:
         return result_list
 
     def gacha(self, qqid: int, nickname: str) -> str:
-        self.check_ver()
+        # self.check_ver()  # no more updating
         db_exists = os.path.exists(os.path.join(
             self.setting["dirname"], "collections.db"))
         db_conn = sqlite3.connect(os.path.join(
@@ -168,7 +168,7 @@ class Gacha:
             for item in more_colle:
                 line.append(str(item.get(char, 0)))
             showdata["body"].append(line)
-        
+
         page = await render_template(
             'collection.html',
             data=showdata,
@@ -225,7 +225,7 @@ class Gacha:
             or (
                 msg["message_type"] == "private"
                 and not self.setting.get("gacha_private_on", True))):
-            reply = "功能已关闭"
+            reply = None
         elif func_num == 1:
             reply = self.gacha(
                 qqid=msg["sender"]["user_id"],
