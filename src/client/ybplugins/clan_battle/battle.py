@@ -290,7 +290,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         boss_summary = (
             f'现在{group.boss_cycle}周目，{group.boss_num}号boss\n'
             f'生命值{group.boss_health}'
@@ -302,7 +302,14 @@ class ClanBattle:
             )
         return boss_summary
 
-    def damage(self, group_id, qqid, damage, behalfed=None, comment={}) -> BossStatus:
+    def damage(self,
+               group_id,
+               qqid,
+               damage,
+               behalfed=None,
+               comment={},
+               previous_day=False,
+               ) -> BossStatus:
         """
         record a non-defeat challenge to boss
 
@@ -317,7 +324,7 @@ class ClanBattle:
             raise InputError('伤害不可以是负数')
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         if damage >= group.boss_health:
             raise InputError('伤害超出剩余血量，如击败请使用尾刀')
         if behalfed is not None:
@@ -335,6 +342,15 @@ class ClanBattle:
         if not is_member:
             raise GroupError('未加入公会，请先发送“加入公会”')
         d, t = pcr_datetime(area=group.game_server)
+        if previous_day:
+            today_count = Clan_challenge.select().where(
+                Clan_challenge.gid == group_id,
+                Clan_challenge.challenge_pcrdate == d,
+            ).count()
+            if today_count != 0:
+                raise GroupError('今日报刀记录不为空，无法将记录添加到昨日')
+            d -= 1
+            t += 86400
         challenges = Clan_challenge.select().where(
             Clan_challenge.gid == group_id,
             Clan_challenge.qqid == qqid,
@@ -344,6 +360,8 @@ class ClanBattle:
         finished = sum(bool(c.boss_health_ramain or c.is_continue)
                        for c in challenges)
         if finished >= 3:
+            if previous_day:
+                raise InputError('昨日上报次数已达到3次')
             raise InputError('今日上报次数已达到3次')
         is_continue = (challenges
                        and challenges[-1].boss_health_ramain == 0
@@ -383,7 +401,13 @@ class ClanBattle:
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
-    def defeat(self, group_id, qqid, behalfed=None, comment={}) -> BossStatus:
+    def defeat(self,
+               group_id,
+               qqid,
+               behalfed=None,
+               comment={},
+               previous_day=False,
+               ) -> BossStatus:
         """
         record a defeating challenge to boss
 
@@ -395,7 +419,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         if behalfed is not None:
             nik = self._get_nickname_by_qqid(qqid) or qqid
             comment['behalf'] = f'由{nik}代报。'
@@ -411,6 +435,15 @@ class ClanBattle:
         if not is_member:
             raise GroupError('未加入公会，请先发送“加入公会”')
         d, t = pcr_datetime(area=group.game_server)
+        if previous_day:
+            today_count = Clan_challenge.select().where(
+                Clan_challenge.gid == group_id,
+                Clan_challenge.challenge_pcrdate == d,
+            ).count()
+            if today_count != 0:
+                raise GroupError('今日报刀记录不为空，无法将记录添加到昨日')
+            d -= 1
+            t += 86400
         challenges = Clan_challenge.select().where(
             Clan_challenge.gid == group_id,
             Clan_challenge.qqid == qqid,
@@ -420,6 +453,8 @@ class ClanBattle:
         finished = sum(bool(c.boss_health_ramain or c.is_continue)
                        for c in challenges)
         if finished >= 3:
+            if previous_day:
+                raise InputError('昨日上报次数已达到3次')
             raise InputError('今日上报次数已达到3次')
         is_continue = (challenges
                        and challenges[-1].boss_health_ramain == 0
@@ -481,7 +516,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         user = User.get_or_create(
             qqid=qqid,
             defaults={
@@ -532,7 +567,7 @@ class ClanBattle:
             raise InputError('boss生命值不能为负')
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         if cycle is not None:
             group.boss_cycle = cycle
         if boss_num is not None:
@@ -571,7 +606,7 @@ class ClanBattle:
             raise InputError(f'不存在{game_server}游戏服务器')
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         group.game_server = game_server
         group.save()
 
@@ -587,7 +622,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         group.boss_cycle = 1
         group.boss_num = 1
         group.boss_health = self.bossinfo[group.game_server][0][0]
@@ -628,7 +663,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         subscribe = Clan_subscribe.get_or_none(
             gid=group_id,
             qqid=qqid,
@@ -701,7 +736,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         if boss_num is None:
             boss_num = group.boss_num
         notice = []
@@ -729,7 +764,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         if group.challenging_member_qq_id is not None:
             nik = self._get_nickname_by_qqid(
                 group.challenging_member_qq_id,
@@ -765,7 +800,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         if group.challenging_member_qq_id is None:
             raise GroupError('没有人正在挑战boss')
         user = User.get_or_create(
@@ -808,7 +843,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         membership = Clan_member.get_or_none(
             group_id=group_id, qqid=qqid)
         if membership is None:
@@ -840,7 +875,7 @@ class ClanBattle:
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
-            raise GroupError('本群未初始化')
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
         report = []
         expressions = [
             Clan_challenge.gid == group_id,
@@ -962,7 +997,7 @@ class ClanBattle:
             return boss_summary
         elif match_num == 4:  # 报刀
             match = re.match(
-                r'^报刀 ?(\d+)([Ww万Kk千])? *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
+                r'^报刀 ?(\d+)([Ww万Kk千])? *(?:\[CQ:at,qq=(\d+)\])? *(昨日)? *$', cmd)
             if not match:
                 return
             unit = {
@@ -975,8 +1010,10 @@ class ClanBattle:
             }.get(match.group(2), 1)
             damage = int(match.group(1)) * unit
             behalf = match.group(3) and int(match.group(3))
+            previous_day = bool(match.group(4))
             try:
-                boss_status = self.damage(group_id, user_id, damage, behalf)
+                boss_status = self.damage(group_id, user_id, damage, behalf,
+                                          previous_day=previous_day)
             except (InputError, GroupError) as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
@@ -984,12 +1021,14 @@ class ClanBattle:
             return str(boss_status)
         elif match_num == 5:  # 尾刀
             match = re.match(
-                r'^尾刀 ?(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
+                r'^尾刀 ?(?:\[CQ:at,qq=(\d+)\])? *(昨日)? *$', cmd)
             if not match:
                 return
             behalf = match.group(1) and int(match.group(1))
+            previous_day = bool(match.group(2))
             try:
-                boss_status = self.defeat(group_id, user_id, behalf)
+                boss_status = self.defeat(group_id, user_id, behalf,
+                                          previous_day=previous_day)
             except (InputError, GroupError) as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)

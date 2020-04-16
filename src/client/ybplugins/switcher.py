@@ -128,6 +128,7 @@ class Switcher:
     def execute(self, match_num: int, msg: dict) -> dict:
         super_admins = self.setting.get("super-admin", list())
         restrict = self.setting.get("setting-restrict", 3)
+        cmd = msg["raw_message"]
         if msg["sender"]["user_id"] in super_admins:
             role = 0
         else:
@@ -139,10 +140,11 @@ class Switcher:
             else:
                 role = 3
         if role > restrict:
+            if not cmd.startswith(("卡池", "邮箱", "新闻", "boss", "码"), 2):
+                return None
             reply = "你的权限不足"
             return {"reply": reply, "block": True}
 
-        cmd = msg["raw_message"]
         if match_num == 0x300:
             if self.setting["clan_battle_mode"] != "chat":
                 return urljoin(

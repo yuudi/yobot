@@ -138,7 +138,7 @@ class Consult:
                 self.setting['public_basepath'], num, filename))
         reply = '找到{}条解法：{}'.format(len(solution), addr)
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/web-mode.md'
+            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
         return reply
 
     @staticmethod
@@ -155,7 +155,7 @@ class Consult:
 
     async def execute_async(self, match_num: int, msg: dict) -> dict:
         if self.setting.get("jjc_consult", True) == False:
-            reply = "此功能未启用"
+            return None
         elif match_num == 1:
             reply = "请接5个昵称，空格分隔"
         else:

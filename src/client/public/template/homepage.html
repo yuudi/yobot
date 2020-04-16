@@ -19,7 +19,14 @@
     <p><a href="{{ url_for('yobot_about') }}">关于</a></p>
     {% if show_icp -%}
     <footer style="position: absolute;bottom: 0;left: 50%;transform: translate(-50%, -50%);">
-        <a href="http://beian.miit.gov.cn/">{{ icp_info }}</a>
+        <a target="_blank" href="http://beian.miit.gov.cn/">{{ icp_info }}</a>
+        {% if gongan_info -%}
+        &nbsp;
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo"> 
+            <img src="{{ url_for('yobot_static', filename='gongan.png') }}">
+            {{ gongan_info }}
+        </a>
+        {% endif -%}
     </footer>
     {% endif -%}
 </body>

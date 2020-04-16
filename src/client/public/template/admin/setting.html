@@ -45,7 +45,15 @@
                     <el-checkbox v-model="setting.show_icp">主页展示备案号</el-checkbox>
                 </el-col>
                 <el-col :span="20">
-                    <el-input :disabled="!setting.show_icp" v-model="setting.icp_info" placeholder="#">
+                    <el-input :disabled="!setting.show_icp" v-model="setting.icp_info" placeholder="icp备案号，例：京ICP备00000000号-1">
+                    </el-input>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="4">
+                </el-col>
+                <el-col :span="20">
+                    <el-input :disabled="!setting.show_icp" v-model="setting.gongan_info" placeholder="公安备案号，例：京公网安备00000000000000号">
                     </el-input>
                 </el-col>
             </el-row>
@@ -250,7 +258,7 @@
             </el-collapse>
         </p>
         <p>
-            <a href="./pool-setting/">卡池设置</a>
+            <a href="{{ url_for('yobot_pool_setting') }}">卡池设置</a>
         </p>
         <p>
             <el-button type="success" @click="update">确定</el-button>

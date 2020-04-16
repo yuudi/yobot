@@ -17,18 +17,17 @@ from opencc import OpenCC
 from quart import Quart, send_file
 
 if __package__:
-    from .ybplugins import (boss_dmg, calender, clan_battle,
-                            gacha, homepage, jjc_consult, login, marionette,
-                            push_news, settings, switcher, updater, web_util,
-                            yobot_msg, ybdata)
+    from .ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
+                            jjc_consult, login, marionette, push_news, settings,
+                            switcher, templating, updater, web_util, ybdata,
+                            yobot_msg)
     from .yybplugins import custom
 else:
-    from ybplugins import (boss_dmg, calender, clan_battle,
-                           gacha, homepage, jjc_consult, login, marionette,
-                           push_news, settings, switcher, updater, web_util,
-                           yobot_msg, ybdata)
+    from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
+                           jjc_consult, login, marionette, push_news, settings,
+                           switcher, templating, updater, web_util, ybdata,
+                           yobot_msg)
     from yybplugins import custom
-
 
 # 本项目构建的框架非常粗糙且幼稚，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -36,8 +35,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.3.28]"
-    Commit = {"yuudi": 73, "sunyubo": 1, "S": 2}
+    Version = "[v3.3.29]"
+    Commit = {"yuudi": 74, "sunyubo": 1, "S": 2}
 
     def __init__(self, *,
                  data_path: str,
@@ -67,6 +66,7 @@ class Yobot:
             self.glo_setting = json.load(config_file)
         if not os.path.exists(config_f_path):
             shutil.copyfile(default_config_f_path, config_f_path)
+            print("设置已初始化，发送help获取帮助")
         boss_filepath = os.path.join(dirname, "boss3.json")
         if not os.path.exists(boss_filepath):
             if is_packaged:
@@ -75,6 +75,7 @@ class Yobot:
             else:
                 default_boss_filepath = os.path.join(
                     os.path.dirname(__file__), "default_boss.json")
+            shutil.copyfile(default_boss_filepath, boss_filepath)
         pool_filepath = os.path.join(dirname, "pool3.json")
         if not os.path.exists(pool_filepath):
             if is_packaged:
@@ -138,6 +139,9 @@ class Yobot:
         if modified:
             with open(config_f_path, "w", encoding="utf-8") as config_file:
                 json.dump(self.glo_setting, config_file, indent=4)
+
+        # initialize utils
+        templating.Ver = self.Version[2:-1]
 
         # generate random secret_key
         if(quart_app.secret_key is None):

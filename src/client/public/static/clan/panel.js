@@ -96,7 +96,7 @@ var vm = new Vue({
                     if (res.data.notice) {
                         thisvue.$notify({
                             title: '通知',
-                            message: (new Date()).toLocaleTimeString('chinese', { hour12: false }) + res.data.notice,
+                            message: '(' + (new Date()).toLocaleTimeString('chinese', { hour12: false }) + ') ' + res.data.notice,
                             duration: 60000,
                         });
                     }

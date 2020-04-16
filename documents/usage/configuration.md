@@ -10,25 +10,27 @@
 
 ## 配置项
 
-`host` 服务绑定的地址，默认值`0.0.0.0`
+`host` 服务绑定的地址，默认值`0.0.0.0`（插件版沿用主配置）
 
-`port` 服务绑定的地址，默认值 `9222`
+`port` 服务绑定的地址，默认值 `9222`（插件版沿用主配置）
 
 `public_priority` 已移除
 
 `public_address` web 模式可以被访问的地址（如 nginx 代理后的地址），如`https://192.168.3.13:9222/yobot/`，默认自动检测
 
-`public_basepath` web 模式使用的目录（防止与其他应用冲突），如 `/`，默认值`/yobot/`
+`public_basepath` web 模式使用的目录，如 `/`，默认值 `/yobot/`（修改此项时请同时修改 `public_address` 中的路径，如果使用了反向代理则视情况而定）
 
-`show_icp` 是否在主页显示 icp 备案信息，默认值`/false/`
+`show_icp` 是否在主页显示 icp 备案信息，默认值`false`（如果需要展示备案信息，需要将 `port` 设置为 `80`、`public_basepath` 设置为 `/`，如果使用了反向代理则视情况而定）
 
 `icp_info` icp 备案信息
+
+`gongan_info` 公安备案信息
 
 `web_mode_hint` web 模式使用提示，默认值 `true`，在 web 模式下进行一次设置后自动修改为 `false`
 
 `clan_battle_mode` 公会战统计方式，可选`web` `chat` `none`，默认值 `web`
 
-`access_token` 与 httpapi 通信的 token，默认值 `null`
+`access_token` 与 httpapi 通信的 token，默认值 `null`（插件版沿用主配置）
 
 `super-admin` 管理员 qq号 列表
 
@@ -64,7 +66,7 @@
 
 `news_interval_auto` 自动优化新闻推送检测时间，默认值 `true`
 
-`news_interval_minutes` 新闻推送检测间隔分钟，默认值 30
+`news_interval_minutes` 新闻推送检测间隔分钟，默认值 30，当 `news_interval_auto` 启用时此项不生效
 
 `calender_region` 日程表地区，可选`jp` `tw` `cn`
 

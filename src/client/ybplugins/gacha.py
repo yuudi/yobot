@@ -185,7 +185,7 @@ class Gacha:
             '{}output/{}/{}'.format(
                 self.setting['public_basepath'], num, filename))
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/web-mode.md'
+            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
         return reply
 
     def check_ver(self) -> None:

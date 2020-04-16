@@ -23,6 +23,7 @@ class Index:
                 verinfo=self.setting["verinfo"]["ver_name"],
                 show_icp=self.setting["show_icp"],
                 icp_info=self.setting["icp_info"],
+                gongan_info=self.setting["gongan_info"],
             )
 
         @app.route(
