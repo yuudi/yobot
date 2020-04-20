@@ -2,6 +2,7 @@ import os
 from urllib.parse import urljoin
 
 import aiohttp
+import requests
 from quart import Quart, jsonify, request, send_file, session
 
 from .yobot_exceptions import ServerError
@@ -44,6 +45,15 @@ class WebUtil:
             glo_setting['dirname'], 'output', 'resource')
         if not os.path.exists(self.resource_path):
             os.makedirs(self.resource_path)
+
+        if not os.path.exists(os.path.join(self.resource_path, 'background.jpg')):
+            try:
+                r = requests.get('http://x.jingzhidh.com/s/background.jpg')
+                assert r.status_code == 200
+                with open(os.path.join(self.resource_path, 'background.jpg'), 'wb') as f:
+                    f.write(r.content)
+            except Exception as e:
+                print(e)
 
     def register_routes(self, app: Quart):
 

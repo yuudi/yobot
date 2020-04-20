@@ -6,6 +6,12 @@
 
 yobot 不需要。（其他插件可能需要）
 
+### Http Api 应用加载失败
+
+参考：[httpapi插件文档](https://cqhttp.cc/docs/)
+
+如果你的windows不是最新版，可能无法启动httpapi插件，请安装Visual C++ 可再发行软件包（[点击下载](https://aka.ms/vs/16/release/vc_redist.x86.exe)）。如果你的系统是 Windows 7 或 Windows Server 2008、或者安装 Visual C++ 可再发行软件包之后仍然加载失败，则还需要安装通用 C 运行库更新（[点击进入官网](https://support.microsoft.com/zh-cn/help/3118401/update-for-universal-c-runtime-in-windows)，选择你系统对应的版本下载安装）
+
 ### 机器人群聊没有回复
 
 新号、长期不登录的号、异地登录的号会被腾讯屏蔽一段时间。如果是这个原因，酷Q 日志会显示已成功发送。解决方法机器人挂机 3-5 天即可。
@@ -41,6 +47,14 @@ mirai 尚未稳定，稳定后本站会发布教程和一键安装包。如果�
 ### 如何删除公会战成员
 
 在公会战面板的查刀页面中，选择要删除的成员点击删除。
+
+### 竞技场查询可以查国服吗
+
+暂时不能
+
+### 日程表有国服吗
+
+暂时没有
 
 ### 这里没有我的问题
 

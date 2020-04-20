@@ -10,15 +10,22 @@ from typing import List, Union
 from urllib.parse import urljoin
 
 import requests
+from quart import Quart
 
 from .templating import render_template
 from .yobot_exceptions import CodingError, ServerError
+
+# 抽卡图片在背景图上的位置
+PASTE_POSITION = (413, 253)  # 第一张图的粘贴位置
+PASTE_SPACING = 290  # 粘贴的图片间距
+PASTE_SIZE = (220, 220)  # 粘贴的图片大小
+SAVE_SIZE = (640, 360)  # 保存的图片大小
 
 
 class Gacha:
     Passive = True
     Active = False
-    Request = False
+    Request = True
     URL = "http://api.yobot.xyz/3.1.4/pool.json"
 
     def __init__(self, glo_setting: dict, bot_api, *args, **kwargs):
@@ -247,3 +254,11 @@ class Gacha:
             "reply": reply,
             "block": True
         }
+
+    def register_routes(self, app: Quart):
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'gacha/'),
+            methods=['GET'])
+        async def yobot_gacha():
+            return await render_template('gacha.html')

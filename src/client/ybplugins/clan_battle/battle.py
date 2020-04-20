@@ -947,13 +947,12 @@ class ClanBattle:
 
     def execute(self, match_num, ctx):
         if ctx['message_type'] != 'group':
-            if match_num < 15:
-                return
+            return None
         cmd = ctx['raw_message']
         group_id = ctx['group_id']
         user_id = ctx['user_id']
         if match_num == 1:  # 创建
-            match = re.match(r'^创建(?:([日台韩国])服)?[公工]会$', cmd)
+            match = re.match(r'^创建(?:([日台韩国])服)?[公工行]会$', cmd)
             if not match:
                 return
             game_server = self.Server.get(match.group(1), 'cn')
@@ -974,7 +973,7 @@ class ClanBattle:
                 asyncio.ensure_future(
                     self._update_all_group_members_async(group_id))
                 return '本群所有成员已添加记录'
-            match = re.match(r'^加入[公工]会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
+            match = re.match(r'^加入[公工行]会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
             if match:
                 if match.group(1):
                     if ctx['sender']['role'] == 'member':

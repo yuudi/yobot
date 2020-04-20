@@ -11,12 +11,14 @@ class Spider_oscn(Base_spider):
     def get_items(self, content):
         try:
             items = [
-                Item(idx=n["id"],
-                     content="{}\nhttps://game.bilibili.com/pcr/yuyue/news.html#detail={}\n{}".format(
-                    n["title"], n["id"], n["content"])
+                Item(
+                    idx=n["id"],
+                    content="{}\nhttps://game.bilibili.com/pcr/news.html#detail={}\n{}".format(
+                        n["title"], n["id"], n["content"])
                 )
                 for n in content["data"]
             ]
+            items.sort(key=lambda x: x["id"], reverse=True)
         except KeyError:
             print("咨询获取错误：{}，未知的样式".format(self.name))
             return None

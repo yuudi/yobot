@@ -25,7 +25,7 @@ class Boss_dmg:
         func = reserve.Reserve.match(cmd)
         if func != 0:
             return func | 0x3000
-        if re.match(r'^创建(?:([日台韩国])服)?[公工]会$', cmd):
+        if re.match(r'^创建(?:([日台韩国])服)?[公工行]会$', cmd):
             return -1
         return 0
 
