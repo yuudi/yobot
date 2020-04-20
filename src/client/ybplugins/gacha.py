@@ -15,12 +15,6 @@ from quart import Quart
 from .templating import render_template
 from .yobot_exceptions import CodingError, ServerError
 
-# 抽卡图片在背景图上的位置
-PASTE_POSITION = (413, 253)  # 第一张图的粘贴位置
-PASTE_SPACING = 290  # 粘贴的图片间距
-PASTE_SIZE = (220, 220)  # 粘贴的图片大小
-SAVE_SIZE = (640, 360)  # 保存的图片大小
-
 
 class Gacha:
     Passive = True
@@ -222,10 +216,17 @@ class Gacha:
             return 1
         elif cmd.startswith("仓库"):
             return 4
+        elif cmd == "在线十连":
+            return 5
         else:
             return 0
 
     def execute(self, func_num: int, msg: dict):
+        if func_num == 5:
+            return urljoin(
+                self.setting["public_address"],
+                '{}gacha/'.format(self.setting['public_basepath'])
+            )
         if ((
                 msg["message_type"] == "group"
                 and not self.setting.get("gacha_on", True))

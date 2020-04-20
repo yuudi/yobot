@@ -18,7 +18,7 @@ class Spider_oscn(Base_spider):
                 )
                 for n in content["data"]
             ]
-            items.sort(key=lambda x: x["id"], reverse=True)
+            items.sort(key=lambda x: x.idx, reverse=True)
         except KeyError:
             print("咨询获取错误：{}，未知的样式".format(self.name))
             return None
