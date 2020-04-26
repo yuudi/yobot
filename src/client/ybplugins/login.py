@@ -36,8 +36,10 @@ class Login:
 
     @staticmethod
     def match(cmd: str):
-        if cmd == '登录' or cmd == '登陆':
+        if cmd in ['登录', '登陆']:
             return 1
+        elif cmd in ['验证', '验证码']:
+            return 2
         return 0
 
     def execute(self, match_num: int, ctx: dict) -> dict:
@@ -69,17 +71,28 @@ class Login:
         user.login_code_expire_time = int(time.time())+60
         user.save()
 
-        newurl = urljoin(
-            self.setting['public_address'],
-            '{}login/?qqid={}&key={}'.format(
-                self.setting['public_basepath'],
-                user.qqid,
-                login_code,
+        if match_num == 1:
+            # 链接登录
+            newurl = urljoin(
+                self.setting['public_address'],
+                '{}login/?qqid={}&key={}'.format(
+                    self.setting['public_basepath'],
+                    user.qqid,
+                    login_code,
+                )
             )
-        )
-        reply = '请在一分钟内点击链接登录：'+newurl
+            reply = '请在一分钟内点击链接登录：'+newurl
+
+        elif match_num == 2:
+            # 验证码登录
+            reply = f'您的验证码为【{login_code}】，请在一分钟内使用。'
+        else:
+            raise Exception(f"发现未设定的match状态：{match_num}")
+
         if self.setting['web_mode_hint']:
             reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
+
+
         return {
             'reply': reply,
             'block': True
@@ -89,29 +102,28 @@ class Login:
 
         @app.route(
             urljoin(self.setting['public_basepath'], 'login/'),
-            methods=['GET'])
+            methods=['GET', 'POST'])
         async def yobot_login():
             qqid = request.args.get('qqid')
             key = request.args.get('key')
             callback_page = request.args.get('callback', url_for('yobot_user'))
             now = int(time.time())
-            login_failure_reason = '登录失败'
-            login_failure_advice = '请私聊机器人“{}登录”重新获取地址'.format(
-                self.setting['preffix_string'] if self.setting['preffix_on'] else ''
-            )
+            login_failure_reason = ''
+            prefix = self.setting['preffix_string'] if self.setting['preffix_on'] else ''
+            login_failure_advice = f'请私聊机器人“{prefix}登录”获取登录地址，或私聊“{prefix}验证码”获取验证码'
             if qqid is not None and key is not None:
                 user = User.get_or_none(User.qqid == qqid)
                 if user is None or user.login_code != key:
                     # 登录码错误
-                    login_failure_reason = '无效的登录地址'
-                    login_failure_advice = '请检查登录地址是否完整'
+                    login_failure_reason = '无效的登录地址/验证码'
+                    login_failure_advice = '请检查登录地址是否完整/验证码是否正确'
                 else:
                     if user.login_code_expire_time < now:
                         # 登录码正确但超时
-                        login_failure_reason = '这个登录地址已过期'
+                        login_failure_reason = '这个登录地址/验证码已过期'
                     if not user.login_code_available:
                         # 登录码正确但已被使用
-                        login_failure_reason = '这个登录地址已被使用'
+                        login_failure_reason = '这个登录地址/验证码已被使用'
                     else:
                         # 登录码有效
                         new_key = _rand_string(32)
@@ -167,9 +179,10 @@ class Login:
                                 login_failure_reason = '登录已过期'
             # 无cookie & cookie错误
             return await render_template(
-                'login-failure.html',
+                'login.html',
                 reason=login_failure_reason,
                 advice=login_failure_advice,
+                prefix=prefix
             )
 
         @app.route(
