@@ -247,7 +247,7 @@ class Login:
                     # 普通登录
                     return await render_template(
                         'login.html',
-                        advice=f'请私聊机器人“{self._get_prefix()}登录”获取登录地址 '
+                        advice=f'请私聊机器人“{self._get_prefix()}登录”获取登录地址 ',
                         prefix=self._get_prefix()
                     )
 
@@ -281,7 +281,7 @@ class Login:
                 return await render_template(
                     'login.html',
                     reason=e.reason,
-                    advice=e.advice or f'请私聊机器人“{self._get_prefix()}登录”获取登录地址 '
+                    advice=e.advice or f'请私聊机器人“{self._get_prefix()}登录”获取登录地址 ',
                     prefix=prefix
                 )
 
