@@ -10,6 +10,7 @@
         #app {
             margin: auto;
         }
+
         .container {
             display: flex;
             justify-content: center;
@@ -25,33 +26,33 @@
     <div class="container">
         <h1>登录</h1>
 
-    {% if reason -%}
-    <el-alert
-            title="{{ reason }}"
-            type="error">
-    </el-alert>
-    {% endif -%}
-    {% if advice -%}
-    <el-alert
-            title="{{ advice }}"
-            type="info">
-    </el-alert>
-    {% endif -%}
+        {% if reason -%}
+        <el-alert
+                title="{{ reason }}"
+                type="error">
+        </el-alert>
+        {% endif -%}
+        {% if advice -%}
+        <el-alert
+                title="{{ advice }}"
+                type="info">
+        </el-alert>
+        {% endif -%}
 
-    <div style="margin: 20px;"></div>
+        <div style="margin: 20px;"></div>
 
-    <el-form ref="form" :model="form" :rules="rules" label-width="80px" >
-        <el-form-item label="QQ号" prop="qq">
-            <el-input v-model="form.qq" placeholder="请输入登录QQ号"></el-input>
-        </el-form-item>
-        <el-form-item label="验证码" prop="key">
-            <el-input v-model="form.key" placeholder="请输入获取的验证码"></el-input>
-            <p style="color: #aaa; margin: 0;">* 您可以通过私聊机器人"{{ prefix }}验证码"获取验证码</p>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="onSubmit">登录</el-button>
-        </el-form-item>
-    </el-form>
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+            <el-form-item label="QQ号" prop="qq">
+                <el-input v-model="form.qq" placeholder="请输入登录QQ号"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="pwd">
+                <el-input v-model="form.pwd" placeholder="请输入您的密码" type="password"></el-input>
+                <p style="color: #aaa; margin: 0;">* 您可以通过私聊机器人"{{ prefix }}密码 [您的密码]"设置密码</p>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">登录</el-button>
+            </el-form-item>
+        </el-form>
     </div>
 </div>
 
@@ -61,26 +62,49 @@
         data: {
             form: {
                 qq: "",
-                key: ""
+                pwd: ""
             },
             rules: {
                 qq: [
-                    {required: true, message: '请输入您的QQ', trigger: 'blur'}
+                    {required: true, message: '必须输入您的QQ号', trigger: 'blur'}
                 ],
-                key: [
-                    {required: true, message: '请输入您的验证码', trigger: 'blur'}
+                pwd: [
+                    {required: true, message: '必须输入您的密码', trigger: 'blur'}
                 ],
             }
         },
         methods: {
+            post: function (url, params) {
+                //创建form表单
+                const temp_form = document.createElement("form");
+                temp_form.action = url;
+                //如需打开新窗口，form的target属性要设置为'_blank'
+                temp_form.target = "_blank";
+                temp_form.method = "post";
+                temp_form.style.display = "none";
+                //添加参数
+                for (const key in params) {
+                    const opt = document.createElement("textarea");
+                    opt.name = key;
+                    opt.value = params[key];
+                    temp_form.appendChild(opt);
+                }
+                document.body.appendChild(temp_form);
+                //提交数据
+                temp_form.submit();
+            },
             onSubmit: function () {
                 this.$refs['form'].validate((valid) => {
-                  if (valid) {
-                    window.location.href = "{{ url_for('yobot_login') }}" + "?qqid=" + this.form.qq + "&key=" + this.form.key
-                  } else {
-                    console.log('请检查输入！');
-                    return false;
-                  }
+                    if (valid) {
+                        const url = "{{ url_for('yobot_login') }}";
+                        this.post(url, {
+                            qqid: this.form.qq,
+                            pwd: this.form.pwd
+                        });
+                    } else {
+                        console.log('请检查输入！');
+                        return false;
+                    }
                 });
             }
         }
