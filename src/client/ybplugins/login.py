@@ -57,10 +57,6 @@ class Login:
         cmd = cmd.split(' ')[0]
         if cmd in ['登录', '登陆']:
             return 1
-        elif cmd in ['验证', '验证码']:
-            return 2
-        elif cmd in ['设密码', '密码', '改密码', '设置密码', '修改密码', '重置密码', '找回密码']:
-            return 3
         return 0
 
     def execute(self, match_num: int, ctx: dict) -> dict:
@@ -70,9 +66,6 @@ class Login:
                 'block': True
             }
 
-        if match_num == 3:
-            return self._set_pwd(ctx)
-
         login_code = _rand_string(6)
 
         user = self._get_or_create_user_model(ctx)
@@ -81,23 +74,16 @@ class Login:
         user.login_code_expire_time = int(time.time())+60
         user.save()
 
-        if match_num == 1:
-            # 链接登录
-            newurl = urljoin(
-                self.setting['public_address'],
-                '{}login/?qqid={}&key={}'.format(
-                    self.setting['public_basepath'],
-                    user.qqid,
-                    login_code,
-                )
+        # 链接登录
+        newurl = urljoin(
+            self.setting['public_address'],
+            '{}login/?qqid={}&key={}'.format(
+                self.setting['public_basepath'],
+                user.qqid,
+                login_code,
             )
-            reply = '请在一分钟内点击链接登录：'+newurl
-
-        elif match_num == 2:
-            # 验证码登录
-            reply = f'您的验证码为【{login_code}】，请在一分钟内使用。'
-        else:
-            raise Exception(f"发现未设定的match状态：{match_num}")
+        )
+        reply = '请在一分钟内点击链接登录：'+newurl
 
         if self.setting['web_mode_hint']:
             reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
@@ -129,47 +115,14 @@ class Login:
     def _validate_pwd(pwd: str) -> Union[str, bool]:
         """
         验证用户密码是否合乎硬性条件
-        :return: 合法返回True，不合法返回原因
+        :return: 合法返回True，不合法抛出ValueError异常
         """
         if len(pwd) < 8:
-            return '密码至少需要8位'
+            raise ValueError('密码至少需要8位')
         char_regex = re.compile(r'^[0-9a-zA-Z!\-\\/@#$%^&*?_.()+=\[\]{}|;:<>`~]+$')
         if not char_regex.match(pwd):
-            return '密码不能含有中文或密码中含有特殊符号'
+            raise ValueError('密码不能含有中文或密码中含有特殊符号')
         return True
-
-    def _set_pwd(self, ctx: dict) -> dict:
-        """
-        检查并设置密码
-        :return: 返回回复格式的设置结果
-        """
-        cmd = ctx['raw_message']
-        cmds = cmd.split(" ")
-        if len(cmds) < 2:
-            return {
-                'reply': '请在命令后输入密码',
-                'block': True
-            }
-        if len(cmds) > 2:
-            return {
-                'reply': '密码中不能包含空格',
-                'block': True
-            }
-        pwd = cmds[1]
-        if self._validate_pwd(pwd) != True:  # 这里不能简写，因为可能会返回str
-            return {
-                'reply': self._validate_pwd(pwd),  # 我需要海象表达式！
-                'block': True
-            }
-        
-        user = self._get_or_create_user_model(ctx)
-        user.password = _add_salt_and_hash(pwd, user.salt)
-        user.save()
-
-        return {
-            'reply': '密码设置成功！',
-            'block': True
-        }
 
     def _get_prefix(self):
         return self.setting['preffix_string'] if self.setting['preffix_on'] else ''
@@ -182,12 +135,12 @@ class Login:
         if not user or not user.password or not user.salt:
             raise ExceptionWithAdvice(
                 'QQ号错误 或 您尚未设置密码',
-                f'请私聊机器人“{self._get_prefix()}密码 [您的密码]”设置'
+                f'请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
             )
         if not user.password == _add_salt_and_hash(pwd, user.salt):
             raise ExceptionWithAdvice(
                 '您的密码不正确',
-                f'如果忘记密码，请私聊机器人“{self._get_prefix()}密码 [您的密码]”修改'
+                f'如果忘记密码，请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
             )
         return True
 
@@ -400,3 +353,32 @@ class Login:
             user_data.nickname = new_nickname
             user_data.save()
             return jsonify(code=0, message='success')
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'user/reset/password'),
+            methods=['GET', 'POST'])
+        async def yobot_reset_pwd():
+            try:
+                if 'yobot_user' not in session:
+                    return redirect(url_for('yobot_login', callback=request.path))
+                if request.method == "GET":
+                    return await render_template('password.html')
+
+                qq = session['yobot_user']
+                user = User.get_or_none(User.qqid == qq)
+                if not user:
+                    raise Exception("请先加公会")
+                form = await request.form
+                pwd = form["pwd"]
+                self._validate_pwd(pwd)
+                user.password = _add_salt_and_hash(pwd, user.salt)
+                user.save()
+                return await render_template(
+                    'password.html',
+                    success="密码设置成功",
+                )
+            except Exception as e:
+                return await render_template(
+                    'password.html',
+                    error=str(e)
+                )
