@@ -1,15 +1,21 @@
 import random
 import string
 import time
+import re
 from hashlib import sha256
 from urllib.parse import urljoin
 
 from aiocqhttp.api import Api
 from quart import (Quart, jsonify, make_response, redirect, request, session,
-                   url_for)
+                   url_for, Response)
+from typing import Union, Coroutine
 
 from .templating import render_template
 from .ybdata import User
+
+
+EXPIRED_TIME = 7 * 24 * 60 * 60  # 7 days
+LOGIN_AUTH_COOKIE_NAME = 'yobot_login'
 
 
 def _rand_string(n=8):
@@ -20,6 +26,18 @@ def _rand_string(n=8):
             string.digits)
         for _ in range(n)
     )
+
+
+class ExceptionWithAdvice(Exception):
+
+    def __init__(self, reason: str, advice=''):
+        super(ExceptionWithAdvice, self).__init__(reason)
+        self.reason = reason
+        self.advice = advice
+
+
+def _add_salt_and_hash(raw: str, salt: str):
+    return sha256((raw + salt).encode()).hexdigest()
 
 
 class Login:
@@ -36,10 +54,9 @@ class Login:
 
     @staticmethod
     def match(cmd: str):
+        cmd = cmd.split(' ')[0]
         if cmd in ['登录', '登陆']:
             return 1
-        elif cmd in ['验证', '验证码']:
-            return 2
         return 0
 
     def execute(self, match_num: int, ctx: dict) -> dict:
@@ -50,6 +67,33 @@ class Login:
             }
 
         login_code = _rand_string(6)
+
+        user = self._get_or_create_user_model(ctx)
+        user.login_code = login_code
+        user.login_code_available = True
+        user.login_code_expire_time = int(time.time())+60
+        user.save()
+
+        # 链接登录
+        newurl = urljoin(
+            self.setting['public_address'],
+            '{}login/?qqid={}&key={}'.format(
+                self.setting['public_basepath'],
+                user.qqid,
+                login_code,
+            )
+        )
+        reply = '请在一分钟内点击链接登录：'+newurl
+
+        if self.setting['web_mode_hint']:
+            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
+
+        return {
+            'reply': reply,
+            'block': True
+        }
+
+    def _get_or_create_user_model(self, ctx: dict) -> User:
         if not self.setting['super-admin']:
             authority_group = 1
             self.setting['super-admin'].append(ctx['user_id'])
@@ -59,44 +103,124 @@ class Login:
             authority_group = 100
 
         # 取出数据
-        user = User.get_or_create(
+        return User.get_or_create(
             qqid = ctx['user_id'],
             defaults={
                 'nickname': ctx['sender']['nickname'],
                 'authority_group': authority_group,
             }
         )[0]
-        user.login_code = login_code
-        user.login_code_available = True
-        user.login_code_expire_time = int(time.time())+60
-        user.save()
 
-        if match_num == 1:
-            # 链接登录
-            newurl = urljoin(
-                self.setting['public_address'],
-                '{}login/?qqid={}&key={}'.format(
-                    self.setting['public_basepath'],
-                    user.qqid,
-                    login_code,
-                )
+    @staticmethod
+    def _validate_pwd(pwd: str) -> Union[str, bool]:
+        """
+        验证用户密码是否合乎硬性条件
+        :return: 合法返回True，不合法抛出ValueError异常
+        """
+        if len(pwd) < 8:
+            raise ValueError('密码至少需要8位')
+        char_regex = re.compile(r'^[0-9a-zA-Z!\-\\/@#$%^&*?_.()+=\[\]{}|;:<>`~]+$')
+        if not char_regex.match(pwd):
+            raise ValueError('密码不能含有中文或密码中含有特殊符号')
+        return True
+
+    def _get_prefix(self):
+        return self.setting['preffix_string'] if self.setting['preffix_on'] else ''
+
+    def _check_pwd(self, user: User, pwd: str) -> bool:
+        """
+        检查是否设置密码且密码是否正确，
+        :return: 成功返回True，失败抛出异常。
+        """
+        if not user or not user.password or not user.salt:
+            raise ExceptionWithAdvice(
+                'QQ号错误 或 您尚未设置密码',
+                f'请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
             )
-            reply = '请在一分钟内点击链接登录：'+newurl
+        if not user.password == _add_salt_and_hash(pwd, user.salt):
+            raise ExceptionWithAdvice(
+                '您的密码不正确',
+                f'如果忘记密码，请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
+            )
+        return True
 
-        elif match_num == 2:
-            # 验证码登录
-            reply = f'您的验证码为【{login_code}】，请在一分钟内使用。'
-        else:
-            raise Exception(f"发现未设定的match状态：{match_num}")
+    def _check_key(self, user: User, key: str) -> Union[bool, str]:
+        """
+        检查登录码是否正确且在有效期内
+        :return: 成功返回True，失败抛出异常
+        """
+        now = int(time.time())
+        if user is None or user.login_code != key:
+            # 登录码错误
+            raise ExceptionWithAdvice(
+                '无效的登录地址',
+                f'请检查登录地址是否完整且为最新。'
+            )
+        if user.login_code_expire_time < now:
+            # 登录码正确但超时
+            raise ExceptionWithAdvice(
+                '这个登录地址已过期',
+                f'私聊机器人“{self._get_prefix()}登录”获取新登录地址'
+            )
+        if not user.login_code_available:
+            # 登录码正确但已被使用
+            raise ExceptionWithAdvice(
+                '这个登录地址已被使用',
+                f'私聊机器人“{self._get_prefix()}登录”获取新登录地址'
+            )
+        return True
 
-        if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
+    def _recall_from_cookie(self) -> User:
+        """
+        检测cookie中的登录状态是否正确，如果cookie有误 会抛出异常
+        :return User: 返回找回的user对象
+        """
+        auth_cookie = request.cookies.get(LOGIN_AUTH_COOKIE_NAME)
+        advice = f'请私聊机器人"{self._get_prefix()}登录"或重新登录'
+        if not auth_cookie:
+            raise ExceptionWithAdvice('登录已过期', advice)
+        s = auth_cookie.split(':')
+        if len(s) != 2:
+            raise ExceptionWithAdvice('Cookie异常', advice)
+        qqid, auth = s
 
+        user = User.get_or_none(User.qqid == qqid)
+        advice = f'请先加入一个公会 或 私聊机器人"{self._get_prefix()}登录"'
+        if user is None:
+            # 有有效Cookie但是数据库没有，怕不是删库跑路了
+            raise ExceptionWithAdvice('用户不存在', advice)
+        if user.auth_cookie != _add_salt_and_hash(auth, user.salt):
+            raise ExceptionWithAdvice('Cookie异常', advice)
+        now = int(time.time())
+        if user.auth_cookie_expire_time < now:
+            raise ExceptionWithAdvice('登录已过期', advice)
+        return user
 
-        return {
-            'reply': reply,
-            'block': True
-        }
+    @staticmethod
+    def _set_auth_info(user: User, res: Response = None, save_user=True):
+        """
+        为某用户设置session中的授权信息
+        并自动修改中的上次登录的信息
+        :param user: 用户模型
+        :param save_user: 是否自动执行user.save()
+        :param res: 如果需要自动更新cookie，请传入返回的response
+        """
+        now = int(time.time())
+        session['yobot_user'] = user.qqid
+        session['csrf_token'] = _rand_string(16)
+        session['last_login_time'] = user.last_login_time
+        session['last_login_ipaddr'] = user.last_login_ipaddr
+        user.last_login_time = now
+        user.last_login_ipaddr = request.headers.get(
+            'X-Real-IP', request.remote_addr)
+        if res:
+            new_key = _rand_string(32)
+            user.auth_cookie = _add_salt_and_hash(new_key, user.salt)
+            user.auth_cookie_expire_time = now + EXPIRED_TIME
+            new_cookie = f'{user.qqid}:{new_key}'
+            res.set_cookie(LOGIN_AUTH_COOKIE_NAME, new_cookie, max_age=EXPIRED_TIME)
+        if save_user:
+            user.save()
 
     def register_routes(self, app: Quart):
 
@@ -104,86 +228,71 @@ class Login:
             urljoin(self.setting['public_basepath'], 'login/'),
             methods=['GET', 'POST'])
         async def yobot_login():
-            qqid = request.args.get('qqid')
-            key = request.args.get('key')
-            callback_page = request.args.get('callback', url_for('yobot_user'))
-            now = int(time.time())
-            login_failure_reason = ''
             prefix = self.setting['preffix_string'] if self.setting['preffix_on'] else ''
-            login_failure_advice = f'请私聊机器人“{prefix}登录”获取登录地址，或私聊“{prefix}验证码”获取验证码'
-            if qqid is not None and key is not None:
+            if request.method == "POST":
+                form = await request.form
+
+            def get_params(k: str) -> str:
+                return request.args.get(k) \
+                    if request.method == "GET" \
+                    else (form and k in form and form[k])
+
+            try:
+                qqid = get_params('qqid')
+                key = get_params('key')
+                pwd = get_params('pwd')
+                callback_page = get_params('callback')
+
+                if not qqid and not callback_page:
+                    # 普通登录
+                    return await render_template(
+                        'login.html',
+                        advice=f'请私聊机器人“{self._get_prefix()}登录”获取登录地址 '
+                        prefix=self._get_prefix()
+                    )
+
+                if callback_page and not qqid:
+                    # 可能用于用cookie寻回session
+
+                    if 'yobot_user' in session:
+                        # 会话未过期
+                        return redirect(callback_page)
+
+                    user = self._recall_from_cookie()
+                    self._set_auth_info(user)
+                    return redirect(callback_page)
+
+                if not key and not pwd:
+                    raise ExceptionWithAdvice("无效的登录地址", "请检查登录地址是否完整")
+
                 user = User.get_or_none(User.qqid == qqid)
-                if user is None or user.login_code != key:
-                    # 登录码错误
-                    login_failure_reason = '无效的登录地址/验证码'
-                    login_failure_advice = '请检查登录地址是否完整/验证码是否正确'
-                else:
-                    if user.login_code_expire_time < now:
-                        # 登录码正确但超时
-                        login_failure_reason = '这个登录地址/验证码已过期'
-                    if not user.login_code_available:
-                        # 登录码正确但已被使用
-                        login_failure_reason = '这个登录地址/验证码已被使用'
-                    else:
-                        # 登录码有效
-                        new_key = _rand_string(32)
-                        session['yobot_user'] = qqid
-                        session['csrf_token'] = _rand_string(16)
-                        session['last_login_time'] = user.last_login_time
-                        session['last_login_ipaddr'] = user.last_login_ipaddr
-                        user.login_code_available = False
-                        user.last_login_time = now
-                        user.last_login_ipaddr = request.headers.get(
-                            'X-Real-IP', request.remote_addr)
-                        user.auth_cookie = sha256(
-                            (new_key+user.salt).encode()).hexdigest()
-                        user.auth_cookie_expire_time = now+604800  # 7 days
-                        user.save()
+                if key:
+                    self._check_key(user, key)
+                if pwd:
+                    self._check_pwd(user, pwd)
 
-                        new_cookie = f'{qqid}:{new_key}'
-                        res = await make_response(redirect(callback_page))
-                        res.set_cookie(
-                            'yobot_login', new_cookie, max_age=604800)
-                        return res
-            # 未提供登录码 & 登录码错误
-            if 'yobot_user' in session:
-                # 会话未过期
-                return redirect(callback_page)
-            # 会话已过期
-            auth_cookie = request.cookies.get('yobot_login')
-            if auth_cookie is not None:
-                # 有cookie
-                s = auth_cookie.split(':')
-                if len(s) == 2:
-                    qqid, auth = s
-                    user = User.get_or_none(User.qqid == qqid)
-                    if user is None:
-                        login_failure_reason = '用户不存在'
-                        login_failure_advice = '请先加入一个公会'
-                    else:
-                        auth = sha256((auth+user.salt).encode()).hexdigest()
-                        if user.auth_cookie == auth:
-                            if user.auth_cookie_expire_time > now:
-                                # cookie有效
-                                session['yobot_user'] = qqid
-                                session['csrf_token'] = _rand_string(16)
-                                session['last_login_time'] = user.last_login_time
-                                session['last_login_ipaddr'] = user.last_login_ipaddr
-                                user.last_login_time = now
-                                user.last_login_ipaddr = request.remote_addr
-                                user.save()
+                res = await make_response(redirect(callback_page or url_for('yobot_user')))
+                self._set_auth_info(user, res, save_user=False)
+                user.login_code_available = False
+                user.save()
+                return res
 
-                                return redirect(callback_page)
-                            else:
-                                # cookie正确但过期
-                                login_failure_reason = '登录已过期'
-            # 无cookie & cookie错误
-            return await render_template(
-                'login.html',
-                reason=login_failure_reason,
-                advice=login_failure_advice,
-                prefix=prefix
-            )
+            except ExceptionWithAdvice as e:
+                return await render_template(
+                    'login.html',
+                    reason=e.reason,
+                    advice=e.advice or f'请私聊机器人“{self._get_prefix()}登录”获取登录地址 '
+                    prefix=prefix
+                )
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'logout/'),
+            methods=['GET', 'POST'])
+        async def yobot_logout():
+            session.clear()
+            res = await make_response(redirect(url_for('yobot_login')))
+            res.delete_cookie(LOGIN_AUTH_COOKIE_NAME)
+            return res
 
         @app.route(
             urljoin(self.setting['public_basepath'], 'user/'),
@@ -242,3 +351,32 @@ class Login:
             user_data.nickname = new_nickname
             user_data.save()
             return jsonify(code=0, message='success')
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'user/reset/password'),
+            methods=['GET', 'POST'])
+        async def yobot_reset_pwd():
+            try:
+                if 'yobot_user' not in session:
+                    return redirect(url_for('yobot_login', callback=request.path))
+                if request.method == "GET":
+                    return await render_template('password.html')
+
+                qq = session['yobot_user']
+                user = User.get_or_none(User.qqid == qq)
+                if not user:
+                    raise Exception("请先加公会")
+                form = await request.form
+                pwd = form["pwd"]
+                self._validate_pwd(pwd)
+                user.password = _add_salt_and_hash(pwd, user.salt)
+                user.save()
+                return await render_template(
+                    'password.html',
+                    success="密码设置成功",
+                )
+            except Exception as e:
+                return await render_template(
+                    'password.html',
+                    error=str(e)
+                )
