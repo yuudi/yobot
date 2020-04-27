@@ -5,6 +5,7 @@
     <title>yobot登录</title>
     <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
     <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
+    <script src="{{ url_for('yobot_static', filename='password.js') }}"></script>
     <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
     <style>
         #app {
@@ -106,7 +107,7 @@
                         const url = "{{ url_for('yobot_login') }}";
                         this.post(url, {
                             qqid: this.form.qq,
-                            pwd: this.form.pwd
+                            pwd: getHashWithSalt(this.form.pwd)
                         });
                     } else {
                         console.log('请检查输入！');

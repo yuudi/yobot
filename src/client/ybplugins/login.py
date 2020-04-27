@@ -232,7 +232,7 @@ class Login:
             if request.method == "POST":
                 form = await request.form
 
-            def get_params(k: str):
+            def get_params(k: str) -> str:
                 return request.args.get(k) \
                     if request.method == "GET" \
                     else (form and k in form and form[k])
