@@ -133,7 +133,7 @@ class Login:
         """
         if len(pwd) < 8:
             return '密码至少需要8位'
-        char_regex = re.compile(r'[0-9a-zA-Z!\-\\/@#$%^&*?_.()+=\[\]{}|;:<>`~]+')
+        char_regex = re.compile(r'^[0-9a-zA-Z!\-\\/@#$%^&*?_.()+=\[\]{}|;:<>`~]+$')
         if not char_regex.match(pwd):
             return '密码不能含有中文或密码中含有特殊符号'
         return True
