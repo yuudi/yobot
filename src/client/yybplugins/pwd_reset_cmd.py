@@ -1,3 +1,8 @@
+"""
+重置密码命令插件 V 0.1.0
+V3.4.3以上使用
+"""
+
 from aiocqhttp.api import Api
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from quart import Quart
