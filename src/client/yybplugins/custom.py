@@ -18,8 +18,16 @@ from aiocqhttp.api import Api
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from quart import Quart
 
+from ybplugins.login import _rand_string, _add_salt_and_hash, Login
+
+FRONT_END_SALT = "14b492a3-a40a-42fc-a236-e9a9307b47d2"
+
 
 class Custom:
+    Passive = True
+    Active = False
+    Request = True
+
     def __init__(self,
                  glo_setting: Dict[str, Any],
                  scheduler: AsyncIOScheduler,
@@ -40,10 +48,11 @@ class Custom:
         # 此时没有running_loop，不要直接使用await或asyncio.creat_task
 
         # 如果需要使用，请注释掉下面一行
-        return
+        # return
 
         self.setting = glo_setting
         self.api = bot_api
+        self.login = Login(glo_setting, bot_api, *args, **kwargs)
 
         # # 注册定时任务，详见apscheduler文档
         # @scheduler.scheduled_job('cron', hour=8)
@@ -55,25 +64,28 @@ class Custom:
         # async def check_bot():
         #     return 'yes, bot is running'
 
-    async def execute_async(self, ctx: Dict[str, Any]) -> Union[None, bool, str]:
-        '''
-        每次bot接收有效消息时触发
+    @staticmethod
+    def match(cmd: str):
+        cmd = cmd.split(' ')[0]
+        if cmd in ['重置密码', '忘记密码']:
+            return 1
+        return 0
 
-        参数ctx 具体格式见：https://cqhttp.cc/docs/#/Post
-        '''
+    def execute(self, ctx: dict):
+        if not self.match(ctx["raw_message"]):
+            return
 
-        # 如果需要使用，请注释掉下面一行
-        return
+        if ctx['message_type'] != 'private':
+            return '请私聊使用'
 
-        cmd = ctx['raw_message']
-        if cmd == '你好':
+        raw_pwd = _rand_string(8)
 
-            # 调用api发送消息
-            await self.api.send_private_msg(
-                user_id=123456, message='收到问好')
+        user = self.login._get_or_create_user_model(ctx)
+        pwd = _add_salt_and_hash(raw_pwd, FRONT_END_SALT)
+        pwd = _add_salt_and_hash(pwd, user.salt)
+        user.password = pwd
+        user.save()
 
-            # 返回字符串：发送消息并阻止后续插件
-            return '世界'
+        reply = '您的密码已重置为：' + raw_pwd
 
-        # 返回布尔值：是否阻止后续插件
-        return False
+        return reply
