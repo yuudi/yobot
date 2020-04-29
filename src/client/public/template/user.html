@@ -26,9 +26,6 @@
             <a href="{{ url_for('yobot_groups_managing') }}">
                 <el-button type="primary">群管理</el-button>
             </a>
-            <a href="{{ url_for('yobot_reset_pwd') }}">
-                <el-button type="primary">修改密码</el-button>
-            </a>
         </el-row>
         <br />
         {%- endif %}
@@ -46,6 +43,9 @@
                 <el-button type="primary">我的公会</el-button>
             </a>
             {%- endif %}
+            <a href="{{ url_for('yobot_reset_pwd') }}">
+                <el-button type="primary">修改密码</el-button>
+            </a>
             <a href="{{ url_for('yobot_logout') }}">
                 <el-button type="primary">登出</el-button>
             </a>
