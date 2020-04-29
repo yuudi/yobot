@@ -4,7 +4,7 @@
 
 由于wine与原生Windows差别较大，很多酷Q插件无法在wine中运行。
 
-Linux推荐使用Docker部署，巨气请看[这里](./docker.md)
+Linux推荐使用Docker部署，具体请看[这里](./docker.md)
 
 ~~Linux 用户建议使用mirai部署~~。mirai现在还不够稳定，再等一两个月吧。
 
