@@ -31,3 +31,7 @@ yobot 从编写开始，nonebot 框架已经变化了很多，现在不再推荐
 作为nonebot插件运行时，配置项中的`host`、`port`、`access_token`不会生效，这些配置会沿用nonebot中的设置
 
 为了开启web模式，请配置nonebot的`host`字段为`0.0.0.0`，yobot的`yobot_data/yobot_config.json`中`public_address`内的端口号与nonebot配置中的`port`对应（如果你使用了反向代理，则`public_address`为代理后的地址）
+
+## 常见问题
+
+见[FAQ](../usage/faq.md)

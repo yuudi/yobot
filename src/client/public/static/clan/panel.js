@@ -1,3 +1,6 @@
+if (!Object.defineProperty) {
+    alert('浏览器版本过低');
+}
 var vm = new Vue({
     el: '#app',
     data: {
@@ -6,17 +9,21 @@ var vm = new Vue({
         bossData: { cycle: 0, full_health: 0, health: 0, num: 0 },
         is_admin: false,
         self_id: 0,
+        today_sl: false,
         members: [],
         damage: 0,
         defeat: null,
         behalf: null,
         boss_num: null,
         recordFormVisible: false,
+        recordDefeatVisible: false,
         recordBehalfVisible: false,
+        lockBossVisible: false,
         subscribe: null,
         message: '',
         subscribeFormVisible: false,
         subscribeCancelVisible: false,
+        suspendVisible: false,
         statusFormVisible: false,
         leavePage: false,
     },
@@ -29,8 +36,9 @@ var vm = new Vue({
             if (res.data.code == 0) {
                 thisvue.groupData = res.data.groupData;
                 thisvue.bossData = res.data.bossData;
-                thisvue.is_admin = res.data.is_admin;
-                thisvue.self_id = res.data.self_id;
+                thisvue.is_admin = res.data.selfData.is_admin;
+                thisvue.self_id = res.data.selfData.user_id;
+                thisvue.today_sl = res.data.selfData.today_sl;
                 document.title = res.data.groupData.group_name + ' - 公会战';
             } else {
                 thisvue.$alert(res.data.message, '加载数据错误');
@@ -152,6 +160,7 @@ var vm = new Vue({
                 defeat: false,
                 damage: this.damage,
                 behalf: null,
+                message:this.message,
             });
             this.recordFormVisible = false;
         },
@@ -160,7 +169,9 @@ var vm = new Vue({
                 action: 'addrecord',
                 defeat: true,
                 behalf: null,
+                message:this.message,
             });
+            this.recordDefeatVisible = false;
         },
         recorddamage: function (event) {
             this.callapi({
@@ -168,6 +179,7 @@ var vm = new Vue({
                 defeat: this.defeat,
                 behalf: this.behalf,
                 damage: this.damage,
+                message:this.message,
             });
             this.recordBehalfVisible = false;
         },
@@ -176,10 +188,13 @@ var vm = new Vue({
                 action: 'undo',
             });
         },
-        challengeapply: function (event) {
+        challengeapply: function (appli_type) {
             this.callapi({
                 action: 'apply',
+                extra_msg:this.message,
+                appli_type:appli_type,
             });
+            this.lockBossVisible=false;
         },
         cancelapply: function (event) {
             this.callapi({
@@ -190,7 +205,11 @@ var vm = new Vue({
             this.callapi({
                 action: 'addsubscribe',
                 boss_num: 0,
+                comment: {
+                    message: this.message,
+                },
             });
+            this.suspendVisible=false;
         },
         cancelsuspend: function (event) {
             this.callapi({
@@ -199,8 +218,10 @@ var vm = new Vue({
             });
         },
         save_slot: function (event) {
+            this.today_sl = !this.today_sl;
             this.callapi({
                 action: 'save_slot',
+                today: this.today_sl,
             });
         },
         addsubscribe: function (event) {

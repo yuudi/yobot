@@ -8,17 +8,21 @@
 
 插件版：在 `<插件目录>/yobot/src/client/yobot_data/yobot_config.json`
 
+## 配置格式
+
+目前只支持 json 格式
+
 ## 配置项
 
-`host` 服务绑定的地址，默认值`0.0.0.0`（插件版沿用主配置）
+`host` 服务绑定的地址，默认值 `0.0.0.0`（插件版沿用主配置）
 
 `port` 服务绑定的地址，默认值 `9222`（插件版沿用主配置）
 
 `public_priority` 已移除
 
-`public_address` web 模式可以被访问的地址（如 nginx 代理后的地址），如`https://192.168.3.13:9222/yobot/`，默认自动检测
+`public_address` web 模式可以被访问的地址（如 nginx 代理后的地址），如`https://robot.yobot.xyz:9222/`，默认自动检测
 
-`public_basepath` web 模式使用的目录，如 `/`，默认值 `/yobot/`（修改此项时请同时修改 `public_address` 中的路径，如果使用了反向代理则视情况而定）
+`public_basepath` web 模式使用的目录，如 `/`，默认值 `/yobot/`（如果使用了反向代理则视情况而定）
 
 `show_icp` 是否在主页显示 icp 备案信息，默认值`false`（如果需要展示备案信息，需要将 `port` 设置为 `80`、`public_basepath` 设置为 `/`，如果使用了反向代理则视情况而定）
 

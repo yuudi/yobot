@@ -27,8 +27,10 @@
 
 ## 国内挂机宝
 
-价格便宜质量差故障多，不建议使用  
+价格便宜质量差故障多，地域选择广泛  
 用搜索引擎就能找到，大约每月5~10元，**由于没有公网IP，开启网页模式需要端口映射**
+
+建议百度搜索【你的城市】+挂机宝，使用同城的服务器，可以避免账号异地登录。
 
 ## 其他小品牌
 
@@ -36,3 +38,9 @@
 （搜索关键词：VPS、挂机宝）
 
 尽量不要相信那些带推广返利的推荐，他们的推荐只在乎佣金不管质量
+
+## 域名购买
+
+国内域名商：[腾讯dnspod](https://dnspod.cloud.tencent.com/)、[阿里万网](https://wanwang.aliyun.com/domain/)  
+国外域名商：[namesilo](https://namesilo.com/)、[porkbun](https://porkbun.com/)  
+免费域名：[freenom](https://www.freenom.com)（条款严格）

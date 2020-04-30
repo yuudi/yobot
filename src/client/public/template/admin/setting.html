@@ -221,7 +221,7 @@
                     <el-select v-model="setting.calender_region" placeholder="日程表区域">
                         <el-option label="日服日程表" value="jp"></el-option>
                         <el-option label="台服日程表" value="tw"></el-option>
-                        <el-option label="国服日程表" value="cn"></el-option>
+                        <el-option label="国服日程表" value="cn" disabled></el-option>
                     </el-select>
                 </el-col>
                 <el-col :span="4">
@@ -258,7 +258,7 @@
             </el-collapse>
         </p>
         <p>
-            <a href="{{ url_for('yobot_pool_setting') }}">卡池设置</a>
+            <a href="{{ url_for('yobot_pool_setting') }}">前往卡池设置</a>
         </p>
         <p>
             <el-button type="success" @click="update">确定</el-button>

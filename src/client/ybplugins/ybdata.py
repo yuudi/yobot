@@ -2,8 +2,10 @@ import random
 import string
 
 from peewee import *
+from playhouse.migrate import SqliteMigrator, migrate
 
 _db = SqliteDatabase(None)
+_version = 2
 
 
 def _rand_string(n=16):
@@ -36,9 +38,8 @@ class User(_BaseModel):
     # 1:主人 2:机器人管理员 10:公会战管理员 100:成员
     authority_group = IntegerField(default=100)
 
-    privacy = IntegerField(default=3)   # 2:本公会成员 3:所有人
+    privacy = IntegerField(default=3)   # 密码输入错误次数
     clan_group_id = BigIntegerField(null=True)
-    last_save_slot = IntegerField(null=True)
     last_login_time = BigIntegerField(default=0)
     last_login_ipaddr = IPField(default='0.0.0.0')
     password = FixedCharField(max_length=64, null=True)
@@ -46,14 +47,25 @@ class User(_BaseModel):
     login_code_available = BooleanField(default=False)
     login_code_expire_time = BigIntegerField(default=0)
     salt = CharField(max_length=16, default=_rand_string)
-    auth_cookie = FixedCharField(max_length=64, null=True)
+    auth_cookie = FixedCharField(max_length=64)
     auth_cookie_expire_time = BigIntegerField(default=0)
+
+
+class User_login(_BaseModel):
+    qqid = BigIntegerField()
+    auth_cookie = FixedCharField(max_length=64)
+    auth_cookie_expire_time = BigIntegerField(default=0)
+    last_login_time = BigIntegerField(default=0)
+    last_login_ipaddr = IPField(default='0.0.0.0')
+
+    class Meta:
+        primary_key = CompositeKey('qqid', 'auth_cookie')
 
 
 class Clan_group(_BaseModel):
     group_id = BigIntegerField(primary_key=True)
     group_name = TextField(null=True)
-    privacy = IntegerField(default=2)  # 2:本公会成员 3:所有人
+    privacy = IntegerField(default=2)
     game_server = CharField(max_length=2, default='cn')
     notification = IntegerField(default=0xffff)  # 需要接收的通知
     level_4 = BooleanField(default=False)  # 公会战是否存在4阶段
@@ -61,6 +73,7 @@ class Clan_group(_BaseModel):
     boss_num = SmallIntegerField(default=1)
     boss_health = BigIntegerField(default=6000000)
     challenging_member_qq_id = IntegerField(null=True)
+    boss_lock_type = IntegerField(default=0)  # 1出刀中，2其他
     challenging_start_time = BigIntegerField(default=0)
     challenging_comment = TextField(null=True)
 
@@ -70,6 +83,7 @@ class Clan_member(_BaseModel):
     qqid = BigIntegerField()
     role = IntegerField(default=100)
     last_save_slot = IntegerField(null=True)
+    remaining_status = TextField(null=True)
 
     class Meta:
         primary_key = CompositeKey('group_id', 'qqid')
@@ -86,6 +100,7 @@ class Clan_challenge(_BaseModel):
     boss_health_ramain = BigIntegerField()
     challenge_damage = BigIntegerField()
     is_continue = BooleanField()  # 此刀是结余刀
+    message = TextField(null=True)
     comment = TextField(null=True)
 
 
@@ -127,6 +142,11 @@ class User_box(_BaseModel):
         primary_key = CompositeKey('qqid', 'chid')
 
 
+class DB_schema(_BaseModel):
+    key = CharField(max_length=64, primary_key=True)
+    value = TextField()
+
+
 def init(sqlite_filename):
     _db.init(
         database=sqlite_filename,
@@ -136,19 +156,41 @@ def init(sqlite_filename):
         },
     )
 
-    if not Admin_key.table_exists():
-        Admin_key.create_table()
+    old_version = 1
+    if not DB_schema.table_exists():
+        DB_schema.create_table()
+        DB_schema.create(key='version', value=str(_version))
+    else:
+        old_version = int(DB_schema.get(key='version').value)
+
     if not User.table_exists():
+        Admin_key.create_table()
         User.create_table()
-    if not Clan_group.table_exists():
+        User_login.create_table()
         Clan_group.create_table()
-    if not Clan_member.table_exists():
         Clan_member.create_table()
-    if not Clan_challenge.table_exists():
         Clan_challenge.create_table()
-    if not Clan_subscribe.table_exists():
         Clan_subscribe.create_table()
-    if not Character.table_exists():
         Character.create_table()
-    if not User_box.table_exists():
         User_box.create_table()
+        old_version = _version
+    if old_version < _version:
+        db_upgrade(old_version)
+
+
+def db_upgrade(old_version):
+    migrator = SqliteMigrator(_db)
+    if old_version < 2:
+        User_login.create_table()
+        migrate(
+            migrator.add_column('clan_member', 'last_message',
+                                TextField(null=True)),
+            migrator.add_column('clan_member', 'remaining_status',
+                                TextField(null=True)),
+            migrator.add_column('clan_challenge', 'message',
+                                TextField(null=True)),
+            migrator.add_column('clan_group', 'boss_lock_type',
+                                IntegerField(default=0)),
+            migrator.drop_column('user', 'last_save_slot'),
+        )
+    DB_schema.replace(key='version', value=str(_version)).execute()

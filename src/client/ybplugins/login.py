@@ -11,13 +11,14 @@ from quart import (Quart, jsonify, make_response, redirect, request, session,
 from .templating import render_template
 from .ybdata import User
 
+_rand_string_chaset = (string.ascii_uppercase +
+                       string.ascii_lowercase +
+                       string.digits)
+
 
 def _rand_string(n=8):
     return ''.join(
-        random.choice(
-            string.ascii_uppercase +
-            string.ascii_lowercase +
-            string.digits)
+        random.choice(_rand_string_chaset)
         for _ in range(n)
     )
 
@@ -58,7 +59,7 @@ class Login:
 
         # 取出数据
         user = User.get_or_create(
-            qqid = ctx['user_id'],
+            qqid=ctx['user_id'],
             defaults={
                 'nickname': ctx['sender']['nickname'],
                 'authority_group': authority_group,
@@ -77,7 +78,7 @@ class Login:
                 login_code,
             )
         )
-        reply = '请在一分钟内点击链接登录：'+newurl
+        reply = newurl+'#\n请在一分钟内点击链接登录，登录成功后将保持登录7天'
         if self.setting['web_mode_hint']:
             reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
         return {
@@ -115,7 +116,7 @@ class Login:
                     else:
                         # 登录码有效
                         new_key = _rand_string(32)
-                        session['yobot_user'] = qqid
+                        session['yobot_user'] = int(qqid)
                         session['csrf_token'] = _rand_string(16)
                         session['last_login_time'] = user.last_login_time
                         session['last_login_ipaddr'] = user.last_login_ipaddr
@@ -153,12 +154,13 @@ class Login:
                         if user.auth_cookie == auth:
                             if user.auth_cookie_expire_time > now:
                                 # cookie有效
-                                session['yobot_user'] = qqid
+                                session['yobot_user'] = int(qqid)
                                 session['csrf_token'] = _rand_string(16)
                                 session['last_login_time'] = user.last_login_time
                                 session['last_login_ipaddr'] = user.last_login_ipaddr
                                 user.last_login_time = now
-                                user.last_login_ipaddr = request.remote_addr
+                                user.last_login_ipaddr = request.headers.get(
+                                    'X-Real-IP', request.remote_addr)
                                 user.save()
 
                                 return redirect(callback_page)

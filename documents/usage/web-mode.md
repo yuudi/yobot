@@ -8,12 +8,12 @@
 
 如果坚持在本地计算机运行，也可以使用内网穿透（不建议新手使用）
 
-### 方法 1：直接连接
+### 方法 1：直接连接（最简单）
 
-在 yobot 配置文件中，将`host`字段设置为`0.0.0.0`（即默认值）
+在 yobot [配置文件](./configuration.md)中，将`host`字段恢复为`0.0.0.0`（即默认值，如果没有手动修改过就不用管）
 
 在服务器的防火墙面板里，打开 9222 端口（如端口更换则为更换后的端口）  
-（[阿里云开启方法](https://yq.aliyun.com/articles/701181) [腾讯云开启方法](https://cloud.tencent.com/document/product/213/39740)）
+（[阿里云开启方法](https://help.aliyun.com/document_detail/25471.html) [腾讯云开启方法](https://cloud.tencent.com/document/product/213/39740)）
 
 如果服务器没有公网地址，可以使用端口映射
 
@@ -24,7 +24,7 @@
 
 :::
 
-### 方法 2：使用 Nginx 代理（推荐）
+### 方法 2：使用 Nginx 代理（功能最强）
 
 如果需要为网页添加日志记录、HTTPS支持、安全限制等，或者需要同时部署其他站点，可以使用 Nginx、Apache 之类的服务器软件
 

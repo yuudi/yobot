@@ -31,7 +31,7 @@
         {%- endif %}
         <el-row>
             <a href="{{ url_for('yobot_user_info', qqid=user.qqid) }}">
-                <el-button type="primary">我的主页</el-button>
+                <el-button type="primary">个人中心</el-button>
             </a>
             {% if user.clan_group_id is none -%}
             <el-tooltip effect="dark" placement="bottom">
@@ -48,6 +48,9 @@
     <p><a href="{{ url_for('yobot_about') }}">关于</a></p>
 </body>
 <script>
+    if (!Object.defineProperty) {
+        alert('浏览器版本过低');
+    }
     new Vue({
         el: '#app',
         data: {
@@ -55,7 +58,7 @@
         },
         mounted() {
             var thisvue = this;
-            axios.get('{{ url_for("yobot_api_iplocation", ip=session["last_login_ipaddr"]) }}').then(function (res) {                
+            axios.get('{{ url_for("yobot_api_iplocation", ip=session["last_login_ipaddr"]) }}').then(function (res) {
                 thisvue.addr = res.data;
             }).catch(function (error) {
                 console.log(error);
@@ -63,7 +66,7 @@
             });
         },
         methods: {
-            from_ts: function(ts) {
+            from_ts: function (ts) {
                 if (ts == 0) {
                     return '-';
                 }

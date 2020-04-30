@@ -1,3 +1,6 @@
+if (!Object.defineProperty) {
+    alert('浏览器版本过低');
+}
 var vm = new Vue({
     el: '#app',
     data: {
@@ -5,6 +8,7 @@ var vm = new Vue({
         groupData: {},
         form: {
             game_server: null,
+            allow_guest: false,
             notify: {
                 challenge: false,
                 undo: false,
@@ -29,6 +33,7 @@ var vm = new Vue({
             if (res.data.code == 0) {
                 thisvue.groupData = res.data.groupData;
                 thisvue.form.game_server = res.data.groupData.game_server;
+                thisvue.form.allow_guest = res.data.groupData.allow_guest;
                 document.title = res.data.groupData.group_name + ' - 公会战设置';
                 var notify_code = res.data.notification;
                 for (key in thisvue.form.notify) {
@@ -55,6 +60,7 @@ var vm = new Vue({
                 action: 'put_setting',
                 csrf_token: csrf_token,
                 game_server: thisvue.form.game_server,
+                allow_guest: thisvue.form.allow_guest,
                 notification: notify_code,
             }).then(function (res) {
                 if (res.data.code == 0) {

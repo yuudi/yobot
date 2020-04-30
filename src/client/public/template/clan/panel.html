@@ -20,6 +20,9 @@
     .el-row {
       margin-bottom: 15px;
     }
+    el-button{
+      width: 80px;
+    }
   </style>
 </head>
 
@@ -43,9 +46,15 @@
         <el-row>
           <el-col :span="24"><a :class="{ exbig: !bossData.challenger }">[[ bossData.health.toLocaleString() ]]</a>/[[ bossData.full_health.toLocaleString() ]]</el-col>
         </el-row>
-        <el-row :hidden="!bossData.challenger">
-          <el-col :span="24"><a style="font-size:32px;color:#003300;">[[ find_name(bossData.challenger) ]]</a>正在挑战boss</el-col>
-        </el-row>
+        <template v-if="bossData.challenger">
+          <el-row>
+            <el-col :span="24">
+              <a style="font-size:32px;color:#003300;">[[ find_name(bossData.challenger) ]]</a>
+              <a v-if="bossData.lock_type==1">正在挑战boss</a>
+              <a v-else>锁定了boss 留言：[[ bossData.challenging_comment ]]</a>
+            </el-col>
+          </el-row>
+        </template>
         <el-row style="margin-bottom: 25px">
           <el-col :span="24"><el-progress :percentage="bossData.health/bossData.full_health*100" :show-text="false" :color="bossData.challenger ? '#909399' : '#67C23A'"></el-progress></el-col>
         </el-row>
@@ -59,13 +68,27 @@
                   <template slot="prepend">[[ damageHint ]]</template>
                 </el-input>
               </el-form-item>
+              <el-form-item label="留言" label-width="120">
+                <el-input v-model="message" placeholder="（选填）"></el-input>
+              </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="recordFormVisible = false">取消</el-button>
               <el-button type="primary" @click="recordselfdamage">上报</el-button>
             </div>
           </el-dialog>
-          <el-col :span="6"><el-button type="success" size="small" @click="recordselfdefeat">上报尾刀</el-button></el-col>
+          <el-col :span="6"><el-button type="success" size="small" @click="recordDefeatVisible = true">上报尾刀</el-button></el-col>
+          <el-dialog title="上报伤害" :visible.sync="recordDefeatVisible">
+            <el-form>
+              <el-form-item label="留言" label-width="120">
+                <el-input v-model="message" placeholder="（选填）"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="recordDefeatVisible = false">取消</el-button>
+              <el-button type="primary" @click="recordselfdefeat">上报</el-button>
+            </div>
+          </el-dialog>
           <el-col :span="6"><el-button type="primary" size="small" @click="recordBehalfVisible = true">代理上报</el-button></el-col>
           <el-dialog title="代理上报" :visible.sync="recordBehalfVisible">
             <el-form>
@@ -85,6 +108,9 @@
                   <template slot="prepend">[[ damageHint ]]</template>
                 </el-input>
               </el-form-item>
+              <el-form-item label="留言" label-width="120">
+                <el-input v-model="message" placeholder="（选填）"></el-input>
+              </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button @click="recordBehalfVisible = false">取消</el-button>
@@ -94,8 +120,36 @@
           <el-col :span="6"><el-button type="danger" size="small" @click="recordundo">撤销上报</el-button></el-col>
         </el-row>
         <el-row>
-          <el-col :span="6"><el-button type="primary" size="small" @click="challengeapply">申请出刀</el-button></el-col>
+          <el-col :span="6"><el-button type="primary" size="small" @click="challengeapply(1)">申请出刀</el-button></el-col>
           <el-col :span="6"><el-button :type="(bossData.challenger)&&(bossData.challenger!=self_id)?'danger':'info'" size="small" @click="cancelapply">[[ (bossData.challenger)&&(bossData.challenger!=self_id)?'强制解锁':'取消申请' ]]</el-button></el-col>
+          <el-col :span="6"><el-button type="primary" size="small" @click="lockBossVisible = true">锁定boss</el-button></el-col>
+          <el-dialog title="锁定boss" :visible.sync="lockBossVisible">
+            <el-form>
+              <el-form-item label="留言" label-width="120">
+                <el-input v-model="message" placeholder="（必填）"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="lockBossVisible = false">取消</el-button>
+              <el-button type="primary" @click="challengeapply(2)">确认</el-button>
+            </div>
+          </el-dialog>
+          <el-col :span="6"><el-button type="warning" size="small" @click="save_slot">[[ today_sl?'取消SL':'SL']]</el-button></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6"><el-button type="warning" size="small" @click="suspendVisible = true">挂树</el-button></el-col>
+          <el-dialog title="挂树" :visible.sync="suspendVisible">
+            <el-form>
+              <el-form-item label="留言" label-width="120">
+                <el-input v-model="message" placeholder="（选填）"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="suspendVisible = false">取消</el-button>
+              <el-button type="primary" @click="addsuspend">确认</el-button>
+            </div>
+          </el-dialog>
+          <el-col :span="6"><el-button type="info" size="small" @click="cancelsuspend">取消挂树</el-button></el-col>
           <el-col :span="6"><el-button type="primary" size="small" @click="subscribeFormVisible = true">预约boss</el-button></el-col>
           <el-dialog title="预约boss" :visible.sync="subscribeFormVisible">
             <el-radio-group v-model="subscribe">
@@ -127,13 +181,8 @@
           </el-dialog>
         </el-row>
         <el-row>
-          <el-col :span="6"><el-button type="warning" size="small" @click="addsuspend">&nbsp;&nbsp;挂树&nbsp;&nbsp;</el-button></el-col>
-          <el-col :span="6"><el-button type="info" size="small" @click="cancelsuspend">取消挂树</el-button></el-col>
-          <el-col :span="6"><el-button type="warning" size="small" @click="save_slot">&nbsp;&nbsp;&nbsp;SL&nbsp;&nbsp;&nbsp;</el-button></el-col>
-        </el-row>
-        <el-row>
           <el-col :span="6"><el-button type="danger" size="small" @click="startmodify">修改状态</el-button></el-col>
-          <el-col :span="6"><a href='./setting/'><el-button type="info" size="small" @click="leavePage=true">&nbsp;&nbsp;设置&nbsp;&nbsp;</el-button></a></el-col>
+          <el-col :span="6"><a href='./setting/'><el-button type="info" size="small" @click="leavePage=true">设置</el-button></a></el-col>
           <el-dialog title="修改状态" :visible.sync="statusFormVisible">
             <el-form>
               <el-form-item label="周目数" label-width="120">

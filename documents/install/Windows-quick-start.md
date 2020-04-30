@@ -49,15 +49,9 @@
 
 如果你的windows不是最新版，可能无法启动httpapi插件，请安装Visual C++ 可再发行软件包（[点击下载](https://aka.ms/vs/16/release/vc_redist.x86.exe)）。如果你的系统是 Windows 7 或 Windows Server 2008、或者安装 Visual C++ 可再发行软件包之后仍然加载失败，则还需要安装通用 C 运行库更新（[点击进入官网](https://support.microsoft.com/zh-cn/help/3118401/update-for-universal-c-runtime-in-windows)，选择你系统对应的版本下载安装）
 
-### 酷Q的日志显示了发送，实际却没有发送
+### 其他问题
 
-这种情况一般是消息被腾讯屏蔽，常常发生在异地登陆时
-
-解决方法：
-
-* 关闭所有插件，机器人挂机一段时间
-* 在远程主机上使用一下QQ网页服务（比如QQ邮箱、QQ安全中心等）
-* 下载QQ安全中心，确认异地登录
+见[FAQ](../usage/faq.md)
 
 ## 开始 web 模式
 

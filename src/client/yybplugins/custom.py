@@ -3,7 +3,6 @@
 
 在这里可以编写自定义的功能，
 编写完毕后记得 git commit，
-（只接收pcr相关功能，最好发到GitHub，我不怎么看Gitee）
 
 这个模块只是为了快速编写小功能，如果想编写完整插件可以使用：
 https://github.com/richardchien/python-aiocqhttp
@@ -48,7 +47,7 @@ class Custom:
         # # 注册定时任务，详见apscheduler文档
         # @scheduler.scheduled_job('cron', hour=8)
         # async def good_morning():
-        #     await bot_api.send_group_msg(group_id=123456, message='早上好')
+        #     await self.api.send_group_msg(group_id=123456, message='早上好')
 
         # # 注册web路由，详见flask与quart文档
         # @app.route('/is-bot-running', methods=['GET'])
@@ -75,5 +74,5 @@ class Custom:
             # 返回字符串：发送消息并阻止后续插件
             return '世界'
 
-        # 返回布尔值：是否阻止后续插件
+        # 返回布尔值：是否阻止后续插件（返回None视作False）
         return False

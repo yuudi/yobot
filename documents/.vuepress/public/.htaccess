@@ -1,0 +1,9 @@
+ErrorDocument 404 /404.html
+
+# BEGIN vuepress-plugin-clean-urls
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^(.*)\.html$
+RewriteRule .* %1/ [L,R=301]
+# END vuepress-plugin-clean-urls
