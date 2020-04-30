@@ -1,0 +1,53 @@
+version: '3'
+services:
+  bot:
+    build: .
+    ports:
+      - "9222:9222"
+    env_file: .env
+    restart: on-failure
+    command: bash -c "
+      python3 main.py > /dev/null 2 > /dev/null
+      && sh yobotg.sh
+      "
+    volumes:
+    - ./src/client:/code
+    networks:
+      - bot_net
+
+  cqhttp:
+    image: richardchien/cqhttp:latest
+#    image: richardchien/cqhttp:4.5.0
+    env_file: .env
+    restart: on-failure
+    environment:
+      - VNC_PASSWD=${VNC_PWD}
+      - COOLQ_ACCOUNT=${QQ_ACCOUNT} # 要登录的 QQ 账号，可选但建议填
+      - COOLQ_URL=${COOLQ_VERSION_URL}
+      - CQHTTP_USE_HTTP=false
+      - CQHTTP_USE_WS=false
+      - CQHTTP_USE_WS_REVERSE=true
+      - CQHTTP_WS_REVERSE_API_URL=ws://bot:9222/ws/api/
+      - CQHTTP_WS_REVERSE_EVENT_URL=ws://bot:9222/ws/event/
+      - CQHTTP_WS_REVERSE_URL=ws://bot:9222
+      - CQHTTP_WS_REVERSE_RECONNECT_INTERVAL=4000
+      - CQHTTP_REVERSE_RECONNECT_ON_CODE_1000=true
+      - CQHTTP_POST_MESSAGE_FORMAT=string
+      - CQHTTP_SERVE_DATA_FILES=false
+      - CQHTTP_UPDATE_SOURCE=github
+      - CQHTTP_UPDATE_CHANNEL=stable
+      - CQHTTP_CHECK_UPDATE=false
+      - CQHTTP_PERFORM_UPDATE=false
+      - CQHTTP_SHOW_LOG_CONSOLE=true
+      - CQHTTP_LOG_LEVEL=info
+    volumes:
+      - ./cqhttp:/home/user/coolq
+    ports:
+      - "9000:9000" # VNC端口
+#      - "5700:5700" # HTTP API 插件开放的端口
+    networks:
+      - bot_net
+
+networks:
+    bot_net:
+        driver: bridge
