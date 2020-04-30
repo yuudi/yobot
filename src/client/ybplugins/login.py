@@ -1,32 +1,19 @@
-import random
-import string
 import time
-import re
 from hashlib import sha256
+from typing import Union
 from urllib.parse import urljoin
 
 from aiocqhttp.api import Api
-from quart import (Quart, jsonify, make_response, redirect, request, session,
-                   url_for, Response)
-from typing import Union, Coroutine
+from quart import (Quart, Response, jsonify, make_response, redirect, request,
+                   session, url_for)
 
 from .templating import render_template
-from .ybdata import User
-
-_rand_string_chaset = (string.ascii_uppercase +
-                       string.ascii_lowercase +
-                       string.digits)
-
+from .web_util import rand_string
+from .ybdata import User,User_login
 
 EXPIRED_TIME = 7 * 24 * 60 * 60  # 7 days
 LOGIN_AUTH_COOKIE_NAME = 'yobot_login'
 
-
-def _rand_string(n=8):
-    return ''.join(
-        random.choice(_rand_string_chaset)
-        for _ in range(n)
-    )
 
 
 class ExceptionWithAdvice(Exception):
@@ -67,7 +54,7 @@ class Login:
                 'block': True
             }
 
-        login_code = _rand_string(6)
+        login_code = rand_string(6)
 
         user = self._get_or_create_user_model(ctx)
         user.login_code = login_code
@@ -104,25 +91,27 @@ class Login:
 
         # 取出数据
         return User.get_or_create(
-            qqid = ctx['user_id'],
+            qqid=ctx['user_id'],
             defaults={
                 'nickname': ctx['sender']['nickname'],
                 'authority_group': authority_group,
             }
         )[0]
 
-    @staticmethod
-    def _validate_pwd(pwd: str) -> Union[str, bool]:
-        """
-        验证用户密码是否合乎硬性条件
-        :return: 合法返回True，不合法抛出ValueError异常
-        """
-        if len(pwd) < 8:
-            raise ValueError('密码至少需要8位')
-        char_regex = re.compile(r'^[0-9a-zA-Z!\-\\/@#$%^&*?_.()+=\[\]{}|;:<>`~]+$')
-        if not char_regex.match(pwd):
-            raise ValueError('密码不能含有中文或密码中含有特殊符号')
-        return True
+    ## 这个放到前端
+    # @staticmethod
+    # def _validate_pwd(pwd: str) -> Union[str, bool]:
+    #     """
+    #     验证用户密码是否合乎硬性条件
+    #     :return: 合法返回True，不合法抛出ValueError异常
+    #     """
+    #     if len(pwd) < 8:
+    #         raise ValueError('密码至少需要8位')
+    #     char_regex = re.compile(
+    #         r'^[0-9a-zA-Z!\-\\/@#$%^&*?_.()+=\[\]{}|;:<>`~]+$')
+    #     if not char_regex.match(pwd):
+    #         raise ValueError('密码不能含有中文或密码中含有特殊符号')
+    #     return True
 
     def _get_prefix(self):
         return self.setting['preffix_string'] if self.setting['preffix_on'] else ''
@@ -189,10 +178,15 @@ class Login:
         if user is None:
             # 有有效Cookie但是数据库没有，怕不是删库跑路了
             raise ExceptionWithAdvice('用户不存在', advice)
-        if user.auth_cookie != _add_salt_and_hash(auth, user.salt):
+        salty_cookie = _add_salt_and_hash(auth, user.salt)
+        userlogin = User_login.get_or_none(
+            qqid=qqid,
+            auth_cookie=salty_cookie,
+        )
+        if userlogin is None:
             raise ExceptionWithAdvice('Cookie异常', advice)
         now = int(time.time())
-        if user.auth_cookie_expire_time < now:
+        if userlogin.auth_cookie_expire_time < now:
             raise ExceptionWithAdvice('登录已过期', advice)
         return user
 
@@ -207,18 +201,22 @@ class Login:
         """
         now = int(time.time())
         session['yobot_user'] = user.qqid
-        session['csrf_token'] = _rand_string(16)
+        session['csrf_token'] = rand_string(16)
         session['last_login_time'] = user.last_login_time
         session['last_login_ipaddr'] = user.last_login_ipaddr
         user.last_login_time = now
         user.last_login_ipaddr = request.headers.get(
             'X-Real-IP', request.remote_addr)
         if res:
-            new_key = _rand_string(32)
-            user.auth_cookie = _add_salt_and_hash(new_key, user.salt)
-            user.auth_cookie_expire_time = now + EXPIRED_TIME
+            new_key = rand_string(32)
+            userlogin = User_login.create(
+                qqid=user.qqid,
+                auth_cookie=_add_salt_and_hash(new_key, user.salt),
+                auth_cookie_expire_time = now + EXPIRED_TIME,
+            )
             new_cookie = f'{user.qqid}:{new_key}'
-            res.set_cookie(LOGIN_AUTH_COOKIE_NAME, new_cookie, max_age=EXPIRED_TIME)
+            res.set_cookie(LOGIN_AUTH_COOKIE_NAME,
+                           new_cookie, max_age=EXPIRED_TIME)
         if save_user:
             user.save()
 
@@ -353,7 +351,7 @@ class Login:
             return jsonify(code=0, message='success')
 
         @app.route(
-            urljoin(self.setting['public_basepath'], 'user/reset/password'),
+            urljoin(self.setting['public_basepath'], 'user/reset-password/'),
             methods=['GET', 'POST'])
         async def yobot_reset_pwd():
             try:
@@ -368,7 +366,7 @@ class Login:
                     raise Exception("请先加公会")
                 form = await request.form
                 pwd = form["pwd"]
-                self._validate_pwd(pwd)
+                # self._validate_pwd(pwd)
                 user.password = _add_salt_and_hash(pwd, user.salt)
                 user.save()
                 return await render_template(

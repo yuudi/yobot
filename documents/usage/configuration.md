@@ -36,6 +36,8 @@
 
 `access_token` 与 httpapi 通信的 token，默认值 `null`（插件版沿用主配置）
 
+`client_salt` 客户端盐，自动生成，请勿修改
+
 `super-admin` 管理员 qq号 列表
 
 `black-list` 黑名单 qq号 列表
@@ -47,10 +49,6 @@
 `auto_update` 自动更新，默认值 `true`
 
 `update-time` 自动更新时间，如 `03:30`，默认为随机的凌晨时间
-
-`show_jjc_solution` 已移除
-
-`jjc_auth_key` 已移除
 
 `gacha_on` 开启群聊抽卡功能，默认值 `false`
 

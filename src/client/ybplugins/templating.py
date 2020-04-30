@@ -1,7 +1,7 @@
 import os
 
 import jinja2
-from quart import session, url_for
+from quart import session, url_for 
 
 static_folder = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../public/static'))

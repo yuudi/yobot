@@ -35,7 +35,6 @@ class Consult:
         self.setting = glo_setting
         self.name2jp = {}
         self.jpname2id = {}
-        self.search_URL = glo_setting["jjc_search_url"]
         nickfile = os.path.join(glo_setting["dirname"], "nickname.csv")
         if refresh_nickfile or not os.path.exists(nickfile):
             res = requests.get(self.URL)

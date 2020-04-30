@@ -1,4 +1,6 @@
 import os
+import random
+import string
 from urllib.parse import urljoin
 
 import aiohttp
@@ -6,6 +8,17 @@ import requests
 from quart import Quart, jsonify, request, send_file, session
 
 from .yobot_exceptions import ServerError
+
+_rand_string_chaset = (string.ascii_uppercase +
+                       string.ascii_lowercase +
+                       string.digits)
+
+
+def rand_string(n=16):
+    return ''.join(
+        random.choice(_rand_string_chaset)
+        for _ in range(n)
+    )
 
 
 def async_cached_func(maxsize=64):

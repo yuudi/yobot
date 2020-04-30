@@ -1,21 +1,10 @@
-import random
-import string
-
 from peewee import *
 from playhouse.migrate import SqliteMigrator, migrate
 
+from .web_util import rand_string
+
 _db = SqliteDatabase(None)
-_version = 2
-
-
-def _rand_string(n=16):
-    return ''.join(
-        random.choice(
-            string.ascii_uppercase +
-            string.ascii_lowercase +
-            string.digits)
-        for _ in range(n)
-    )
+_version = 3
 
 
 class _BaseModel(Model):
@@ -46,9 +35,7 @@ class User(_BaseModel):
     login_code = FixedCharField(max_length=6, null=True)
     login_code_available = BooleanField(default=False)
     login_code_expire_time = BigIntegerField(default=0)
-    salt = CharField(max_length=16, default=_rand_string)
-    auth_cookie = FixedCharField(max_length=64)
-    auth_cookie_expire_time = BigIntegerField(default=0)
+    salt = CharField(max_length=16, default=rand_string)
 
 
 class User_login(_BaseModel):
@@ -183,8 +170,6 @@ def db_upgrade(old_version):
     if old_version < 2:
         User_login.create_table()
         migrate(
-            migrator.add_column('clan_member', 'last_message',
-                                TextField(null=True)),
             migrator.add_column('clan_member', 'remaining_status',
                                 TextField(null=True)),
             migrator.add_column('clan_challenge', 'message',
@@ -192,5 +177,10 @@ def db_upgrade(old_version):
             migrator.add_column('clan_group', 'boss_lock_type',
                                 IntegerField(default=0)),
             migrator.drop_column('user', 'last_save_slot'),
+        )
+    if old_version < 3:
+        migrate(
+            migrator.drop_column('user', 'auth_cookie'),
+            migrator.drop_column('user', 'auth_cookie_expire_time'),
         )
     DB_schema.replace(key='version', value=str(_version)).execute()

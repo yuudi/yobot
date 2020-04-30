@@ -35,8 +35,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.5.0-alpha_1]"
-    Commit = {"yuudi": 83, "彼端。": 8, "往日。": 5, "S": 2, "sunyubo": 1}
+    Version = "[v3.5.0-alpha_2]"
+    Commit = {"yuudi": 84, "彼端。": 8, "往日。": 5, "S": 2, "sunyubo": 1}
 
     def __init__(self, *,
                  data_path: str,
@@ -129,10 +129,15 @@ class Yobot:
 
         # initialize update time
         if self.glo_setting["update-time"] == "random":
-            self.glo_setting["update-time"] = "{}:{}".format(
+            self.glo_setting["update-time"] = "{:02d}:{:02d}".format(
                 random.randint(2, 4),
                 random.randint(0, 59)
             )
+            modified = True
+
+        # initialize client salt
+        if self.glo_setting["client_salt"] is None:
+            self.glo_setting["client_salt"] = web_util.rand_string(16)
             modified = True
 
         # save initialization

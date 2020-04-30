@@ -8,6 +8,10 @@
 https://github.com/richardchien/python-aiocqhttp
 或者
 https://github.com/richardchien/nonebot
+
+关于PR：
+如果基于此文件的PR，请在此目录下新建一个`.py`文件，并修改类名
+然后在`yobot.py`中添加`import`（这一步可以交给仓库管理者做）
 '''
 
 import asyncio

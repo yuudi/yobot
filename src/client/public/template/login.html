@@ -77,7 +77,7 @@
                     {required: true, message: '必须输入您的QQ号', trigger: 'blur'}
                 ],
                 pwd: [
-                    {required: true, message: '必须输入您的密码', trigger: 'blur'}
+                    {required: true, message: '这个密码不是QQ密码', trigger: 'blur'}
                 ],
             }
         },
@@ -107,7 +107,7 @@
                         const url = "{{ url_for('yobot_login') }}";
                         this.post(url, {
                             qqid: this.form.qq,
-                            pwd: getHashWithSalt(this.form.pwd)
+                            pwd: getHashWithSalt(this.form.pwd + this.form.qq)
                         });
                     } else {
                         console.log('请检查输入！');

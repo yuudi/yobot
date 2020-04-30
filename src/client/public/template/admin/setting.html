@@ -165,14 +165,6 @@
             <el-radio v-model="setting.show_jjc_solution" label="text">文字</el-radio>
             <el-radio v-model="setting.show_jjc_solution" label="url">网页</el-radio>
         </p>
-        <p :hidden="hide_jjckey<5">
-            <el-row>
-                <el-col :span="4">显示竞技场查询授权码</el-col>
-                <el-col :span="20">
-                    <el-input v-model="setting.jjc_auth_key"></el-input>
-                </el-col>
-            </el-row>
-        </p>
         <p>
             新闻推送：
             <el-checkbox v-model="setting.news_jp_official">日服官网</el-checkbox>
