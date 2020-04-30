@@ -255,12 +255,12 @@ class Updater:
         return (job,)
 
 
-def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
+def get_version(base_version: str, base_commit:  int) -> dict:
     if "_MEIPASS" in dir(sys):
         return {
             "run-as": "exe",
             "ver_name": "yobot" + base_version,
-            "ver_id": 3300 + sum(base_commit.values()),
+            "ver_id": 3300 + base_commit,
             "check_url": [
                 "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
                 "https://yuudi.github.io/yobot/v3/ver.json",
@@ -274,29 +274,22 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
             return {
                 "run-as": "python",
                 "commited": False,
-                "ver_name": "yobot源码版{}\n存在未提交的修改".format(base_version)
+                "ver_name": "yobot{}源码版\n存在未提交的修改".format(base_version)
             }
-    except:
+    except Exception as e:
+        print(e)
         return {
             "run-as": "python",
             "commited": False,
             "ver_name": "无法检测版本"
         }
     try:
-        with os.popen("git shortlog --numbered --summary") as r:
+        vername = "yobot{}源码版".format(base_version)
+        with os.popen("git rev-list --count HEAD") as r:
             summary = r.read()
-        logs = summary.split()
-        commits = {}
-        for key in base_commit.keys():
-            commits[key] = -base_commit[key]
-        for count, usrmail in zip(logs[::2], logs[1::2]):
-            usr = usrmail.split("@")[0].split("+")[-1]
-            commits[usr] = int(count) + commits.get(usr, 0)
-        vername = "yobot源码版{}".format(base_version)
-        extra_commit = ["{}: {}".format(c, commits[c])
-                        for c in commits if commits[c] != 0]
+        extra_commit = int(summary.strip())-base_commit
         if extra_commit:
-            vername += "\n额外的提交：\n" + "\n".join(extra_commit)
+            vername += "\n额外的提交：\n" + str(extra_commit)
             with os.popen("git rev-parse HEAD") as r:
                 hash_ = r.read().strip()
             vername += "\nhash: {}".format(hash_)
@@ -305,14 +298,15 @@ def get_version(base_version: str, base_commit: Dict[str, int]) -> dict:
             "commited": True,
             "extra_commit": extra_commit,
             "ver_name": vername,
-            "ver_id": 3300 + sum(base_commit.values()),
+            "ver_id": 3300 + base_commit,
             "check_url": [
                 "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
                 "https://yuudi.github.io/yobot/v3/ver.json",
                 "http://api.yobot.xyz/v3/version/"
             ],
         }
-    except:
+    except Exception as e:
+        print(e)
         return {
             "run-as": "python",
             "commited": False,

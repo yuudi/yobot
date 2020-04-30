@@ -63,8 +63,8 @@ var vm = new Vue({
             var detailstr = nd.toLocaleString('chinese', { hour12: false }) + '<br />';
             detailstr += cha.cycle + '周目' + cha.boss_num + '号boss<br />';
             detailstr += (cha.health_ramain + cha.damage).toLocaleString() + '→' + cha.health_ramain.toLocaleString();
-            if (cha.comment.message) {
-                detailstr += '<br>' + cha.comment.message;
+            if (cha.message) {
+                detailstr += '<br>' + cha.message;
             }
             return detailstr;
         },
@@ -136,7 +136,7 @@ var vm = new Vue({
                         nickname: m.nickname,
                         boss: c.cycle + '-' + c.boss_num,
                         damage: c.damage,
-                        message: c.comment.message,
+                        message: c.message,
                     });
                 }
             }

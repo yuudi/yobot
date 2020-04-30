@@ -4,16 +4,16 @@ from typing import Union
 from urllib.parse import urljoin
 
 from aiocqhttp.api import Api
+from apscheduler.triggers.cron import CronTrigger
 from quart import (Quart, Response, jsonify, make_response, redirect, request,
                    session, url_for)
 
 from .templating import render_template
 from .web_util import rand_string
-from .ybdata import User,User_login
+from .ybdata import User, User_login
 
 EXPIRED_TIME = 7 * 24 * 60 * 60  # 7 days
 LOGIN_AUTH_COOKIE_NAME = 'yobot_login'
-
 
 
 class ExceptionWithAdvice(Exception):
@@ -30,7 +30,7 @@ def _add_salt_and_hash(raw: str, salt: str):
 
 class Login:
     Passive = True
-    Active = False
+    Active = True
     Request = True
 
     def __init__(self,
@@ -39,6 +39,17 @@ class Login:
                  *args, **kwargs):
         self.setting = glo_setting
         self.api = bot_api
+
+    def jobs(self):
+        trigger = CronTrigger(hour=5)
+        return ((trigger, self.drop_expired_logins),)
+
+    def drop_expired_logins(self):
+        # 清理过期cookie
+        now = int(time.time())
+        User_login.delete().where(
+            User_login.auth_cookie_expire_time < now,
+        ).execute()
 
     @staticmethod
     def match(cmd: str):
@@ -98,7 +109,7 @@ class Login:
             }
         )[0]
 
-    ## 这个放到前端
+    # 这个放到前端
     # @staticmethod
     # def _validate_pwd(pwd: str) -> Union[str, bool]:
     #     """
@@ -159,13 +170,12 @@ class Login:
             )
         return True
 
-    def _recall_from_cookie(self) -> User:
+    def _recall_from_cookie(self, auth_cookie) -> User:
         """
         检测cookie中的登录状态是否正确，如果cookie有误 会抛出异常
         :return User: 返回找回的user对象
         """
-        auth_cookie = request.cookies.get(LOGIN_AUTH_COOKIE_NAME)
-        advice = f'请私聊机器人"{self._get_prefix()}登录"或重新登录'
+        advice = f'请私聊机器人“{self._get_prefix()}登录”或重新登录'
         if not auth_cookie:
             raise ExceptionWithAdvice('登录已过期', advice)
         s = auth_cookie.split(':')
@@ -174,7 +184,7 @@ class Login:
         qqid, auth = s
 
         user = User.get_or_none(User.qqid == qqid)
-        advice = f'请先加入一个公会 或 私聊机器人"{self._get_prefix()}登录"'
+        advice = f'请先加入一个公会 或 私聊机器人“{self._get_prefix()}登录”'
         if user is None:
             # 有有效Cookie但是数据库没有，怕不是删库跑路了
             raise ExceptionWithAdvice('用户不存在', advice)
@@ -188,6 +198,12 @@ class Login:
         now = int(time.time())
         if userlogin.auth_cookie_expire_time < now:
             raise ExceptionWithAdvice('登录已过期', advice)
+
+        userlogin.last_login_time = now
+        userlogin.last_login_ipaddr = request.headers.get(
+            'X-Real-IP', request.remote_addr)
+        userlogin.save()
+
         return user
 
     @staticmethod
@@ -212,7 +228,7 @@ class Login:
             userlogin = User_login.create(
                 qqid=user.qqid,
                 auth_cookie=_add_salt_and_hash(new_key, user.salt),
-                auth_cookie_expire_time = now + EXPIRED_TIME,
+                auth_cookie_expire_time=now + EXPIRED_TIME,
             )
             new_cookie = f'{user.qqid}:{new_key}'
             res.set_cookie(LOGIN_AUTH_COOKIE_NAME,
@@ -240,8 +256,9 @@ class Login:
                 key = get_params('key')
                 pwd = get_params('pwd')
                 callback_page = get_params('callback')
+                auth_cookie = request.cookies.get(LOGIN_AUTH_COOKIE_NAME)
 
-                if not qqid and not callback_page:
+                if not qqid and not auth_cookie:
                     # 普通登录
                     return await render_template(
                         'login.html',
@@ -249,25 +266,39 @@ class Login:
                         prefix=self._get_prefix()
                     )
 
-                if callback_page and not qqid:
+                key_failure = None
+                if qqid:
+                    user = User.get_or_none(User.qqid == qqid)
+                    if key:
+                        try:
+                            self._check_key(user, key)
+                        except ExceptionWithAdvice as e:
+                            if auth_cookie:
+                                qqid = None
+                                key_failure = e
+                            else:
+                                raise e from e
+                    if pwd:
+                        self._check_pwd(user, pwd)
+
+                if auth_cookie and not qqid:
                     # 可能用于用cookie寻回session
 
                     if 'yobot_user' in session:
                         # 会话未过期
                         return redirect(callback_page)
-
-                    user = self._recall_from_cookie()
+                    try:
+                        user = self._recall_from_cookie(auth_cookie)
+                    except ExceptionWithAdvice as e:
+                        if key_failure is not None:
+                            raise key_failure
+                        else:
+                            raise e from e
                     self._set_auth_info(user)
                     return redirect(callback_page)
 
                 if not key and not pwd:
                     raise ExceptionWithAdvice("无效的登录地址", "请检查登录地址是否完整")
-
-                user = User.get_or_none(User.qqid == qqid)
-                if key:
-                    self._check_key(user, key)
-                if pwd:
-                    self._check_pwd(user, pwd)
 
                 res = await make_response(redirect(callback_page or url_for('yobot_user')))
                 self._set_auth_info(user, res, save_user=False)

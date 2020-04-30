@@ -945,6 +945,7 @@ class ClanBattle:
                 'health_ramain': c.boss_health_ramain,
                 'damage': c.challenge_damage,
                 'is_continue': c.is_continue,
+                'message': c.message,
                 'comment': json.loads(c.comment),
             })
         return report
@@ -1793,7 +1794,7 @@ class ClanBattle:
                 _logger.error(e)
                 return jsonify(code=31, message='missing key: '+str(e))
             # except asyncio.CancelledError as e:
-            #     raise from e
+            #     raise e from e
             except Exception as e:
                 _logger.exception(e)
                 return jsonify(code=40, message='server error')

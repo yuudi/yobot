@@ -21,13 +21,13 @@ if __package__:
                             jjc_consult, login, marionette, push_news, settings,
                             switcher, templating, updater, web_util, ybdata,
                             yobot_msg)
-    from .yybplugins import custom
+    from .ybplugins.yybplugins import custom
 else:
     from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
                            yobot_msg)
-    from yybplugins import custom
+    from ybplugins.yybplugins import custom
 
 # 本项目构建的框架非常粗糙且幼稚，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -35,8 +35,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.5.0-alpha_2]"
-    Commit = {"yuudi": 84, "彼端。": 8, "往日。": 5, "S": 2, "sunyubo": 1}
+    Version = "[v3.5.0-beta_1]"
+    Version_id = 101
 
     def __init__(self, *,
                  data_path: str,
@@ -95,7 +95,7 @@ class Yobot:
             json.dump(self.glo_setting, config_file, indent=4)
 
         if verinfo is None:
-            verinfo = updater.get_version(self.Version, self.Commit)
+            verinfo = updater.get_version(self.Version, self.Version_id)
 
         modified = False
 
