@@ -1,3 +1,4 @@
+venv
 *.py[cdo]
 .vscode/
 src/client/*.bat
@@ -16,3 +17,5 @@ src/client/*.ics
 src/client/*.pid
 src/client/*.spec
 src/client/test.py
+.env
+cqhttp

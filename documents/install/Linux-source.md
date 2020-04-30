@@ -4,6 +4,8 @@
 
 由于wine与原生Windows差别较大，很多酷Q插件无法在wine中运行。
 
+Linux可以使用Docker部署（测试中），具体请看[这里](./docker.md)
+
 ~~Linux 用户建议使用mirai部署~~。mirai现在还不够稳定，再等一两个月吧。
 
 **Linux运行存在问题较多，不推荐使用**，如果你坚持使用Linux来部署机器人，可以参考本文步骤。

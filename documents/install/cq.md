@@ -34,6 +34,12 @@ yobot搭建难度约等于搭建网站的难度，请量力而行
 
 [详细说明](./Linux-source.md)
 
+## Linux 服务器：Docker 部署
+
+使用 Docker 一键部署（测试中）
+
+[详细说明](./docker.md)
+
 ## 作为 nonebot 插件运行
 
 如果想搭建一个高度自定义的机器人，可以使用 [nonebot](https://nonebot.cqp.moe/) 框架。（Python语言）

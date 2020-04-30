@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8"/>
+    <title>yobot登录</title>
+    <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+    <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
+    <script src="{{ url_for('yobot_static', filename='password.js') }}"></script>
+    <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+    <style>
+        #app {
+            margin: auto;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-flow: column;
+            max-width: 400px;
+        }
+
+        .comment {
+            color: #aaa;
+            line-height: 20px;
+            font-size: 0.8em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app" class="container">
+    <div class="container">
+        <h1>登录</h1>
+
+        {% if reason -%}
+        <el-alert
+                title="{{ reason }}"
+                type="error">
+        </el-alert>
+        {% endif -%}
+        {% if advice -%}
+        <el-alert
+                title="{{ advice }}"
+                type="info">
+        </el-alert>
+        {% endif -%}
+
+        <div style="margin: 20px;"></div>
+
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+            <el-form-item label="QQ号" prop="qq">
+                <el-input v-model="form.qq" placeholder="请输入登录QQ号"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="pwd">
+                <el-input v-model="form.pwd" placeholder="请输入您的密码" type="password"></el-input>
+                <p class="comment">* 您可以通过私聊机器人"{{ prefix }}登录"，点击链接登录后，再进行修改密码</p>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">登录</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            form: {
+                qq: "",
+                pwd: ""
+            },
+            rules: {
+                qq: [
+                    {required: true, message: '必须输入您的QQ号', trigger: 'blur'}
+                ],
+                pwd: [
+                    {required: true, message: '必须输入您的密码', trigger: 'blur'}
+                ],
+            }
+        },
+        methods: {
+            post: function (url, params) {
+                //创建form表单
+                const temp_form = document.createElement("form");
+                temp_form.action = url;
+                //如需打开新窗口，form的target属性要设置为'_blank'
+                temp_form.target = "_blank";
+                temp_form.method = "post";
+                temp_form.style.display = "none";
+                //添加参数
+                for (const key in params) {
+                    const opt = document.createElement("textarea");
+                    opt.name = key;
+                    opt.value = params[key];
+                    temp_form.appendChild(opt);
+                }
+                document.body.appendChild(temp_form);
+                //提交数据
+                temp_form.submit();
+            },
+            onSubmit: function () {
+                this.$refs['form'].validate((valid) => {
+                    if (valid) {
+                        const url = "{{ url_for('yobot_login') }}";
+                        this.post(url, {
+                            qqid: this.form.qq,
+                            pwd: getHashWithSalt(this.form.pwd)
+                        });
+                    } else {
+                        console.log('请检查输入！');
+                        return false;
+                    }
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>
