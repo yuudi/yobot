@@ -51,8 +51,8 @@ server {
   }
 
   ## 强制使用https加密通信（可选，安全）
-  #if ($server_port !~ 443){
-  #  rewrite ^(/.*)$ https://$host$1 permanent;
+  #if ($server_port != 443){
+  #  return 301 https://$host$request_uri;
   #}
 
   ## 静态文件直接访问（可选，性能）

@@ -67,6 +67,10 @@ mirai 尚未稳定，稳定后本站会发布教程和一键安装包。如果�
 
 在公会战面板的查刀页面中，选择要删除的成员点击删除。
 
+### yobot 支持多个账号共用一个后端吗
+
+不支持
+
 ### 这里没有我的问题
 
 可以在[这里](https://github.com/yuudi/yobot/issues)提问，提问前可以阅读[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)

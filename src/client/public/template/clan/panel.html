@@ -121,7 +121,7 @@
         </el-row>
         <el-row>
           <el-col :span="6"><el-button type="primary" size="small" @click="challengeapply(1)">申请出刀</el-button></el-col>
-          <el-col :span="6"><el-button :type="(bossData.challenger)&&(bossData.challenger!=self_id)?'danger':'info'" size="small" @click="cancelapply">[[ (bossData.challenger)&&(bossData.challenger!=self_id)?'强制解锁':'取消申请' ]]</el-button></el-col>
+          <el-col :span="6"><el-button :type="(bossData.challenger)&&(bossData.challenger!=self_id)?'danger':'info'" size="small" @click="cancelapply">[[ (bossData.challenger)&&(bossData.challenger!=self_id)?'强制解锁':'解锁' ]]</el-button></el-col>
           <el-col :span="6"><el-button type="primary" size="small" @click="lockBossVisible = true">锁定boss</el-button></el-col>
           <el-dialog title="锁定boss" :visible.sync="lockBossVisible">
             <el-form>

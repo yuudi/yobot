@@ -289,7 +289,7 @@ def get_version(base_version: str, base_commit:  int) -> dict:
             summary = r.read()
         extra_commit = int(summary.strip())-base_commit
         if extra_commit:
-            vername += "\n额外的提交：\n" + str(extra_commit)
+            vername += "\n额外的提交：" + str(extra_commit)
             with os.popen("git rev-parse HEAD") as r:
                 hash_ = r.read().strip()
             vername += "\nhash: {}".format(hash_)

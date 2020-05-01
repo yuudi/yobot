@@ -216,7 +216,7 @@ class Gacha:
             return 1
         elif cmd.startswith("仓库"):
             return 4
-        elif cmd == "在线十连":
+        elif cmd == "在线十连" or cmd == "在线抽卡":
             return 5
         else:
             return 0

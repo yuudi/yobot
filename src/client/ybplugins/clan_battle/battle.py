@@ -1567,9 +1567,10 @@ class ClanBattle:
                         bossData=self._boss_data_dict(group),
                     )
                 elif action == 'save_slot':
+                    todaystatus=payload['today']
                     try:
                         self.save_slot(group_id, user_id,
-                                       todaystatus=payload['today'])
+                                       todaystatus=todaystatus)
                     except (GroupError, UserError) as e:
                         _logger.info('网页 失败 {} {} {}'.format(
                             user_id, group_id, action))
