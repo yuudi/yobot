@@ -1,6 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
+        isLoading: true,
         userData: [],
         authtype: [{
             value: 100,
@@ -36,6 +37,7 @@ var vm = new Vue({
             }).then(function (res) {
                 if (res.data.code == 0) {
                     thisvue.userData = res.data.data;
+                    thisvue.isLoading = false;
                 } else {
                     thisvue.$alert(res.data.message, '加载数据错误');
                 }

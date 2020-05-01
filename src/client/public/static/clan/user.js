@@ -7,6 +7,7 @@ function ts2ds(timestamp) {
 var vm = new Vue({
     el: '#app',
     data: {
+        isLoading: true,
         challengeData: [],
         activeIndex: '5',
         qqid: 0,
@@ -27,6 +28,7 @@ var vm = new Vue({
             }
             thisvue.nickname = res.data.user_info.nickname;
             thisvue.refresh(res.data.challenges, res.data.game_server);
+            thisvue.isLoading = false;
         }).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');
         });
@@ -36,7 +38,7 @@ var vm = new Vue({
             if (cha == undefined) {
                 return '';
             }
-            return '(' + cha.cycle + '-' + cha.boss_num + ') ' + cha.damage.toLocaleString();
+            return `(${cha.cycle}-${cha.boss_num}) <a class="digit${cha.damage.toString().length}">${cha.damage}</a>`;
         },
         cdetail: function (cha) {
             if (cha == undefined) {
@@ -47,6 +49,9 @@ var vm = new Vue({
             var detailstr = nd.toLocaleString('chinese', { hour12: false }) + '<br />';
             detailstr += cha.cycle + '周目' + cha.boss_num + '号boss<br />';
             detailstr += (cha.health_ramain + cha.damage).toLocaleString() + '→' + cha.health_ramain.toLocaleString();
+            if (cha.message) {
+                detailstr += '<br>留言：' + cha.message;
+            }
             return detailstr;
         },
         arraySpanMethod: function ({ row, column, rowIndex, columnIndex }) {

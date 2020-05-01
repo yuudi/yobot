@@ -50,8 +50,9 @@ def main():
 ==============================""")
     print("正在初始化...")
 
-    if os.path.exists("yobot_config.json"):
-        with open("yobot_config.json", "r") as f:
+    basedir = "." if platform.system() == "Windows" else "./yobot_data"
+    if os.path.exists(os.path.join(basedir, "yobot_config.json")):
+        with open(os.path.join(basedir, "yobot_config.json"), "r") as f:
             config = json.load(f)
         token = config.get("access_token", None)
         if token is None:

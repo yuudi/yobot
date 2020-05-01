@@ -1,3 +1,5 @@
+import json
+import os
 import time
 from hashlib import sha256
 from typing import Union
@@ -16,7 +18,7 @@ EXPIRED_TIME = 7 * 24 * 60 * 60  # 7 days
 LOGIN_AUTH_COOKIE_NAME = 'yobot_login'
 
 
-class ExceptionWithAdvice(Exception):
+class ExceptionWithAdvice(RuntimeError):
 
     def __init__(self, reason: str, advice=''):
         super(ExceptionWithAdvice, self).__init__(reason)
@@ -84,7 +86,7 @@ class Login:
         )
         reply = newurl+'#\n请在一分钟内点击链接登录，登录成功后将保持登录7天'
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
+            reply += '\n\n如果连接无法打开，请仔细阅读教程中《链接无法打开》的说明'
 
         return {
             'reply': reply,
@@ -95,6 +97,13 @@ class Login:
         if not self.setting['super-admin']:
             authority_group = 1
             self.setting['super-admin'].append(ctx['user_id'])
+            save_setting = self.setting.copy()
+            del save_setting['dirname']
+            del save_setting['verinfo']
+            config_path = os.path.join(
+                self.setting['dirname'], 'yobot_config.json')
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(save_setting, f, indent=4)
         elif ctx['user_id'] in self.setting['super-admin']:
             authority_group = 1
         else:
@@ -137,7 +146,14 @@ class Login:
                 'QQ号错误 或 您尚未设置密码',
                 f'请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
             )
+        if user.privacy >= 3:
+            raise ExceptionWithAdvice(
+                '您的密码错误次数过多，账号已锁定',
+                f'如果忘记密码，请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
+            )
         if not user.password == _add_salt_and_hash(pwd, user.salt):
+            user.privacy += 1  # 密码错误次数+1
+            user.save()
             raise ExceptionWithAdvice(
                 '您的密码不正确',
                 f'如果忘记密码，请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
@@ -255,7 +271,7 @@ class Login:
                 qqid = get_params('qqid')
                 key = get_params('key')
                 pwd = get_params('pwd')
-                callback_page = get_params('callback')
+                callback_page = get_params('callback') or url_for('yobot_user')
                 auth_cookie = request.cookies.get(LOGIN_AUTH_COOKIE_NAME)
 
                 if not qqid and not auth_cookie:
@@ -300,7 +316,7 @@ class Login:
                 if not key and not pwd:
                     raise ExceptionWithAdvice("无效的登录地址", "请检查登录地址是否完整")
 
-                res = await make_response(redirect(callback_page or url_for('yobot_user')))
+                res = await make_response(redirect(callback_page))
                 self._set_auth_info(user, res, save_user=False)
                 user.login_code_available = False
                 user.save()
@@ -393,12 +409,13 @@ class Login:
 
                 qq = session['yobot_user']
                 user = User.get_or_none(User.qqid == qq)
-                if not user:
+                if user is None:
                     raise Exception("请先加公会")
                 form = await request.form
                 pwd = form["pwd"]
                 # self._validate_pwd(pwd)
                 user.password = _add_salt_and_hash(pwd, user.salt)
+                user.privacy = 0
                 user.save()
                 return await render_template(
                     'password.html',

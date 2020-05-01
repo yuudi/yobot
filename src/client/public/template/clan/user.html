@@ -12,6 +12,18 @@
     .el-table th {
       text-align: center;
     }
+    .digit6{
+      color:blue;
+    }
+    .digit7{
+      color:green;
+    }
+    .digit8{
+      color:orange;
+    }
+    .digit9{
+      color:red;
+    }
   </style>
 </head>
 
@@ -27,13 +39,14 @@
     </el-menu>
     <h1 style="text-align:center">[[ nickname ]]的出刀记录</h1>
     <template v-if="challengeData.length > 0">
+      <a class="digit6">十万</a> <a class="digit7">百万</a> <a class="digit8">千万</a> <a class="digit9">亿</a>
       <el-table :data="challengeData" :span-method="arraySpanMethod" style="width: 1100" stripe>
         <el-table-column prop="pcrdate" label="日期" width="100" sortable></el-table-column>
         <el-table-column prop="finished" label="已完成" width="100" sortable></el-table-column>
         <el-table-column label="第一刀">
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[0]" slot-scope="scope">
-              [[ csummary(scope.row.detail[0]) ]]
+              <span v-html="csummary(scope.row.detail[0])"></span>
               <el-popover placement="top" effect="light" trigger="hover">
                 <p v-html="cdetail(scope.row.detail[0])"></p>
                 <i class="el-icon-info" slot="reference"></i>
@@ -42,7 +55,7 @@
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[1]" slot-scope="scope">
-              [[ csummary(scope.row.detail[1]) ]]
+              <span v-html="csummary(scope.row.detail[1])"></span>
               <el-popover placement="top" effect="light" trigger="hover">
                 <p v-html="cdetail(scope.row.detail[1])"></p>
                 <i class="el-icon-info" slot="reference"></i>
@@ -53,7 +66,7 @@
         <el-table-column label="第二刀">
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[2]" slot-scope="scope">
-              [[ csummary(scope.row.detail[2]) ]]
+              <span v-html="csummary(scope.row.detail[2])"></span>
               <el-popover placement="top" effect="light" trigger="hover">
                 <p v-html="cdetail(scope.row.detail[2])"></p>
                 <i class="el-icon-info" slot="reference"></i>
@@ -62,7 +75,7 @@
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[3]" slot-scope="scope">
-              [[ csummary(scope.row.detail[3]) ]]
+              <span v-html="csummary(scope.row.detail[3])"></span>
               <el-popover placement="top" effect="light" trigger="hover">
                 <p v-html="cdetail(scope.row.detail[3])"></p>
                 <i class="el-icon-info" slot="reference"></i>
@@ -73,7 +86,7 @@
         <el-table-column label="第三刀">
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[4]" slot-scope="scope">
-              [[ csummary(scope.row.detail[4]) ]]
+              <span v-html="csummary(scope.row.detail[4])"></span>
               <el-popover placement="top" effect="light" trigger="hover">
                 <p v-html="cdetail(scope.row.detail[4])"></p>
                 <i class="el-icon-info" slot="reference"></i>
@@ -82,7 +95,7 @@
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[5]" slot-scope="scope">
-              [[ csummary(scope.row.detail[5]) ]]
+              <span v-html="csummary(scope.row.detail[5])"></span>
               <el-popover placement="top" effect="light" trigger="hover">
                 <p v-html="cdetail(scope.row.detail[5])"></p>
                 <i class="el-icon-info" slot="reference"></i>

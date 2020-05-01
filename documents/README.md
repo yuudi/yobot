@@ -7,10 +7,6 @@ editLink: false
 
 [yobot](./about.md) 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊机器人，开源、免费。
 
-## 试用
-
-之前的试用网页没了，要试用可以加 QQ群 1044314369
-
 ## 安装
 
 [安装教程](./install/README.md)

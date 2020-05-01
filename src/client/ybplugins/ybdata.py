@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 3
+_version = 3  # 目前版本
 
 
 class _BaseModel(Model):
@@ -161,6 +161,9 @@ def init(sqlite_filename):
         Character.create_table()
         User_box.create_table()
         old_version = _version
+    if old_version > _version:
+        print('数据库版本高于程序版本，请升级yobot')
+        raise SystemExit()
     if old_version < _version:
         db_upgrade(old_version)
 

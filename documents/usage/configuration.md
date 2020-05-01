@@ -12,13 +12,45 @@
 
 目前只支持 json 格式
 
-## 配置项
+## 示例
+
+高亮部分必要，其他部分供参考，详细说明参考[httpapi文档](https://cqhttp.cc/docs/#/Configuration)
+
+不懂就全部复制
+
+```json {2-7}
+{
+    "use_http": false,
+    "use_ws": false,
+    "use_ws_reverse": true,
+    "ws_reverse_api_url": "ws://127.0.0.1:9222/ws/api/",
+    "ws_reverse_event_url": "ws://127.0.0.1:9222/ws/event/",
+    "access_token": "your-token",
+    "host": "[::]",
+    "port": 5700,
+    "ws_host": "[::]",
+    "ws_port": 6700,
+    "ws_reverse_url": "ws://127.0.0.1:9222",
+    "ws_reverse_reconnect_interval": 4000,
+    "ws_reverse_reconnect_on_code_1000": true,
+    "post_url": "",
+    "secret": "",
+    "post_message_format": "string",
+    "serve_data_files": false,
+    "update_source": "github",
+    "update_channel": "stable",
+    "auto_check_update": false,
+    "auto_perform_update": false,
+    "show_log_console": true,
+    "log_level": "info"
+}
+```
+
+## 配置项说明
 
 `host` 服务绑定的地址，默认值 `0.0.0.0`（插件版沿用主配置）
 
 `port` 服务绑定的地址，默认值 `9222`（插件版沿用主配置）
-
-`public_priority` 已移除
 
 `public_address` web 模式可以被访问的地址（如 nginx 代理后的地址），如`https://robot.yobot.xyz:9222/`，默认自动检测
 
@@ -44,7 +76,7 @@
 
 `black-list-group` 黑名单 qq群 列表
 
-`setting-restrict` 权限控制，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 `3`
+`setting-restrict` 更新和重启指令需要的权限，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 `3`
 
 `auto_update` 自动更新，默认值 `true`
 

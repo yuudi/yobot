@@ -64,7 +64,7 @@ var vm = new Vue({
             detailstr += cha.cycle + '周目' + cha.boss_num + '号boss<br />';
             detailstr += (cha.health_ramain + cha.damage).toLocaleString() + '→' + cha.health_ramain.toLocaleString();
             if (cha.message) {
-                detailstr += '<br>' + cha.message;
+                detailstr += '<br>留言：' + cha.message;
             }
             return detailstr;
         },

@@ -34,11 +34,6 @@
         <p>
             此站点的URL前缀：<el-input v-model="setting.public_basepath" placeholder="/yobot/"></el-input>
         </p>
-        <p hidden>
-            生成聊天链接：
-            <el-radio v-model="setting.public_priority" label="self" disabled>使用此站点</el-radio>
-            <el-radio v-model="setting.public_priority" label="monster">使用io.yobot.monster</el-radio>
-        </p>
         <p>
             <el-row>
                 <el-col :span="4">
@@ -128,7 +123,7 @@
         </p>
         <p>
             <el-row>
-                <el-col :span="4">权限设置</el-col>
+                <el-col :span="4">更新和重启指令需要的权限</el-col>
                 <el-col :span="12">
                     <el-slider v-model.number="setting['setting-restrict']" :min="0" :max="3.2" :show-tooltip="false"
                         :marks="{0:'仅主人',1:'群主以上',2:'管理员以上',3:'所有人'}">
@@ -156,14 +151,12 @@
             <el-radio v-model="setting.clan_battle_mode" label="none">关闭</el-radio>
         </p>
         <p>
-            <a @click="hide_jjckey+=1">模拟抽卡：</a>
+            <a>模拟抽卡：</a>
             <el-checkbox v-model="setting.gacha_on">允许群聊抽卡</el-checkbox>
             <el-checkbox v-model="setting.gacha_private_on">允许私聊抽卡</el-checkbox>
         </p>
-        <p :hidden="hide_jjckey<5">
-            显示竞技场查询结果：
-            <el-radio v-model="setting.show_jjc_solution" label="text">文字</el-radio>
-            <el-radio v-model="setting.show_jjc_solution" label="url">网页</el-radio>
+        <p>
+            <el-checkbox v-model="setting.jjc_consult">允许竞技场查询</el-checkbox>
         </p>
         <p>
             新闻推送：

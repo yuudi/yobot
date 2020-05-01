@@ -209,6 +209,22 @@ class ClanBattle:
         except Exception as e:
             _logger.exception(e)
 
+    def _boss_data_dict(self, group: Clan_group) -> Dict[str, Any]:
+        return {
+            'cycle': group.boss_cycle,
+            'num': group.boss_num,
+            'health': group.boss_health,
+            'challenger': group.challenging_member_qq_id,
+            'lock_type': group.boss_lock_type,
+            'challenging_comment': group.challenging_comment,
+            'full_health': (
+                self.bossinfo[group.game_server]
+                [self._level_by_cycle(
+                    group.boss_cycle, game_server=group.game_server)]
+                [group.boss_num-1]
+            ),
+        }
+
     def creat_group(self, group_id: Groupid, game_server, group_name=None) -> None:
         """
         create a group for clan-battle
@@ -641,6 +657,9 @@ class ClanBattle:
         group.save()
         Clan_challenge.delete().where(
             Clan_challenge.gid == group_id,
+        ).execute()
+        Clan_subscribe.delete().where(
+            Clan_subscribe.gid == group_id,
         ).execute()
 
     def send_remind(self, group_id: Groupid, member_list: List[QQid]):
@@ -1361,20 +1380,7 @@ class ClanBattle:
                             'game_server': group.game_server,
                             'level_4': group.level_4,
                         },
-                        bossData={
-                            'cycle': group.boss_cycle,
-                            'num': group.boss_num,
-                            'health': group.boss_health,
-                            'challenger': group.challenging_member_qq_id,
-                            'lock_type': group.boss_lock_type,
-                            'challenging_comment': group.challenging_comment,
-                            'full_health': (
-                                self.bossinfo[group.game_server]
-                                [self._level_by_cycle(
-                                    group.boss_cycle, game_server=group.game_server)]
-                                [group.boss_num-1]
-                            ),
-                        },
+                        bossData=self._boss_data_dict(group),
                         selfData={
                             'is_admin': (is_member and user.authority_group < 100),
                             'user_id': user_id,
@@ -1419,18 +1425,7 @@ class ClanBattle:
                             timeout=30)
                         return jsonify(
                             code=0,
-                            bossData={
-                                'cycle': status.cycle,
-                                'num': status.num,
-                                'health': status.health,
-                                'challenger': status.challenger,
-                                'full_health': (
-                                    self.bossinfo[group.game_server]
-                                    [self._level_by_cycle(
-                                        status.cycle, game_server=group.game_server)]
-                                    [status.num-1]
-                                ),
-                            },
+                            bossData=self._boss_data_dict(group),
                             notice=status.info,
                         )
                     except asyncio.TimeoutError:
@@ -1465,18 +1460,7 @@ class ClanBattle:
                             )
                         return jsonify(
                             code=0,
-                            bossData={
-                                'cycle': status.cycle,
-                                'num': status.num,
-                                'health': status.health,
-                                'challenger': status.challenger,
-                                'full_health': (
-                                    self.bossinfo[group.game_server]
-                                    [self._level_by_cycle(
-                                        status.cycle, game_server=group.game_server)]
-                                    [status.num-1]
-                                ),
-                            },
+                            bossData=self._boss_data_dict(group),
                         )
                     else:
                         try:
@@ -1505,18 +1489,7 @@ class ClanBattle:
                             )
                         return jsonify(
                             code=0,
-                            bossData={
-                                'cycle': status.cycle,
-                                'num': status.num,
-                                'health': status.health,
-                                'challenger': status.challenger,
-                                'full_health': (
-                                    self.bossinfo[group.game_server]
-                                    [self._level_by_cycle(
-                                        status.cycle, game_server=group.game_server)]
-                                    [status.num-1]
-                                ),
-                            },
+                            bossData=self._boss_data_dict(group),
                         )
                 elif action == 'undo':
                     try:
@@ -1540,18 +1513,7 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        bossData={
-                            'cycle': status.cycle,
-                            'num': status.num,
-                            'health': status.health,
-                            'challenger': status.challenger,
-                            'full_health': (
-                                self.bossinfo[group.game_server]
-                                [self._level_by_cycle(
-                                    status.cycle, game_server=group.game_server)]
-                                [status.num-1]
-                            ),
-                        },
+                        bossData=self._boss_data_dict(group),
                     )
                 elif action == 'apply':
                     try:
@@ -1578,18 +1540,7 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        bossData={
-                            'cycle': status.cycle,
-                            'num': status.num,
-                            'health': status.health,
-                            'challenger': status.challenger,
-                            'full_health': (
-                                self.bossinfo[group.game_server]
-                                [self._level_by_cycle(
-                                    status.cycle, game_server=group.game_server)]
-                                [status.num-1]
-                            ),
-                        },
+                        bossData=self._boss_data_dict(group),
                     )
                 elif action == 'cancelapply':
                     try:
@@ -1613,18 +1564,7 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        bossData={
-                            'cycle': status.cycle,
-                            'num': status.num,
-                            'health': status.health,
-                            'challenger': status.challenger,
-                            'full_health': (
-                                self.bossinfo[group.game_server]
-                                [self._level_by_cycle(
-                                    status.cycle, game_server=group.game_server)]
-                                [status.num-1]
-                            ),
-                        },
+                        bossData=self._boss_data_dict(group),
                     )
                 elif action == 'save_slot':
                     try:
@@ -1637,6 +1577,7 @@ class ClanBattle:
                             code=10,
                             message=str(e),
                         )
+                    sw = '添加' if todaystatus else '删除'
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
                     if group.notification & 0x200:
@@ -1644,10 +1585,10 @@ class ClanBattle:
                             self.api.send_group_msg(
                                 group_id=group_id,
                                 message=(self._get_nickname_by_qqid(user_id)
-                                         + '已使用SL'),
+                                         + f'已{sw}SL'),
                             )
                         )
-                    return jsonify(code=0, notice='已记录SL')
+                    return jsonify(code=0, notice=f'已{sw}SL')
                 elif action == 'get_subscribers':
                     subscribers = self.get_subscribe_list(group_id)
                     return jsonify(
@@ -1759,18 +1700,7 @@ class ClanBattle:
                         )
                     return jsonify(
                         code=0,
-                        bossData={
-                            'cycle': status.cycle,
-                            'num': status.num,
-                            'health': status.health,
-                            'challenger': status.challenger,
-                            'full_health': (
-                                self.bossinfo[group.game_server]
-                                [self._level_by_cycle(
-                                    status.cycle, game_server=group.game_server)]
-                                [status.num-1]
-                            ),
-                        },
+                        bossData=self._boss_data_dict(group),
                     )
                 elif action == 'send_remind':
                     if user.authority_group >= 100:
@@ -1901,7 +1831,7 @@ class ClanBattle:
                         groupData={
                             'group_name': group.group_name,
                             'game_server': group.game_server,
-                            'allow_guest': group.privacy & 0x1,
+                            'allow_guest': bool(group.privacy & 0x1),
                         },
                         notification=group.notification,
                     )

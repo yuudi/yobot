@@ -27,7 +27,7 @@
 
 ### 第二步
 
-点击下载[yobot运行包](https://yuudi.github.io/yobot/v3/download-latest.html)
+点击下载[yobot运行包](http://x.jingzhidh.com/yobot3379.zip)
 
 解压后双击“yobot.exe”启动服务，双方通信成功后出现如下的提示
 

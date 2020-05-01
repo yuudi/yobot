@@ -137,7 +137,7 @@ class Consult:
                 self.setting['public_basepath'], num, filename))
         reply = '找到{}条解法：{}'.format(len(solution), addr)
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果连接无法打开，请参考https://gitee.com/yobot/yobot/blob/master/documents/usage/cannot-open-webpage.md'
+            reply += '\n\n如果连接无法打开，请仔细阅读教程中《链接无法打开》的说明'
         return reply
 
     @staticmethod

@@ -35,7 +35,7 @@ else:
 
 
 class Yobot:
-    Version = "[v3.5.0-beta_1]"
+    Version = "[v3.5.0-beta_2]"
     Version_id = 101
 
     def __init__(self, *,

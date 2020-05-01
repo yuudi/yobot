@@ -2,7 +2,6 @@ var vm = new Vue({
     el: '#app',
     data: {
         setting: {},
-        hide_jjckey: 0,
         activeNames: [],
         bossSetting: false,
         domainApply: false,
