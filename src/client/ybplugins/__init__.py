@@ -1,13 +1,19 @@
 __all__ = [
+    'ybdata',
+    'web_util',
+    'templating',
     'switcher',
     'yobot_msg',
     'gacha',
+    'homepage',
     'jjc_consult',
     'boss_dmg',
+    'clan_battle',
+    'login',
+    'marionette',
+    'settings',
     'updater',
-    'yobot_exceptions',
-    'char_consult',
     'push_news',
     'calender',
-    'custom'
+    'custom',
 ]

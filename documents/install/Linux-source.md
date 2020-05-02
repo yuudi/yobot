@@ -36,7 +36,7 @@ Linux可以使用Docker部署（测试中），具体请看[这里](./docker.md)
 
 参考：[httpapi插件文档配置说明](https://cqhttp.cc/docs/#/Configuration)  
 
-配置文件位于：`<酷Q运行目录>coolq/app/io.github.richardchien.coolqhttpapi/config/general.json`或`<QQ号>.json`，将其修改为[这里](../usage/configuration.md)的配置，如果启动过httpapi，会出现`QQ号.ini`文件，请将其删除。
+配置文件位于：`<酷Q运行目录>coolq/app/io.github.richardchien.coolqhttpapi/config/general.json`或`<QQ号>.json`，将其修改为[这里](./config.md)的配置，如果启动过httpapi，会出现`QQ号.ini`文件，请将其删除。
 
 **请注意：** docker 版本默认的网络模式为“桥接模式（bridge）”，此模式下与宿主机进行网络通信的ip地址为172.17.0.1，如果使用阿里云服务器，这个地址被占用则改为172.18.0.1，请将配置文件中127.0.0.1修改为这个地址。
 

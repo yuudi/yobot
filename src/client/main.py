@@ -50,7 +50,10 @@ def main():
 ==============================""")
     print("正在初始化...")
 
-    basedir = "." if platform.system() == "Windows" else "./yobot_data"
+    if os.path.exists('yobotdata.db'):
+        basedir = "."
+    else:
+        basedir = "./yobot_data"
     if os.path.exists(os.path.join(basedir, "yobot_config.json")):
         with open(os.path.join(basedir, "yobot_config.json"), "r") as f:
             config = json.load(f)
@@ -64,7 +67,7 @@ def main():
     cqbot = CQHttp(access_token=token,
                    enable_http_post=False)
     sche = AsyncIOScheduler()
-    bot = yobot.Yobot(data_path=".",
+    bot = yobot.Yobot(data_path=basedir,
                       scheduler=sche,
                       quart_app=cqbot.server_app,
                       bot_api=cqbot._api,

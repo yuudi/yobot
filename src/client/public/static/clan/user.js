@@ -46,11 +46,11 @@ var vm = new Vue({
             }
             var nd = new Date();
             nd.setTime(cha.challenge_time * 1000);
-            var detailstr = nd.toLocaleString('chinese', { hour12: false }) + '<br />';
-            detailstr += cha.cycle + '周目' + cha.boss_num + '号boss<br />';
+            var detailstr = nd.toLocaleString('chinese', { hour12: false }) + '\n';
+            detailstr += cha.cycle + '周目' + cha.boss_num + '号boss\n';
             detailstr += (cha.health_ramain + cha.damage).toLocaleString() + '→' + cha.health_ramain.toLocaleString();
             if (cha.message) {
-                detailstr += '<br>留言：' + cha.message;
+                detailstr += '\n留言：' + cha.message;
             }
             return detailstr;
         },

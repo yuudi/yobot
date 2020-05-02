@@ -20,14 +20,12 @@ if __package__:
     from .ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                             jjc_consult, login, marionette, push_news, settings,
                             switcher, templating, updater, web_util, ybdata,
-                            yobot_msg)
-    from .ybplugins.yybplugins import custom
+                            yobot_msg, custom)
 else:
     from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
-                           yobot_msg)
-    from ybplugins.yybplugins import custom
+                           yobot_msg, custom)
 
 # 本项目构建的框架非常粗糙且幼稚，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -256,12 +254,7 @@ class Yobot:
         # run new
         reply_msg = None
         for plug in self.plug_new:
-            if hasattr(plug, "execute_async"):
-                ret = await plug.execute_async(msg)
-            elif hasattr(plug, "execute"):
-                ret = plug.execute(msg)
-            else:
-                continue
+            ret = await plug.execute_async(msg)
             if ret is None:
                 continue
             elif isinstance(ret, bool):

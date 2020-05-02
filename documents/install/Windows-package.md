@@ -31,7 +31,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 由于新装的 httpapi 启动时有时候会重置配置文件，所以如果 httpapi 启动后与下图不符请手动配置一下文件
 
-配置文件位于：`<酷Q运行目录>data\app\io.github.richardchien.coolqhttpapi\config\general.json`或 *QQ号.json* ，将其修改为[这里](../usage/configuration.md)的配置。
+配置文件位于：`<酷Q运行目录>data\app\io.github.richardchien.coolqhttpapi\config\general.json`或 *QQ号.json* ，将其修改为[这里](./config.md)的配置。
 
 配置正确后，启动 httpapi 插件后会反复出现如下的提示
 
@@ -41,7 +41,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 ### Windows系统运行包
 
-[点击下载运行包](http://x.jingzhidh.com/yobot3379.zip)
+[点击下载运行包](https://yuudi.github.io/yobot/v3/download-latest.html)
 
 下载yobot运行包，创建一个文件夹解压，启动 yobot.exe 即可。如需更改端口，请启动一次后修改 yobot_config.json 中的 port 字段并重启。
 

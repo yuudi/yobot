@@ -6,7 +6,7 @@ python最低要求为`python3.6`
 
 ## 扩展
 
-见[custom.py](./yybplugins/custom.py)文件
+见[custom.py](./ybplugins/custom.py)文件
 
 ## 移植
 

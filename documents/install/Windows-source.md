@@ -37,7 +37,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 由于新装的 httpapi 启动时有时候会重置配置文件，所以如果 httpapi 启动后与下图不符请手动配置一下文件
 
-配置文件位于：`<酷Q运行目录>data\app\io.github.richardchien.coolqhttpapi\config\general.json`或 *QQ号.json* ，将其修改为[这里](../usage/configuration.md)的配置。
+配置文件位于：`<酷Q运行目录>data\app\io.github.richardchien.coolqhttpapi\config\general.json`或 *QQ号.json* ，将其修改为[这里](./config.md)的配置。
 
 配置正确后，启动 httpapi 插件后会反复出现如下都提示
 

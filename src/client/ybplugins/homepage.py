@@ -44,3 +44,9 @@ class Index:
             methods=['GET'])
         async def yobot_help():
             return await send_from_directory(template_folder, "help.html")
+
+        @app.route(
+            urljoin(self.public_basepath, 'manual/'),
+            methods=['GET'])
+        async def yobot_manual():
+            return await send_from_directory(template_folder, "manual.html")

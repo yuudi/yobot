@@ -34,12 +34,20 @@ themeConfig:
           link: /usage/web-mode/
         - text: Web 模式公会战
           link: /usage/web-clanbattle/
+        - text: 公会战手册
+          link: /usage/manual/
     - text: 常见问题
       link: /usage/faq/
     - text: 链接无法打开
       link: /usage/cannot-open-webpage/
     - text: 关于
-      link: /about/
+      items:
+        - text: 关于
+          link: /about/
+        - text: 更新日志
+          link: /project/changelog/
+        - text: 待办事项
+          link: /project/todo/
 plugins:
   vuepress-plugin-clean-urls:
     normalSuffix: /

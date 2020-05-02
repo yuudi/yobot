@@ -12,6 +12,9 @@
     .el-table th {
       text-align: center;
     }
+    .el-popover {
+      white-space: pre-wrap;
+    }
     .digit6{
       color:blue;
     }
@@ -47,19 +50,13 @@
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[0]" slot-scope="scope">
               <span v-html="csummary(scope.row.detail[0])"></span>
-              <el-popover placement="top" effect="light" trigger="hover">
-                <p v-html="cdetail(scope.row.detail[0])"></p>
-                <i class="el-icon-info" slot="reference"></i>
-              </el-popover>
+              <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[0]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[1]" slot-scope="scope">
               <span v-html="csummary(scope.row.detail[1])"></span>
-              <el-popover placement="top" effect="light" trigger="hover">
-                <p v-html="cdetail(scope.row.detail[1])"></p>
-                <i class="el-icon-info" slot="reference"></i>
-              </el-popover>
+              <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[1]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
         </el-table-column>
@@ -67,19 +64,13 @@
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[2]" slot-scope="scope">
               <span v-html="csummary(scope.row.detail[2])"></span>
-              <el-popover placement="top" effect="light" trigger="hover">
-                <p v-html="cdetail(scope.row.detail[2])"></p>
-                <i class="el-icon-info" slot="reference"></i>
-              </el-popover>
+              <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[2]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[3]" slot-scope="scope">
               <span v-html="csummary(scope.row.detail[3])"></span>
-              <el-popover placement="top" effect="light" trigger="hover">
-                <p v-html="cdetail(scope.row.detail[3])"></p>
-                <i class="el-icon-info" slot="reference"></i>
-              </el-popover>
+              <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[3]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
         </el-table-column>
@@ -87,19 +78,13 @@
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[4]" slot-scope="scope">
               <span v-html="csummary(scope.row.detail[4])"></span>
-              <el-popover placement="top" effect="light" trigger="hover">
-                <p v-html="cdetail(scope.row.detail[4])"></p>
-                <i class="el-icon-info" slot="reference"></i>
-              </el-popover>
+              <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[4]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[5]" slot-scope="scope">
               <span v-html="csummary(scope.row.detail[5])"></span>
-              <el-popover placement="top" effect="light" trigger="hover">
-                <p v-html="cdetail(scope.row.detail[5])"></p>
-                <i class="el-icon-info" slot="reference"></i>
-              </el-popover>
+              <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[5]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
         </el-table-column>
