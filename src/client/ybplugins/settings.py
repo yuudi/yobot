@@ -191,7 +191,9 @@ class Setting:
                 action = req['action']
                 if action == 'get_data':
                     users = []
-                    for user in User.select():
+                    for user in User.select().where(
+                        User.deleted==False,
+                    ):
                         users.append({
                             'qqid': user.qqid,
                             'nickname': user.nickname,
@@ -204,8 +206,20 @@ class Setting:
                 elif action == 'modify_user':
                     data = req['data']
                     user = User.get_or_none(qqid=data['qqid'])
+                    if user is None:
+                        return jsonify(code=21, message='user not exist')
                     for key in data.keys():
                         setattr(user, key, data[key])
+                    user.save()
+                    return jsonify(code=0, message='success')
+                elif action == 'delete_user':
+                    user = User.get_or_none(qqid=req['data']['qqid'])
+                    if user is None:
+                        return jsonify(code=21, message='user not exist')
+                    user.clan_group_id = None
+                    user.authority_group = 999
+                    user.password = None
+                    user.deleted = True
                     user.save()
                     return jsonify(code=0, message='success')
                 else:

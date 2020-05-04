@@ -163,7 +163,6 @@
             <el-checkbox v-model="setting.news_jp_official">日服官网</el-checkbox>
             <el-checkbox v-model="setting.news_jp_twitter">日服推特</el-checkbox>
             <el-checkbox v-model="setting.news_tw_official">台服官网</el-checkbox>
-            <el-checkbox v-model="setting.news_tw_facebook">台服FaceBook</el-checkbox>
             <el-checkbox v-model="setting.news_cn_official">国服官网</el-checkbox>
             <el-checkbox v-model="setting.news_cn_bilibili">国服Bilibili动态</el-checkbox>
             <el-row>
@@ -206,7 +205,7 @@
                     <el-select v-model="setting.calender_region" placeholder="日程表区域">
                         <el-option label="日服日程表" value="jp"></el-option>
                         <el-option label="台服日程表" value="tw"></el-option>
-                        <el-option label="国服日程表" value="cn" disabled></el-option>
+                        <el-option label="国服日程表" value="cn"></el-option>
                     </el-select>
                 </el-col>
                 <el-col :span="4">

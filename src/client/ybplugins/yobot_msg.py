@@ -14,7 +14,7 @@ class Message:
                 glo_setting["public_address"],
                 '{}help/'.format(glo_setting['public_basepath']))
             if glo_setting['web_mode_hint']:
-                self.help_page += '\n\n如果连接无法打开，请仔细阅读教程中《链接无法打开》的说明'
+                self.help_page += '\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
         else:
             self.help_page = "https://gitee.com/yobot/yobot/blob/master/documents/features/old.md"
 
@@ -37,7 +37,7 @@ class Message:
         elif match_num == 97:
             reply = urljoin(
                 self.setting["public_address"],
-                '{}help/'.format(self.setting['public_basepath']))
+                '{}manual/'.format(self.setting['public_basepath']))
         elif match_num == 2:
             reply = "boss被击败后我会提醒下树"
         else:

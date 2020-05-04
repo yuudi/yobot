@@ -39,13 +39,16 @@ class Custom:
             app 是机器人后台Quart服务器实例
         '''
         # 注意：这个类加载时，asyncio事件循环尚未启动，且bot_api没有连接
-        # 此时不要调用bot_api，如需初始化请使用api_init
+        # 此时不要调用bot_api
         # 此时没有running_loop，不要直接使用await或asyncio.creat_task
 
-        # 如果需要使用，请注释掉下面一行
+        # 如果需要启用，请注释掉下面一行
         return
 
+        # 这是来自yobot_config.json的设置，如果需要增加设置项，请修改default_config.json文件
         self.setting = glo_setting
+
+        # 这是cqhttp的api，详见cqhttp文档
         self.api = bot_api
 
         # # 注册定时任务，详见apscheduler文档
@@ -64,6 +67,7 @@ class Custom:
 
         参数ctx 具体格式见：https://cqhttp.cc/docs/#/Post
         '''
+        # 注意：这是一个异步函数，禁止使用阻塞操作（比如requests）
 
         # 如果需要使用，请注释掉下面一行
         return
@@ -71,7 +75,7 @@ class Custom:
         cmd = ctx['raw_message']
         if cmd == '你好':
 
-            # 调用api发送消息
+            # 调用api发送消息，详见cqhttp文档
             await self.api.send_private_msg(
                 user_id=123456, message='收到问好')
 

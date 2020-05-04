@@ -55,7 +55,7 @@ def main():
     else:
         basedir = "./yobot_data"
     if os.path.exists(os.path.join(basedir, "yobot_config.json")):
-        with open(os.path.join(basedir, "yobot_config.json"), "r") as f:
+        with open(os.path.join(basedir, "yobot_config.json"), "r", encoding="utf-8") as f:
             config = json.load(f)
         token = config.get("access_token", None)
         if token is None:

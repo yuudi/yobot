@@ -36,6 +36,8 @@ themeConfig:
           link: /usage/web-clanbattle/
         - text: 公会战手册
           link: /usage/manual/
+        - text: 安全性
+          link: /usage/security/
     - text: 常见问题
       link: /usage/faq/
     - text: 链接无法打开

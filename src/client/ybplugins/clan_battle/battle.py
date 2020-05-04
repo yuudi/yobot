@@ -404,8 +404,14 @@ class ClanBattle:
                                ensure_ascii=False),
         )
         group.boss_health -= damage
+        # 如果当前正在挑战，则取消挑战
         if user.qqid == group.challenging_member_qq_id:
             group.challenging_member_qq_id = None
+        # 如果当前正在挂树，则取消挂树
+        Clan_subscribe.delete().where(
+            Clan_subscribe.gid == group_id,
+            Clan_subscribe.subscribe_item == 0
+        ).execute()
 
         challenge.save()
         group.save()
@@ -512,8 +518,14 @@ class ClanBattle:
             [self._level_by_cycle(
                 group.boss_cycle, game_server=group.game_server)]
             [group.boss_num-1])
+        # 如果当前正在挑战，则取消挑战
         if user.qqid == group.challenging_member_qq_id:
             group.challenging_member_qq_id = None
+        # 如果当前正在挂树，则取消挂树
+        Clan_subscribe.delete().where(
+            Clan_subscribe.gid == group_id,
+            Clan_subscribe.subscribe_item == 0
+        ).execute()
 
         group.save()
         challenge.save()
@@ -912,7 +924,7 @@ class ClanBattle:
             Clan_subscribe.delete().where(
                 Clan_subscribe.gid == group_id,
                 Clan_subscribe.subscribe_item == 0
-            )
+            ).execute()
         else:
             if membership.last_save_slot != today:
                 raise UserError('您今天没有SL记录')
@@ -988,6 +1000,7 @@ class ClanBattle:
             attr='clan_member',
         ).where(
             Clan_member.group_id == group_id,
+            User.deleted==False,
         ):
             member_list.append({
                 'qqid': user.qqid,
@@ -1273,7 +1286,7 @@ class ClanBattle:
                 return '没有人'+beh
             reply = beh+'的成员：\n' + '\n'.join(
                 self._get_nickname_by_qqid(m['qqid'])
-                + m['comment'].get('message', '')
+                + m.get('comment', {}).get('message', '')
                 for m in subscribers
             )
             return reply
@@ -1567,7 +1580,7 @@ class ClanBattle:
                         bossData=self._boss_data_dict(group),
                     )
                 elif action == 'save_slot':
-                    todaystatus=payload['today']
+                    todaystatus = payload['today']
                     try:
                         self.save_slot(group_id, user_id,
                                        todaystatus=todaystatus)

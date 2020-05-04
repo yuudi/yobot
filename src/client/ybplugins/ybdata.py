@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 3  # 目前版本
+_version = 4  # 目前版本
 
 
 class _BaseModel(Model):
@@ -36,6 +36,7 @@ class User(_BaseModel):
     login_code_available = BooleanField(default=False)
     login_code_expire_time = BigIntegerField(default=0)
     salt = CharField(max_length=16, default=rand_string)
+    deleted = BooleanField(default=False)
 
 
 class User_login(_BaseModel):
@@ -185,5 +186,10 @@ def db_upgrade(old_version):
         migrate(
             migrator.drop_column('user', 'auth_cookie'),
             migrator.drop_column('user', 'auth_cookie_expire_time'),
+        )
+    if old_version < 4:
+        migrate(
+            migrator.add_column('user', 'deleted',
+                                BooleanField(default=False)),
         )
     DB_schema.replace(key='version', value=str(_version)).execute()

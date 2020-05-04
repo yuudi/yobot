@@ -23,7 +23,7 @@ var vm = new Vue({
     methods: {
         datestr: function (ts) {
             if (ts == 0) {
-                return '-';
+                return null;
             }
             var nd = new Date();
             nd.setTime(ts * 1000);
@@ -66,6 +66,42 @@ var vm = new Vue({
             }).catch(function (error) {
                 thisvue.$message.error(error);
             });
+        },
+        delete_user: function (scope) {
+            var thisvue = this;
+            thisvue.$confirm('是否删除' + scope.row.nickname, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'danger'
+            }).then(() => {
+                axios.post(api_path, {
+                    action: 'delete_user',
+                    csrf_token: csrf_token,
+                    data: {
+                        qqid: scope.row.qqid,
+                    },
+                }).then(function (res) {
+                    if (res.data.code == 0) {
+                        thisvue.$message({
+                            message: '删除成功',
+                            type: 'success',
+                        });
+                    } else {
+                        thisvue.$message.error('删除失败' + res.data.message);
+                    }
+                }).catch(function (error) {
+                    thisvue.$message.error(error);
+                });
+            }).catch(() => {
+                thisvue.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });
+            });
+
+
+
+
         },
     },
     delimiters: ['[[', ']]'],

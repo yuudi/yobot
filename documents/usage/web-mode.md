@@ -14,6 +14,7 @@
 
 在服务器的防火墙面板里，打开 9222 端口（如端口更换则为更换后的端口）  
 （[阿里云开启方法](https://help.aliyun.com/document_detail/25471.html) [腾讯云开启方法](https://cloud.tencent.com/document/product/213/39740)）
+如果是腾讯云 Windows 服务器，可能还需要放行 Windows 防火墙
 
 如果服务器没有公网地址，可以使用端口映射
 
@@ -44,7 +45,7 @@ server {
 
   server_name io.yobot.xyz;  # 你的域名
 
-  location /yobot/  # 如果你修改了`public_basepath`，请同时修改这里的`location`
+  location /
   {
     proxy_pass http://localhost:9222;  # 反向代理
     proxy_set_header X-Real-IP $remote_addr;  # 传递用户IP
@@ -57,13 +58,13 @@ server {
 
   ## 静态文件直接访问（可选，性能）
   #location /yobot/assets/ {
-  #  alias /home/yobot/src/client/public/static/;  # 你的静态文件目录
+  #  alias /home/yobot/src/client/public/static/;  # 你的静态文件目录，如果你修改了`public_basepath`，请同时修改这里的`location`
   #  expires 30d;
   #}
 
   ## 输出文件直接访问（可选，性能）
   #location /yobot/output/ {
-  #  alias /home/yobot/src/client/output/;  # 你的输出文件目录
+  #  alias /home/yobot/src/client/output/;  # 你的输出文件目录，如果你修改了`public_basepath`，请同时修改这里的`location`
   #  expires 30d;
   #}
 

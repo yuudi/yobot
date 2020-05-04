@@ -202,7 +202,7 @@ class Switcher:
                 if self.setting["clan_battle_mode"] != "chat":
                     return '请机器人管理员在后台设置中进行设置'
                 keys = ("news_jp_official", "news_jp_twitter", "news_tw_official",
-                        "news_tw_facebook", "news_cn_official", "news_cn_bilibili",
+                        "news_cn_official", "news_cn_bilibili",
                         "news_interval_minutes", "notify_groups", "notify_privates",
                         "calender_on", "calender_time", "calender_region")
                 reply = self.dump_url(keys, "news")

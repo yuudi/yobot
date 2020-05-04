@@ -41,7 +41,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 ### Windows系统运行包
 
-[点击下载运行包](https://yuudi.github.io/yobot/v3/download-latest.html)
+[点击下载运行包](https://download-latest.yobot.workers.dev)
 
 下载yobot运行包，创建一个文件夹解压，启动 yobot.exe 即可。如需更改端口，请启动一次后修改 yobot_config.json 中的 port 字段并重启。
 

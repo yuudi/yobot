@@ -5,7 +5,9 @@ editLink: false
 
 ## 介绍
 
-[yobot](./about.md) 是为[公主连接](https://game.bilibili.com/pcr/)玩家打造的群聊机器人，开源、免费。
+[yobot](./about.md) 是为[公主连接](https://game.bilibili.com/pcr/)公会战设计的辅助机器人，能够帮助公会战管理者提供自动化管理服务。
+
+yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷、通知及时、数据详细的特点。
 
 ## 安装
 
@@ -25,12 +27,6 @@ editLink: false
 - 挂树，当前 boss 被击败时提醒挂树的人
 - 申请出刀，提醒之后申请出刀的人有人正在出刀，防止意外撞刀
 - SL记录，记录每天的SL使用情况，方便指挥
-
-![统计成员伤害](https://x.jingzhidh.com/img/yobot/u1rouD.png)
-
-![生成统计报表](https://x.jingzhidh.com/img/yobot/u1rTDe.png)
-
-![每日出刀情况](https://x.jingzhidh.com/img/yobot/utk0Gq.png)
 
 新版助手提供了一个网页面板，面板上可以进行更多操作
 

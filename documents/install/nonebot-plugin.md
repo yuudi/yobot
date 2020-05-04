@@ -34,6 +34,32 @@ nonebot.run(
 
 为了开启web模式，请配置nonebot的`host`字段为`0.0.0.0`，yobot的`yobot_data/yobot_config.json`中`public_address`内的端口号与nonebot配置中的`port`对应（如果你使用了反向代理，则`public_address`为代理后的地址）
 
+### 使用 HoshinoBot 时的注意事项
+
+由于 `HoshinoBot` 重新封装了 `nonebot` 的插件，增加了服务层，所以需要如下的操作。
+
+1. 在 `hoshino/modules` 目录下创建目录 `yobot`
+1. 进入 `yobot` 目录，按上文的方法添加子模块
+1. 在 `config.py` 的 `MODULES_ON` 中添加 `yobot`
+
+其他步骤与上文相同，最终目录结构应该是：
+
+```treeview
+HoshinoBot
+├── config.py
+├── hoshino
+|   ├── modules
+|   |   ├── botmanage
+|   |   ├── yobot
+|   |   |   └── yobot
+|   |   |       ├── README.md
+|   |   |       ├── __init__.py
+|   |   |       └── ...
+|   |   └── ...
+|   └── ...
+└── ...
+```
+
 ## 常见问题
 
 见[FAQ](../usage/faq.md)

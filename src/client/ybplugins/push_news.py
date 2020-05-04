@@ -44,12 +44,6 @@ class News:
                 "headers": {"host": "rsshub.app"},
                 "pattern": "{title}\n{link}",
             },
-            "news_tw_facebook": {
-                "name": "台服FaceBook",
-                "source": "http://rsshub.app.cdn.cloudflare.net/facebook/page/SonetPCR",
-                "headers": {"host": "rsshub.app"},
-                "pattern": "链接：{link}",
-            },
             "news_cn_bilibili": {
                 "name": "国服B站动态",
                 "source": "http://rsshub.app.cdn.cloudflare.net/bilibili/user/dynamic/353840826",

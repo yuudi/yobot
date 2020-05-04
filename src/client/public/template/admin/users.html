@@ -2,11 +2,16 @@
 
 <head>
     <title>yobot用户管理</title>
-    <meta name='viewport' content='width=970' charset="utf-8" />
+    <meta name='viewport' content='width=1000' charset="utf-8" />
     <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
     <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
     <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
     <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+    <style>
+        [icon="el-icon-delete"]{
+            color: red;
+        }
+    </style>
 </head>
 
 <body>
@@ -34,6 +39,11 @@
                 </template>
             </el-table-column>
             <el-table-column prop="last_login_ipaddr" label="上次登录IP地址" width="150"></el-table-column>
+            <el-table-column label="删除" width="30">
+                <template slot-scope="scope">
+                        <el-button type="text" @click="delete_user(scope)" icon="el-icon-delete"></el-button>
+                </template>
+            </el-table-column>
         </el-table>
     </div>
 </body>

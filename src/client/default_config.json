@@ -20,7 +20,6 @@
     "news_jp_official": true,
     "news_jp_twitter": true,
     "news_tw_official": true,
-    "news_tw_facebook": true,
     "news_cn_official": true,
     "news_cn_bilibili": true,
     "news_interval_auto": true,

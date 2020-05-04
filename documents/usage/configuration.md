@@ -58,8 +58,6 @@
 
 `news_tw_official` 开启台服官网新闻推送，默认值 `true`
 
-`news_tw_facebook` 开启台服 FaceBook 新闻推送，默认值 `true`
-
 `news_cn_official` 开启国服官网新闻推送，默认值 `true`
 
 `news_cn_bilibili` 开启国服 Bilibili 动态新闻推送，默认值 `true`

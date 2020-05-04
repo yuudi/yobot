@@ -45,23 +45,10 @@ class Event:
         # 。。。屁东8区，Arrow这个库解析的时候把时区略了，加东8区会有bug，导致每天早上8点前获取的calendar会延后一天
         self.timezone = datetime.timezone(datetime.timedelta(hours=0))
 
-        # self.load_timeline(glo_setting.get("calender_region", "default"))
-        # self.last_check = time.time()
         self.timeline = None
 
     def load_timeline(self, rg):
-        if rg == "default":
-            self.timeline = None
-        elif rg == "jp":
-            self.timeline = self.load_timeline_jp()
-        elif rg == "tw":
-            self.timeline = self.load_timeline_tw()
-        elif rg == "cn":
-            self.timeline = None
-        elif rg == "kr":
-            self.timeline = None
-        else:
-            raise ValueError(f"unknown region: {rg}")
+        raise RuntimeError("no more sync calling")
 
     async def load_timeline_async(self, rg=None):
         if rg is None:
@@ -78,6 +65,12 @@ class Event:
                 return
             self.timeline = timeline
             print("刷新台服日程表成功")
+        elif rg == "cn":
+            timeline = await self.load_timeline_cn_async()
+            if timeline is None:
+                return
+            self.timeline = timeline
+            print("刷新国服日程表成功")
         else:
             self.timeline = None
             print(f"{rg}区域无日程表")
@@ -89,29 +82,6 @@ class Event:
         if a_time.hour < 4:
             a_time -= datetime.timedelta(hours=4)
         return a_time
-
-    def load_timeline_jp(self):
-        event_source = "https://gamewith.jp/pricone-re/article/show/93857"
-        try:
-            res = requests.get(event_source)
-        except requests.exceptions.ConnectionError:
-            raise ServerError("无法连接服务器")
-        if res.status_code != 200:
-            raise ServerError(f"服务器状态错误：{res.status_code}")
-        soup = BeautifulSoup(res.text, features="html.parser")
-        events_ids = set()
-        timeline = Event_timeline()
-        for event in soup.select("[data-calendar]"):
-            e = json.loads(event["data-calendar"])
-            if e["id"] in events_ids:
-                continue
-            events_ids.add(e["id"])
-            timeline.add_event(
-                self.load_time_jp(e["start_time"]),
-                self.load_time_jp(e["end_time"]),
-                e["event_name"],
-            )
-        return timeline
 
     async def load_timeline_jp_async(self):
         event_source = "https://gamewith.jp/pricone-re/article/show/93857"
@@ -145,24 +115,6 @@ class Event:
             a_time -= datetime.timedelta(hours=5)
         return a_time
 
-    def load_timeline_tw(self):
-        event_source = "https://pcredivewiki.tw/static/data/event.json"
-        try:
-            res = requests.get(event_source)
-        except requests.exceptions.ConnectionError:
-            raise ServerError("无法连接服务器")
-        if res.status_code != 200:
-            raise ServerError(f"服务器状态错误：{res.status_code}")
-        events = json.loads(res.text)
-        timeline = Event_timeline()
-        for e in events:
-            timeline.add_event(
-                self.load_time_tw(e["start_time"]),
-                self.load_time_tw(e["end_time"]),
-                e["campaign_name"],
-            )
-        return timeline
-
     async def load_timeline_tw_async(self):
         event_source = "https://pcredivewiki.tw/static/data/event.json"
         async with aiohttp.request("GET", url=event_source) as response:
@@ -179,10 +131,28 @@ class Event:
             )
         return timeline
 
-    def check_and_update(self, interval=200000):
-        if time.time() - self.last_check > interval:
-            self.load_timeline(self.setting.get("calender_region", "default"))
-            self.last_check = time.time()
+    def load_time_cn(self, timestr) -> Arrow:
+        d_time = datetime.datetime.strptime(timestr, r"%Y/%m/%d %H:%M:%S")
+        a_time = Arrow.fromdatetime(d_time)
+        if a_time.time() < datetime.time(hour=5):
+            a_time -= datetime.timedelta(hours=5)
+        return a_time
+
+    async def load_timeline_cn_async(self):
+        event_source = "http://api.v3.yobot.xyz/calender/cn.json"
+        async with aiohttp.request("GET", url=event_source) as response:
+            if response.status != 200:
+                raise ServerError(f"服务器状态错误：{response.status}")
+            res = await response.text()
+        events = json.loads(res)
+        timeline = Event_timeline()
+        for e in events:
+            timeline.add_event(
+                self.load_time_cn(e["start_time"]),
+                self.load_time_cn(e["end_time"]),
+                e["name"],
+            )
+        return timeline
 
     def get_day_events(self, match_num) -> tuple:
         if match_num == 2:
