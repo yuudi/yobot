@@ -31,6 +31,7 @@ done
 import asyncio
 import json
 
+import pytz
 from aiocqhttp import CQHttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -66,7 +67,7 @@ def main():
 
     cqbot = CQHttp(access_token=token,
                    enable_http_post=False)
-    sche = AsyncIOScheduler()
+    sche = AsyncIOScheduler(timezone=pytz.timezone('Asia/Shanghai'))
     bot = yobot.Yobot(data_path=basedir,
                       scheduler=sche,
                       quart_app=cqbot.server_app,
