@@ -51,10 +51,10 @@
 
         <el-form ref="form" :model="form" :rules="rules" label-width="80px">
             <el-form-item label="QQ号" prop="qq">
-                <el-input v-model="form.qq" placeholder="请输入登录QQ号"></el-input>
+                <el-input v-model="form.qq" name="user" placeholder="请输入登录QQ号"></el-input>
             </el-form-item>
             <el-form-item label="密码" prop="pwd">
-                <el-input v-model="form.pwd" placeholder="这个密码不是QQ密码" type="password"></el-input>
+                <el-input v-model="form.pwd" name="password" placeholder="这个密码不是QQ密码" type="password"></el-input>
                 <p class="comment">* 您可以通过私聊机器人"{{ prefix }}登录"，点击链接登录后，再进行修改密码</p>
             </el-form-item>
             <el-form-item>
@@ -77,7 +77,7 @@
                     {required: true, message: '必须输入您的QQ号', trigger: 'blur'}
                 ],
                 pwd: [
-                    {required: true, message: '这个密码不是QQ密码', trigger: 'blur'}
+                    {required: true, message: '必须输入您的密码', trigger: 'blur'},
                 ],
             }
         },

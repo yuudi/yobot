@@ -2,7 +2,7 @@ import json
 import os
 import time
 from hashlib import sha256
-from typing import Union
+from typing import Union, Dict
 from urllib.parse import urljoin
 
 from aiocqhttp.api import Api
@@ -12,10 +12,11 @@ from quart import (Quart, Response, jsonify, make_response, redirect, request,
 
 from .templating import render_template
 from .web_util import rand_string
-from .ybdata import User, User_login
+from .ybdata import User, User_login, MAX_TRY_TIMES
 
 EXPIRED_TIME = 7 * 24 * 60 * 60  # 7 days
 LOGIN_AUTH_COOKIE_NAME = 'yobot_login'
+FRONTEND_SALT = '14b492a3-a40a-42fc-a236-e9a9307b47d2'  # this need be same with static/password.js
 
 
 class ExceptionWithAdvice(RuntimeError):
@@ -58,6 +59,12 @@ class Login:
         cmd = cmd.split(' ')[0]
         if cmd in ['登录', '登陆']:
             return 1
+        if cmd in ['重置次数', '重置登陆', '重置登陆次数', '解除锁定']:
+            return 2
+        if cmd in ['忘记密码', '重置密码', '随机密码']:
+            return 3
+        if cmd in ['网页', '管理页', '网页版', '访问网页']:
+            return 4
         return 0
 
     def execute(self, match_num: int, ctx: dict) -> dict:
@@ -66,26 +73,23 @@ class Login:
                 'reply': '请私聊使用',
                 'block': True
             }
+        reply = ''
+        if match_num == 1:
+            # reply = self._get_login_code_url(ctx)
+            # 不知道用CQ码能不能规避腾讯的链接检查
+            reply = f'[CQ:share,url={self._get_login_code_url(ctx)},title=登录公会系统,' \
+                        'content=如显示已被使用，可发送 重置密码，之后用密码登录]'
+        elif match_num == 2:
+            reply = self._reset_privacy(ctx)
+        elif match_num == 3:
+            reply = f'您的密码已重置为：{self._reset_pwd(ctx)}'
+        elif match_num == 4:
+            # reply = self.setting['public_address']
+            reply = f'[CQ:share,url={self.setting["public_address"]},title=会战管理网页版,' \
+                        'content=点击访问网页版会战管理页面]'
+        else:
+            assert False, f"没有实现匹配码{match_num}对应的操作"
 
-        login_code = rand_string(6)
-
-        user = self._get_or_create_user_model(ctx)
-        user.login_code = login_code
-        user.login_code_available = True
-        user.login_code_expire_time = int(time.time())+60
-        user.deleted = False
-        user.save()
-
-        # 链接登录
-        newurl = urljoin(
-            self.setting['public_address'],
-            '{}login/?qqid={}&key={}'.format(
-                self.setting['public_basepath'],
-                user.qqid,
-                login_code,
-            )
-        )
-        reply = newurl
         if self.setting['web_mode_hint']:
             reply += '#\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
 
@@ -116,6 +120,7 @@ class Login:
             defaults={
                 'nickname': ctx['sender']['nickname'],
                 'authority_group': authority_group,
+                'privacy': 0
             }
         )[0]
 
@@ -134,6 +139,60 @@ class Login:
     #         raise ValueError('密码不能含有中文或密码中含有特殊符号')
     #     return True
 
+    def _get_login_code_url(self, ctx: Dict) -> str:
+        """
+        获取新的登录链接
+        :param ctx: 本次消息事件的ctx对象
+        :return: 登录链接
+        """
+        login_code = rand_string(6)
+
+        user = self._get_or_create_user_model(ctx)
+        user.login_code = login_code
+        user.login_code_available = True
+        user.login_code_expire_time = int(time.time()) + 60
+        user.deleted = False
+        user.save()
+
+        # 链接登录
+        url = urljoin(
+            self.setting['public_address'],
+            '{}login/?qqid={}&key={}'.format(
+                self.setting['public_basepath'],
+                user.qqid,
+                login_code,
+            )
+        )
+        return url
+
+    def _reset_privacy(self, ctx: Dict) -> str:
+        """
+        重置用户的登录次数
+        :param ctx: 本次消息事件的ctx对象
+        :return:
+        """
+        user = self._get_or_create_user_model(ctx)
+        user.privacy = 0
+        user.deleted = False
+        user.save()
+        return "您的账号锁定已解除"
+
+    def _reset_pwd(self, ctx: Dict) -> str:
+        """
+        随机生成一个密码
+        :param ctx: 本次消息事件的ctx对象
+        :return: 新的密码
+        """
+        raw_pwd = rand_string(8)
+
+        user = self._get_or_create_user_model(ctx)
+        frontend_salted_pwd = _add_salt_and_hash(raw_pwd + str(ctx['user_id']), FRONTEND_SALT)
+        user.password = _add_salt_and_hash(frontend_salted_pwd, user.salt)
+        user.privacy = 0
+        user.deleted = False
+        user.save()
+        return raw_pwd
+
     def _get_prefix(self):
         return self.setting['preffix_string'] if self.setting['preffix_on'] else ''
 
@@ -147,17 +206,18 @@ class Login:
                 'QQ号错误 或 您尚未设置密码',
                 f'请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
             )
-        if user.privacy >= 3:
+        if user.privacy >= MAX_TRY_TIMES:
             raise ExceptionWithAdvice(
                 '您的密码错误次数过多，账号已锁定',
-                f'如果忘记密码，请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
+                f'如果忘记密码，请私聊机器人“{self._get_prefix()}解除锁定”后，重新登录'
             )
         if not user.password == _add_salt_and_hash(pwd, user.salt):
             user.privacy += 1  # 密码错误次数+1
             user.save()
             raise ExceptionWithAdvice(
                 '您的密码不正确',
-                f'如果忘记密码，请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改'
+                f'如果忘记密码，请私聊机器人“{self._get_prefix()}登录”后，再次选择[修改密码]修改，'
+                f'或私聊机器人“{self._get_prefix()}重置密码”'
             )
         return True
 
