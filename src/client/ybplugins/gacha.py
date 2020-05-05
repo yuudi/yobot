@@ -127,6 +127,32 @@ class Gacha:
         db_conn.close()
         return reply
 
+    def thirtytimes(self, qqid: int, nickname: str) -> str:
+        reply = ""
+        result = ""
+        for i in range(1,31):
+            single_result = self.gacha(qqid, nickname)
+            if "明天再来吧" in single_result and i == 1:
+                reply += "{}今天已经达到今日抽卡上限，明天再来吧".format(nickname)
+                return reply
+            else:
+                if "明天再来吧" in single_result:
+                    reply += "{}抽到第{}发时已经达到今日抽卡上限，抽卡结果:\n".format(nickname, i)
+                    result = result.strip("\n")
+                    reply += result
+                    return reply
+                ssr_list = re.findall("(★★★.*\))", single_result)
+                if ssr_list:
+                    for ssr in ssr_list:
+                        result += ssr+"\n"
+        if not result:
+            reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
+            return reply
+        reply += "{}本次下井结果：\n".format(nickname)
+        result = result.strip("\n")
+        reply += result
+        return reply
+
     async def show_colleV2_async(self, qqid, nickname, cmd: Union[None, str] = None) -> str:
         if not os.path.exists(os.path.join(self.setting["dirname"], "collections.db")):
             return "没有仓库"
@@ -218,6 +244,8 @@ class Gacha:
             return 4
         elif cmd == "在线十连" or cmd == "在线抽卡":
             return 5
+        elif cmd == "抽一井" or cmd == "来一井":
+            return 6
         else:
             return 0
 
@@ -236,6 +264,10 @@ class Gacha:
             reply = None
         elif func_num == 1:
             reply = self.gacha(
+                qqid=msg["sender"]["user_id"],
+                nickname=msg["sender"]["card"])
+        elif func_num ==6:
+            reply = self.thirtytimes(
                 qqid=msg["sender"]["user_id"],
                 nickname=msg["sender"]["card"])
         elif func_num == 4:
