@@ -15,7 +15,7 @@
 
 ### 第一步
 
-点击下载[酷Q-httpapi 整合包](https://x.jingzhidh.com/CoolQ_With_Httpapi.7z)
+点击下载[酷Q-httpapi 整合包](https://pan.loli.com.se/api/files/onedrive/uploads/2020/05/01/CoolQ_With_Httpapi.7z)
 
 解压后双击“CQA.exe”，输入账号密码（注意账号风险，请勿使用重要的QQ号）
 

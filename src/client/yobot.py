@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.5.2_beta_1]"
-    Version_id = 105
+    Version = "[v3.5.2]"
+    Version_id = 106
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -95,6 +95,7 @@ class Yobot:
 
         if verinfo is None:
             verinfo = updater.get_version(self.Version, self.Version_id)
+            print(verinfo['ver_name'])
 
         modified = False
 

@@ -85,9 +85,9 @@ class Login:
                 login_code,
             )
         )
-        reply = newurl + '#'
+        reply = newurl
         if self.setting['web_mode_hint']:
-            reply += '\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
+            reply += '#\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
 
         return {
             'reply': reply,

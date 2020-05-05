@@ -1210,6 +1210,8 @@ class ClanBattle:
             if cmd == '申请出刀':
                 appli_type = 1
                 extra_msg = None
+            if cmd == '锁定':
+                return '锁定时请留言'
             else:
                 match = re.match(r'^锁定(?:boss)? *(?:[\:：](.*))?$', cmd)
                 if match:

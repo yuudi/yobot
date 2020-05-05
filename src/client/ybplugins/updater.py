@@ -1,6 +1,7 @@
 import json
 import os
 import platform
+import random
 import shutil
 import sys
 import zipfile
@@ -136,6 +137,8 @@ class Updater:
 
     def check_commit(self):
         if not self.ver["commited"]:
+            if self.ver["ver_name"] == "无法检测版本":
+                return "没有版本信息，无法更新"
             return "存在未提交的修改，无法自动更新"
         if self.ver["extra_commit"]:
             return "存在额外的提交，建议手动更新\n发送“强制更新”以忽略检查"
@@ -255,11 +258,29 @@ class Updater:
         return (job,)
 
 
+def rand_vername(seed, length=2):
+    try:
+        myrandom = random.Random(seed)
+        word = ''
+        for _ in range(length):
+            a = myrandom.randint(0xb0, 0xd7)
+            if a == 0xd7:
+                b = myrandom.randint(0xa1, 0xf9)
+            else:
+                b = myrandom.randint(0xa1, 0xfe)
+            val = f'{a:x}{b:x}'
+            word += bytes.fromhex(val).decode('gb2312')
+        return word
+    except Exception as e:
+        print(e)
+        return str(seed)
+
+
 def get_version(base_version: str, base_commit:  int) -> dict:
     if "_MEIPASS" in dir(sys):
         return {
             "run-as": "exe",
-            "ver_name": "yobot" + base_version,
+            "ver_name": "yobot{}便携版".format(base_version),
             "ver_id": 3300 + base_commit,
             "check_url": [
                 "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
@@ -292,7 +313,8 @@ def get_version(base_version: str, base_commit:  int) -> dict:
             vername += "\n额外的提交：" + str(extra_commit)
             with os.popen("git rev-parse HEAD") as r:
                 hash_ = r.read().strip()
-            vername += "\nhash: {}".format(hash_)
+            # vername += "\nhash: {}".format(hash_)
+            vername += "\n哈希名: " + rand_vername(seed=hash_, length=2)
         return {
             "run-as": "python",
             "commited": True,

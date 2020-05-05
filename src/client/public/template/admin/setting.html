@@ -20,7 +20,7 @@
         <el-dialog title="申请yobot域名" :visible.sync="domainApply">
             <el-form>
                 <el-form-item label="域名" label-width="120">
-                    <el-input v-model="applyName" placeholder="此域名已被QQ封禁，不再建议使用" maxlength="16" show-word-limit>
+                    <el-input v-model="applyName" placeholder="字母、数字" maxlength="16" show-word-limit>
                         <template slot="append">.yobot.xyz</template>
                     </el-input>
                 </el-form-item>
