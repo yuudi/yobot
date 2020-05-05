@@ -6,6 +6,8 @@ from .web_util import rand_string
 _db = SqliteDatabase(None)
 _version = 4  # 目前版本
 
+MAX_TRY_TIMES = 3
+
 
 class _BaseModel(Model):
     class Meta:
@@ -27,7 +29,7 @@ class User(_BaseModel):
     # 1:主人 2:机器人管理员 10:公会战管理员 100:成员
     authority_group = IntegerField(default=100)
 
-    privacy = IntegerField(default=3)   # 密码输入错误次数
+    privacy = IntegerField(default=MAX_TRY_TIMES)   # 密码错误次数
     clan_group_id = BigIntegerField(null=True)
     last_login_time = BigIntegerField(default=0)
     last_login_ipaddr = IPField(default='0.0.0.0')
