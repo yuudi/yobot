@@ -84,8 +84,9 @@ class Login:
         elif match_num == 3:
             reply = f'您的密码已重置为：{self._reset_pwd(ctx)}'
         elif match_num == 4:
-            # reply = self.setting['public_address']
-            reply = f'[CQ:share,url={self.setting["public_address"]},title=会战管理网页版,' \
+            url = urljoin(self.setting['public_address'], self.setting['public_basepath'])
+            # reply = url
+            reply = f'[CQ:share,url={url},title=会战管理网页版,' \
                         'content=点击访问网页版会战管理页面]'
         else:
             assert False, f"没有实现匹配码{match_num}对应的操作"
