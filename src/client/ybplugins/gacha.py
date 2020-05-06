@@ -167,9 +167,11 @@ class Gacha:
             return "{}今天已经抽了{}次了，明天再来吧".format(nickname, day_times)
         reply = ""
         result = ""
+        flag = True
         for i in range(1,31):
             if day_limit != 0 and day_times >= day_limit:
                 reply += "{}抽到第{}发十连时已经达到今日抽卡上限，抽卡结果:".format(nickname, i)
+                flag = False
                 break
             single_result = self.result()
             times += 1
@@ -193,7 +195,8 @@ class Gacha:
         if not result:
             reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
             return reply
-        reply += "{}本次下井结果：".format(nickname)
+        if flag:
+            reply += "{}本次下井结果：".format(nickname)
         reply += result
         db_conn.commit()
         db_conn.close()

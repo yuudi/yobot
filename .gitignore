@@ -20,3 +20,4 @@ src/client/test.py
 .env
 cqhttp
 .idea/
+.DS_Store
