@@ -8,9 +8,9 @@ from urllib.parse import urljoin
 from aiocqhttp.api import Api
 from apscheduler.triggers.cron import CronTrigger
 from quart import (Quart, Response, jsonify, make_response, redirect, request,
-                   session, url_for)
+                   send_from_directory, session, url_for)
 
-from .templating import render_template
+from .templating import render_template, template_folder
 from .web_util import rand_string
 from .ybdata import User, User_login
 
@@ -79,7 +79,7 @@ class Login:
         # 链接登录
         newurl = urljoin(
             self.setting['public_address'],
-            '{}login/?qqid={}&key={}'.format(
+            '{}login/c/#qqid={}&key={}'.format(
                 self.setting['public_basepath'],
                 user.qqid,
                 login_code,
@@ -87,7 +87,7 @@ class Login:
         )
         reply = newurl
         if self.setting['web_mode_hint']:
-            reply += '#\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
+            reply += '\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
 
         return {
             'reply': reply,
@@ -332,6 +332,12 @@ class Login:
                     advice=e.advice or f'请私聊机器人“{self._get_prefix()}登录”获取登录地址 ',
                     prefix=prefix
                 )
+
+        @app.route(
+            urljoin(self.setting['public_basepath'], 'login/c/'),
+            methods=['GET', 'POST'])
+        async def yobot_login_code():
+            return await send_from_directory(template_folder, "login-code.html")
 
         @app.route(
             urljoin(self.setting['public_basepath'], 'logout/'),
