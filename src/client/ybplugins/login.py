@@ -76,9 +76,9 @@ class Login:
         reply = ''
         if match_num == 1:
             # reply = self._get_login_code_url(ctx)
-            # 不知道用CQ码能不能规避腾讯的链接检查
-            reply = f'[CQ:share,url={self._get_login_code_url(ctx)},title=登录公会系统,' \
-                        'content=如显示已被使用，可发送 重置密码，之后用密码登录]'
+            # 不知道用CQ码能不能规避腾讯的链接检查  ## 不能，而且会被屏蔽
+            reply = f'{self._get_login_code_url(ctx)}' \
+                        '\n如显示已被使用，可发送 重置密码，之后用密码登录'
         elif match_num == 2:
             reply = self._reset_privacy(ctx)
         elif match_num == 3:
