@@ -78,7 +78,7 @@ class Login:
             # reply = self._get_login_code_url(ctx)
             # 不知道用CQ码能不能规避腾讯的链接检查  ## 不能，而且会被屏蔽
             reply = f'{self._get_login_code_url(ctx)}' \
-                        '\n如显示已被使用，可发送 重置密码，之后用密码登录'
+                        '\n如显示已被使用，可发送 重置密码，之后用密码登录\n※ 请及时设置一个登录密码以避免无法获取登录链接时无法登录'
         elif match_num == 2:
             reply = self._reset_privacy(ctx)
         elif match_num == 3:
