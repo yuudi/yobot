@@ -79,13 +79,13 @@
         <el-table-column prop="nickname" label="昵称" width="200" sortable></el-table-column>
         <el-table-column prop="finished" label="已完成" width="100" sortable></el-table-column>
         <el-table-column label="第一刀">
-          <el-table-column label="尾刀" width="150">
+          <el-table-column label="尾刀" width="130">
             <template v-if="scope.row.detail[0]" slot-scope="scope">
               <a v-html="csummary(scope.row.detail[0])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[0]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
-          <el-table-column label="剩余刀" width="150">
+          <el-table-column label="剩余刀" width="130">
             <template v-if="scope.row.detail[1]" slot-scope="scope">
               <a v-html="csummary(scope.row.detail[1])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[1]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
@@ -93,13 +93,13 @@
           </el-table-column>
         </el-table-column>
         <el-table-column label="第二刀">
-          <el-table-column label="尾刀" width="150">
+          <el-table-column label="尾刀" width="130">
             <template v-if="scope.row.detail[2]" slot-scope="scope">
               <a v-html="csummary(scope.row.detail[2])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[2]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
-          <el-table-column label="剩余刀" width="150">
+          <el-table-column label="剩余刀" width="130">
             <template v-if="scope.row.detail[3]" slot-scope="scope">
               <a v-html="csummary(scope.row.detail[3])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[3]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
@@ -107,16 +107,22 @@
           </el-table-column>
         </el-table-column>
         <el-table-column label="第三刀">
-          <el-table-column label="尾刀" width="150">
+          <el-table-column label="尾刀" width="130">
             <template v-if="scope.row.detail[4]" slot-scope="scope">
               <a v-html="csummary(scope.row.detail[4])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[4]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
-          <el-table-column label="剩余刀" width="150">
+          <el-table-column label="剩余刀" width="130">
             <template v-if="scope.row.detail[5]" slot-scope="scope">
               <a v-html="csummary(scope.row.detail[5])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[5]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
+            </template>
+          </el-table-column>
+        </el-table-column>
+	<el-table-column label="今日总伤害" width="120" sortable :sort-method="(a, b) => {return a.today_total_damage - b.today_total_damage}">
+            <template v-if="scope.row" slot-scope="scope">
+              <a :class='"digit" + scope.row.today_total_damage.toString().length'>[[ scope.row.today_total_damage ]]</a>
             </template>
           </el-table-column>
         </el-table-column>

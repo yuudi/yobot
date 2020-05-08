@@ -102,6 +102,7 @@ var vm = new Vue({
         },
         refresh: function (challenges) {
             this.progressData = [...this.members];
+            for (m of this.progressData) m.today_total_damage = 0;
             var thisvue = this;
             var m = { qqid: -1 };
             for (c of challenges) {
@@ -111,9 +112,11 @@ var vm = new Vue({
                         qqid: c.qqid,
                         finished: 0,
                         detail: [],
+                        today_total_damage: 0,
                     }
                 }
                 m.detail[2 * m.finished] = c;
+                m.today_total_damage += c.damage;
                 if (c.is_continue) {
                     m.finished += 0.5;
                 } else {
