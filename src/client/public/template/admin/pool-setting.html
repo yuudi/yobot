@@ -2,13 +2,14 @@
 <html>
 
 <head>
-  <title>自定义卡池</title>
+  <title>自定义奖池</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="//cdn.staticfile.org/vue/2.6.11/vue.js"></script>
-  <script src="//cdn.staticfile.org/axios/0.19.2/axios.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
 </head>
 
 <body>
+  <p>所有概率都是相对值，即：抽取率 = 当前奖池概率 ÷ 所有奖池总概率 </p>
   <div id="app">
     <div v-for="(pdata, pname) in settings.pool">
       <h2>奖池：[[pname]]</h2>

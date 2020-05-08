@@ -20,8 +20,7 @@
 
 ::: warning
 
-- 如果使用这种方法，**必须**为 httpapi 和 yobot 设定 access_token 防止入侵
-- 此方式无法使用https，仍存在被劫持的可能（[了解更多](https://baike.baidu.com/item/https/285356)）
+如果使用这种方法，**必须**为 httpapi 和 yobot 设定 access_token 防止入侵
 
 :::
 
@@ -70,7 +69,7 @@ server {
 
   # 阻止酷Q接口被访问(可选，安全)
   location /ws/ {
-    # allow 172.16.0.0/12;  # 允许酷Q通过（yobot与酷Q不在同一个服务器上时使用）
+    # allow 172.16.0.0/12;  # 允许酷Q通过（yobot与酷Q不在同一个服务器上时使用，ip为酷Q所在服务器的ip）
     deny all;
   }
 }
@@ -88,7 +87,7 @@ server {
     Order Deny, Allow
     Allow from All
   </Proxy>
-  <Location /yobot/>  # 反向代理，如果你修改了`public_basepath`，请同时修改这里的`location`
+  <Location />  # 反向代理
     ProxyPass http://localhost:9222/
     ProxyPassReverse http://localhost:9222/
   </Location>

@@ -258,6 +258,7 @@ class ClanBattle:
         user = User.get_or_create(qqid=qqid)[0]
         user.clan_group_id = group_id
         user.nickname = nickname
+        user.deleted = False
         membership = Clan_member.get_or_create(
             group_id=group_id,
             qqid=qqid,
@@ -709,6 +710,9 @@ class ClanBattle:
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
+        user = User.get_or_none(qqid=qqid)
+        if user is None:
+            raise GroupError('请先加入公会')
         subscribe = Clan_subscribe.get_or_none(
             gid=group_id,
             qqid=qqid,
@@ -747,6 +751,8 @@ class ClanBattle:
             query.append(Clan_subscribe.subscribe_item == boss_num)
         for subscribe in Clan_subscribe.select().where(
             *query
+        ).order_by(
+            Clan_subscribe.sid
         ):
             subscribe_list.append({
                 'boss': subscribe.subscribe_item,
@@ -819,6 +825,9 @@ class ClanBattle:
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
+        user = User.get_or_none(qqid=qqid)
+        if user is None:
+            raise UserError('请先加入公会')
         if (appli_type != 1) and (extra_msg is None):
             raise UserError('锁定boss时必须留言')
         if group.challenging_member_qq_id is not None:

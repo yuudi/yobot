@@ -16,10 +16,12 @@
 
 **兼容性**：请在 `nonebot` 启用时的 `nonebot.run` 中添加如下的三个额外参数
 
-```python {4-6}
+```python {6-8}
 nonebot.run(
     host=host,
     port=port,
+    # 请添加以下三个额外参数
+    # 不要忘记 import asyncio
     debug=False,
     use_reloader=False,
     loop=asyncio.get_event_loop(),
@@ -28,7 +30,7 @@ nonebot.run(
 
 向机器人发送“version”、“帮助”，即可开始使用
 
-## 注意事项
+## 注意事项（必读）
 
 作为nonebot插件运行时，配置项中的`host`、`port`、`access_token`不会生效，这些配置会沿用nonebot中的设置
 
@@ -36,7 +38,7 @@ nonebot.run(
 
 ### 使用 HoshinoBot 时的注意事项
 
-由于 `HoshinoBot` 重新封装了 `nonebot` 的插件，增加了服务层，所以需要如下的操作。
+如果你使用 `HoshinoBot` 作为基础框架，由于 `HoshinoBot` 重新封装了 `nonebot` 的插件，增加了服务层，则需要以下的额外步骤：
 
 1. 在 `hoshino/modules` 目录下创建目录 `yobot`
 1. 进入 `yobot` 目录，按上文的方法添加子模块
@@ -44,7 +46,7 @@ nonebot.run(
 
 其他步骤与上文相同，最终目录结构应该是：
 
-```treeview
+```tree
 HoshinoBot
 ├── config.py
 ├── hoshino

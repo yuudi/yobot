@@ -73,7 +73,8 @@ class Event:
             print("刷新国服日程表成功")
         else:
             self.timeline = None
-            print(f"{rg}区域无日程表")
+            if rg != "default":
+                print(f"{rg}区域无日程表")
 
     def load_time_jp(self, timestamp) -> Arrow:
         tz = datetime.timezone(datetime.timedelta(hours=8))

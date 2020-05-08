@@ -64,7 +64,7 @@ class Updater:
         cmd = '''
             cd "{}"
             ping 127.0.0.1 -n 2 >nul
-            taskkill /pid {} /f
+            taskkill /pid {} /f >nul
             ping 127.0.0.1 -n 3 >nul
             del yobot.exe
             ren yobot.new.exe yobot.exe
@@ -150,14 +150,14 @@ class Updater:
             if self.evn == "exe":
                 cmd = '''
                     ping 127.0.0.1 -n 2 >nul
-                    taskkill /pid {} /f
+                    taskkill /pid {} /f >nul
                     ping 127.0.0.1 -n 3 >nul
                     powershell Start-Process -FilePath "{}"
                     '''.format(self_pid, os.path.join(self.path, "yobot.exe"))
             elif self.evn == "py" or self.evn == "python":
                 cmd = '''
                     ping 127.0.0.1 -n 2 >nul
-                    taskkill /pid {} /f
+                    taskkill /pid {} /f >nul
                     ping 127.0.0.1 -n 3 >nul
                     powershell Start-Process -FilePath "python.exe" -ArgumentList "{}"
                     '''.format(self_pid, os.path.join(self.path, "main.py"))

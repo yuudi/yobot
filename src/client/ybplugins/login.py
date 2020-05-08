@@ -2,7 +2,7 @@ import json
 import os
 import time
 from hashlib import sha256
-from typing import Union, Dict
+from typing import Dict, Union
 from urllib.parse import urljoin
 
 from aiocqhttp.api import Api
@@ -12,7 +12,7 @@ from quart import (Quart, Response, jsonify, make_response, redirect, request,
 
 from .templating import render_template, template_folder
 from .web_util import rand_string
-from .ybdata import User, User_login, MAX_TRY_TIMES
+from .ybdata import MAX_TRY_TIMES, User, User_login
 
 EXPIRED_TIME = 7 * 24 * 60 * 60  # 7 days
 LOGIN_AUTH_COOKIE_NAME = 'yobot_login'
@@ -59,12 +59,8 @@ class Login:
         cmd = cmd.split(' ')[0]
         if cmd in ['登录', '登陆']:
             return 1
-        if cmd in ['重置次数', '重置登陆', '重置登陆次数', '解除锁定']:
-            return 2
-        if cmd in ['忘记密码', '重置密码', '随机密码']:
+        if cmd =='重置密码':
             return 3
-        if cmd in ['网页', '管理页', '网页版', '访问网页']:
-            return 4
         return 0
 
     def execute(self, match_num: int, ctx: dict) -> dict:
@@ -75,18 +71,10 @@ class Login:
             }
         reply = ''
         if match_num == 1:
-            # reply = self._get_login_code_url(ctx)
-            # 不知道用CQ码能不能规避腾讯的链接检查  ## 不能，而且会被屏蔽
             reply = f'{self._get_login_code_url(ctx)}' \
                         '\n如显示已被使用，可发送 重置密码，之后用密码登录\n※ 请及时设置一个登录密码以避免无法获取登录链接时无法登录'
-        elif match_num == 2:
-            reply = self._reset_privacy(ctx)
         elif match_num == 3:
-            reply = f'您的密码已重置为：{self._reset_pwd(ctx)}'
-        elif match_num == 4:
-            url = urljoin(self.setting['public_address'], self.setting['public_basepath'])
-            # reply = url
-            reply = f'[CQ:share,url={url},title=会战管理网页版,content=点击访问网页版会战管理页面]'
+            reply = f'您的密码已重置为临时密码：{self._reset_pwd(ctx)}，登录后请立刻修改'
         else:
             assert False, f"没有实现匹配码{match_num}对应的操作"
 
@@ -124,21 +112,6 @@ class Login:
             }
         )[0]
 
-    # 这个放到前端
-    # @staticmethod
-    # def _validate_pwd(pwd: str) -> Union[str, bool]:
-    #     """
-    #     验证用户密码是否合乎硬性条件
-    #     :return: 合法返回True，不合法抛出ValueError异常
-    #     """
-    #     if len(pwd) < 8:
-    #         raise ValueError('密码至少需要8位')
-    #     char_regex = re.compile(
-    #         r'^[0-9a-zA-Z!\-\\/@#$%^&*?_.()+=\[\]{}|;:<>`~]+$')
-    #     if not char_regex.match(pwd):
-    #         raise ValueError('密码不能含有中文或密码中含有特殊符号')
-    #     return True
-
     def _get_login_code_url(self, ctx: Dict) -> str:
         """
         获取新的登录链接
@@ -157,7 +130,7 @@ class Login:
         # 链接登录
         url = urljoin(
             self.setting['public_address'],
-            '{}login/?qqid={}&key={}'.format(
+            '{}login/c/#qqid={}&key={}'.format(
                 self.setting['public_basepath'],
                 user.qqid,
                 login_code,
@@ -165,17 +138,17 @@ class Login:
         )
         return url
 
-    def _reset_privacy(self, ctx: Dict) -> str:
-        """
-        重置用户的登录次数
-        :param ctx: 本次消息事件的ctx对象
-        :return:
-        """
-        user = self._get_or_create_user_model(ctx)
-        user.privacy = 0
-        user.deleted = False
-        user.save()
-        return "您的账号锁定已解除"
+    # def _reset_privacy(self, ctx: Dict) -> str:
+    #     """
+    #     重置用户的登录次数
+    #     :param ctx: 本次消息事件的ctx对象
+    #     :return:
+    #     """
+    #     user = self._get_or_create_user_model(ctx)
+    #     user.privacy = 0
+    #     user.deleted = False
+    #     user.save()
+    #     return "您的账号锁定已解除"
 
     def _reset_pwd(self, ctx: Dict) -> str:
         """
@@ -190,7 +163,12 @@ class Login:
         user.password = _add_salt_and_hash(frontend_salted_pwd, user.salt)
         user.privacy = 0
         user.deleted = False
+        user.must_change_password = True
         user.save()
+        # 踢掉过去的登录
+        User_login.delete().where(
+            User_login.qqid==ctx['user_id'],
+        ).execute()
         return raw_pwd
 
     def _get_prefix(self):
@@ -374,11 +352,15 @@ class Login:
                         else:
                             raise e from e
                     self._set_auth_info(user)
+                    if user.must_change_password:
+                        callback_page = url_for('yobot_reset_pwd')
                     return redirect(callback_page)
 
                 if not key and not pwd:
                     raise ExceptionWithAdvice("无效的登录地址", "请检查登录地址是否完整")
 
+                if user.must_change_password:
+                    callback_page = url_for('yobot_reset_pwd')
                 res = await make_response(redirect(callback_page))
                 self._set_auth_info(user, res, save_user=False)
                 user.login_code_available = False
@@ -485,7 +467,12 @@ class Login:
                 # self._validate_pwd(pwd)
                 user.password = _add_salt_and_hash(pwd, user.salt)
                 user.privacy = 0
+                user.must_change_password = False
                 user.save()
+                # 踢掉过去的登录
+                User_login.delete().where(
+                    User_login.qqid==qq,
+                ).execute()
                 return await render_template(
                     'password.html',
                     success="密码设置成功",

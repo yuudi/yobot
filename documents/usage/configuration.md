@@ -2,11 +2,7 @@
 
 ## 配置文件位置
 
-运行包版：在 `yobot.exe` 同目录下的 `yobot_config.json`
-
-源码版：在 `src/client/yobot_config.json`
-
-插件版：在 `<插件目录>/yobot/src/client/yobot_data/yobot_config.json`
+运行一次后自动生成，位置在运行目录下的 `yobot_data/yobot_config.json`  
 
 ## 配置格式
 

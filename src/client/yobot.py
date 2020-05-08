@@ -27,14 +27,14 @@ else:
                            switcher, templating, updater, web_util, ybdata,
                            yobot_msg, custom)
 
-# 本项目构建的框架非常粗糙且幼稚，不建议各位把时间浪费本项目上
+# 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
 # https://nonebot.cqp.moe/
 
 
 class Yobot:
-    Version = "[v3.5.5]"
-    Version_id = 109
+    Version = "[v3.5.6_beta_1]"
+    Version_id = 122
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
