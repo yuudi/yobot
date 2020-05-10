@@ -11,7 +11,8 @@ from urllib.parse import urljoin
 import peewee
 from aiocqhttp.api import Api
 from apscheduler.triggers.cron import CronTrigger
-from quart import Quart, jsonify, redirect, request, session, url_for
+from quart import (Quart, jsonify, make_response, redirect, request, session,
+                   url_for)
 
 from ..templating import render_template
 from ..web_util import async_cached_func
@@ -1896,17 +1897,14 @@ class ClanBattle:
                         groupData={
                             'group_name': group.group_name,
                             'game_server': group.game_server,
-                            'allow_guest': bool(group.privacy & 0x1),
                         },
+                        privacy=group.privacy,
                         notification=group.notification,
                     )
                 elif action == 'put_setting':
                     group.game_server = payload['game_server']
                     group.notification = payload['notification']
-                    if payload['allow_guest']:
-                        group.privacy |= 0x0001
-                    else:
-                        group.privacy &= 0xfffe
+                    group.privacy = payload['privacy']
                     group.save()
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
@@ -1949,18 +1947,27 @@ class ClanBattle:
                     'clan/<int:group_id>/statistics/api/'),
             methods=['GET'])
         async def yobot_clan_statistics_api(group_id):
-            if 'yobot_user' not in session:
-                return jsonify(code=10, message='Not logged in')
-            user = User.get_by_id(session['yobot_user'])
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return jsonify(code=20, message='Group not exists')
-            is_member = Clan_member.get_or_none(
-                group_id=group_id, qqid=session['yobot_user'])
-            if (not is_member and user.authority_group >= 10):
-                return jsonify(code=11, message='Insufficient authority')
+            if not (group.privacy & 0x2):
+                if 'yobot_user' not in session:
+                    return jsonify(code=10, message='Not logged in')
+                user = User.get_by_id(session['yobot_user'])
+                is_member = Clan_member.get_or_none(
+                    group_id=group_id, qqid=session['yobot_user'])
+                if (not is_member and user.authority_group >= 10):
+                    return jsonify(code=11, message='Insufficient authority')
             report = self.get_report(group_id, None, None)
-            return jsonify(code=0, challenges=report)
+            member_list = self.get_member_list(group_id)
+            response = await make_response(jsonify(
+                code=0, 
+                challenges=report, 
+                members=member_list,
+            ))
+            if (group.privacy & 0x2):
+                response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
 
         @app.route(
             urljoin(self.setting['public_basepath'],

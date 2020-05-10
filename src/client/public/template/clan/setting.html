@@ -29,8 +29,9 @@
           <el-option label="国服" value="cn"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="出刀表无需登录">
-        <el-checkbox v-model="form.allow_guest"></el-checkbox>
+      <el-form-item label="隐私设置">
+        <el-checkbox v-model="form.privacy.allow_guest">出刀表无需登录</el-checkbox>
+        <el-checkbox v-model="form.privacy.allow_statistics_api">允许api获取数据</el-checkbox>
       </el-form-item>
       <el-form-item label="通知到群">
         <el-checkbox v-model="form.notify.challenge">伤害上报</el-checkbox>

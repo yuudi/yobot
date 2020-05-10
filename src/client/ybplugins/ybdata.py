@@ -56,7 +56,7 @@ class User_login(_BaseModel):
 class Clan_group(_BaseModel):
     group_id = BigIntegerField(primary_key=True)
     group_name = TextField(null=True)
-    privacy = IntegerField(default=2)
+    privacy = IntegerField(default=0)
     game_server = CharField(max_length=2, default='cn')
     notification = IntegerField(default=0xffff)  # 需要接收的通知
     level_4 = BooleanField(default=False)  # 公会战是否存在4阶段
