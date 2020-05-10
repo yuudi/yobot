@@ -6,7 +6,7 @@ services:
       - "9222:9222"
     env_file: .env
     restart: on-failure
-    command: |
+    command: >
       bash -c "
       python3 main.py > /dev/null 2 > /dev/null
       && sh yobotg.sh

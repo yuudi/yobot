@@ -173,10 +173,10 @@ class Gacha:
             return "{}今天剩余抽卡次数不足30次，不能抽一井".format(nickname, day_times)
         reply = ""
         result = ""
+        flag = False
         for i in range(1, 31):
             if day_limit != 0 and day_times >= day_limit:
                 reply += "{}抽到第{}发十连时已经达到今日抽卡上限，抽卡结果:".format(nickname, i)
-                flag = False
                 break
             single_result = self.result()
             times += 1
@@ -186,10 +186,12 @@ class Gacha:
                     info[char] += 1
                     if self.check_ssr(char):
                         result += "\n{}({})".format(char, info[char])
+                        flag = True
                 else:
                     info[char] = 1
                     if self.check_ssr(char):
                         result += "\n{}(new)".format(char)
+                        flag = True
         sql_info = pickle.dumps(info)
         if mem_exists:
             db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
