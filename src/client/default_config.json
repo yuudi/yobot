@@ -1,7 +1,7 @@
 {
     "host": "0.0.0.0",
     "port": 9222,
-    "access_token": null,
+    "access_token": "",
     "client_salt": null,
     "public_address": null,
     "public_basepath": "/yobot/",
@@ -10,6 +10,7 @@
     "black-list": [],
     "black-list-group": [],
     "setting-restrict": 3,
+    "allow_bulk_private": false,
     "auto_update": true,
     "update-time": "random",
     "clan_battle_mode": "web",
@@ -54,12 +55,6 @@
             [6000000, 8000000, 10000000, 12000000, 15000000],
             [6000000, 8000000, 10000000, 12000000, 15000000],
             [6000000, 8000000, 10000000, 12000000, 15000000]
-        ],
-        "eff": [
-            [1.2, 1.2, 1.3, 1.4, 1.5],
-            [1.6, 1.6, 1.8, 1.9, 2.0],
-            [2.0, 2.0, 2.4, 2.4, 2.6],
-            [2.4, 2.4, 2.6, 2.6, 3.0]
         ]
     }
 }

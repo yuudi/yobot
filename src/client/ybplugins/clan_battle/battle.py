@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os
+import random
 import re
 import time
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -258,6 +259,7 @@ class ClanBattle:
         user = User.get_or_create(qqid=qqid)[0]
         user.clan_group_id = group_id
         user.nickname = nickname
+        user.deleted = False
         membership = Clan_member.get_or_create(
             group_id=group_id,
             qqid=qqid,
@@ -680,7 +682,20 @@ class ClanBattle:
             Clan_subscribe.gid == group_id,
         ).execute()
 
-    def send_remind(self, group_id: Groupid, member_list: List[QQid]):
+    async def send_private_remind(self, member_list: List[QQid], content: str):
+        for qqid in member_list:
+            await asyncio.sleep(random.randint(3, 10))
+            try:
+                await self.api.send_private_msg(user_id=qqid, message=content)
+                _logger.info(f'向{qqid}发送出刀提醒')
+            except Exception as e:
+                _logger.exception(e)
+
+    def send_remind(self,
+                    group_id: Groupid,
+                    member_list: List[QQid],
+                    sender: QQid,
+                    send_private_msg: bool = False):
         """
         remind members to finish challenge
 
@@ -690,13 +705,20 @@ class ClanBattle:
             group_id: group id
             member_list: a list of qqid to reminder
         """
-        message = ' '.join((
-            atqq(qqid) for qqid in member_list
-        ))
-        asyncio.ensure_future(self.api.send_group_msg(
-            group_id=group_id,
-            message=message+'\n=======\n请及时完成今日出刀',
-        ))
+        sender_name = self._get_nickname_by_qqid(sender)
+        if send_private_msg:
+            asyncio.ensure_future(self.send_private_remind(
+                member_list=member_list,
+                content=f'{sender_name}提醒您及时完成今日出刀',
+            ))
+        else:
+            message = ' '.join((
+                atqq(qqid) for qqid in member_list
+            ))
+            asyncio.ensure_future(self.api.send_group_msg(
+                group_id=group_id,
+                message=message+f'\n=======\n{sender_name}提醒您及时完成今日出刀',
+            ))
 
     def add_subscribe(self, group_id: Groupid, qqid: QQid, boss_num, comment=None):
         """
@@ -715,6 +737,9 @@ class ClanBattle:
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
+        user = User.get_or_none(qqid=qqid)
+        if user is None:
+            raise GroupError('请先加入公会')
         subscribe = Clan_subscribe.get_or_none(
             gid=group_id,
             qqid=qqid,
@@ -753,6 +778,8 @@ class ClanBattle:
             query.append(Clan_subscribe.subscribe_item == boss_num)
         for subscribe in Clan_subscribe.select().where(
             *query
+        ).order_by(
+            Clan_subscribe.sid
         ):
             subscribe_list.append({
                 'boss': subscribe.subscribe_item,
@@ -777,7 +804,7 @@ class ClanBattle:
         ).execute()
         return deleted_counts
 
-    def notify_subscribe(self, group_id: Groupid, boss_num=None):
+    def notify_subscribe(self, group_id: Groupid, boss_num=None, send_private_msg=False):
         """
         send notification to subsciber and remove them (when boss is defeated).
 
@@ -825,6 +852,9 @@ class ClanBattle:
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
+        user = User.get_or_none(qqid=qqid)
+        if user is None:
+            raise UserError('请先加入公会')
         if (appli_type != 1) and (extra_msg is None):
             raise UserError('锁定boss时必须留言')
         if group.challenging_member_qq_id is not None:
@@ -1009,7 +1039,7 @@ class ClanBattle:
             attr='clan_member',
         ).where(
             Clan_member.group_id == group_id,
-            User.deleted==False,
+            User.deleted == False,
         ):
             member_list.append({
                 'qqid': user.qqid,
@@ -1730,7 +1760,17 @@ class ClanBattle:
                 elif action == 'send_remind':
                     if user.authority_group >= 100:
                         return jsonify(code=11, message='Insufficient authority')
-                    self.send_remind(group_id, payload['memberlist'])
+                    sender = user_id
+                    private = payload.get('send_private_msg', False)
+                    if private and not self.setting['allow_bulk_private']:
+                        return jsonify(
+                            code=12,
+                            message='私聊通知已禁用',
+                        )
+                    self.send_remind(group_id,
+                                     payload['memberlist'],
+                                     sender=sender,
+                                     send_private_msg=private)
                     return jsonify(
                         code=0,
                         notice='发送成功',

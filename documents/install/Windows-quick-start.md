@@ -1,15 +1,16 @@
-# Windows 运行包（快速上手版）
+# Windows 便携版（快速上手版）
 
 ## 参考视频
 
-在 windows 下使用运行包安装可以参考[演示视频](https://x.jingzhidh.com/3/Tutorial.mp4)  
+在 windows 下使用便携版安装可以参考[演示视频](https://x.jingzhidh.com/3/Tutorial.mp4)  
 （视频中网站为旧版，不影响安装过程）
 
 ## 准备服务器
 
-虽然在自己电脑运行也可以，不过最好能租一个服务器，以便长期挂机和提供web服务
+服务器能保证24小时在线和提供web服务
 
-[服务器推荐](./server.md)
+[服务器推荐](./server.md)  
+服务器操作系统建议选择 Windows 7 或 Windows Server 2008
 
 ## 安装
 
@@ -27,7 +28,7 @@
 
 ### 第二步
 
-点击下载[yobot运行包](https://download-latest.yobot.workers.dev)
+点击下载[yobot便携版](https://tools.yobot.win/download-latest/)
 
 解压后双击“yobot.exe”启动服务，双方通信成功后出现如下的提示
 

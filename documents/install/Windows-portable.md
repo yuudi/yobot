@@ -1,4 +1,4 @@
-# Windows 运行包（新手推荐）
+# Windows 便携版
 
 ## 准备服务器
 
@@ -39,11 +39,11 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 ## 运行yobot服务
 
-### Windows系统运行包
+### Windows系统
 
-[点击下载运行包](https://download-latest.yobot.workers.dev)
+[点击下载便携版](https://tools.yobot.win/download-latest/)
 
-下载yobot运行包，创建一个文件夹解压，启动 yobot.exe 即可。如需更改端口，请启动一次后修改 yobot_config.json 中的 port 字段并重启。
+下载yobot便携版，创建一个文件夹解压，启动 yobot.exe 即可。如需更改端口，请启动一次后修改 yobot_config.json 中的 port 字段并重启。
 
 ![windows下正确启动图](https://x.jingzhidh.com/img/yobot/aaf38d1a5cbc1c87.jpg)
 

@@ -13,6 +13,6 @@
     if (!h) {
         alert('登录错误：登录码丢失');
     } else {
-        window.location = '../?' + h.substr(1);
+        window.location = '../?' + h.split('?')[0].substr(1);
     }
 </script>

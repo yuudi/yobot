@@ -62,14 +62,8 @@ class Consult:
             item = self.name2jp.get(index.lower(), None)
             if item is None:
                 if is_retry:
-                    try:
-                        requests.get(self.Feedback_URL+index)
-                    except requests.exceptions.ConnectionError:
-                        msg = "没有找到【{}】，目前昵称表：{}".format(
-                            index, self.Nicknames_repo)
-                    else:
-                        msg = "没有找到【{}】，已自动反馈，目前昵称表：{}".format(
-                            index, self.Nicknames_repo)
+                    msg = "没有找到【{}】，目前昵称表：{}".format(
+                        index, self.Nicknames_repo)
                     raise ValueError(msg)
                 else:
                     self.__init__(self.setting, refresh_nickfile=True)

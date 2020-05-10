@@ -2,11 +2,7 @@
 
 ## 配置文件位置
 
-运行包版：在 `yobot.exe` 同目录下的 `yobot_config.json`
-
-源码版：在 `src/client/yobot_config.json`
-
-插件版：在 `<插件目录>/yobot/src/client/yobot_data/yobot_config.json`
+运行一次后自动生成，位置在运行目录下的 `yobot_data/yobot_config.json`  
 
 ## 配置格式
 
@@ -43,6 +39,8 @@
 `black-list-group` 黑名单 qq群 列表
 
 `setting-restrict` 更新和重启指令需要的权限，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 `3`
+
+`allow_bulk_private` 允许公会战管理员发起批量私聊通知，默认值 `false`
 
 `auto_update` 自动更新，默认值 `true`
 

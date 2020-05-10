@@ -8,7 +8,7 @@
 
 [mirai 项目地址](https://github.com/mamoe/mirai)
 
-## 使用 yobot-mirai 运行
+## 使用 yobot-mirai 运行（推荐）
 
 编写中……
 
