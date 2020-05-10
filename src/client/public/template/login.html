@@ -81,6 +81,11 @@
                 ],
             }
         },
+        methods() {
+            if (localStorage.login_qqid) {
+                this.form.qq = String(localStorage.login_qqid);
+            }
+        },
         methods: {
             post: function (url, params) {
                 //创建form表单
@@ -102,6 +107,7 @@
                 temp_form.submit();
             },
             onSubmit: function () {
+                localStorage.login_qqid = this.form.qq;
                 this.$refs['form'].validate((valid) => {
                     if (valid) {
                         const url = "{{ url_for('yobot_login') }}";

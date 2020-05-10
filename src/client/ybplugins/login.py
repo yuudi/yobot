@@ -16,7 +16,8 @@ from .ybdata import MAX_TRY_TIMES, User, User_login
 
 EXPIRED_TIME = 7 * 24 * 60 * 60  # 7 days
 LOGIN_AUTH_COOKIE_NAME = 'yobot_login'
-FRONTEND_SALT = '14b492a3-a40a-42fc-a236-e9a9307b47d2'  # this need be same with static/password.js
+# this need be same with static/password.js
+FRONTEND_SALT = '14b492a3-a40a-42fc-a236-e9a9307b47d2'
 
 
 class ExceptionWithAdvice(RuntimeError):
@@ -59,7 +60,7 @@ class Login:
         cmd = cmd.split(' ')[0]
         if cmd in ['登录', '登陆']:
             return 1
-        if cmd =='重置密码':
+        if cmd == '重置密码':
             return 3
         return 0
 
@@ -72,7 +73,7 @@ class Login:
         reply = ''
         if match_num == 1:
             reply = f'{self._get_login_code_url(ctx)}' \
-                        '\n如显示已被使用，可发送 重置密码，之后用密码登录\n※ 请及时设置一个登录密码以避免无法获取登录链接时无法登录'
+                '\n如显示已被使用，可发送 重置密码，之后用密码登录\n※ 请及时设置一个登录密码以避免无法获取登录链接时无法登录'
         elif match_num == 3:
             reply = f'您的密码已重置为临时密码：{self._reset_pwd(ctx)}，登录后请立刻修改'
         else:
@@ -87,7 +88,9 @@ class Login:
         }
 
     def _get_or_create_user_model(self, ctx: dict) -> User:
+        first_admin_login = False
         if not self.setting['super-admin']:
+            first_admin_login = True
             authority_group = 1
             self.setting['super-admin'].append(ctx['user_id'])
             save_setting = self.setting.copy()
@@ -103,7 +106,7 @@ class Login:
             authority_group = 100
 
         # 取出数据
-        return User.get_or_create(
+        user = User.get_or_create(
             qqid=ctx['user_id'],
             defaults={
                 'nickname': ctx['sender']['nickname'],
@@ -111,6 +114,9 @@ class Login:
                 'privacy': 0
             }
         )[0]
+        if first_admin_login:
+            user.authority_group = 1
+        return user
 
     def _get_login_code_url(self, ctx: Dict) -> str:
         """
@@ -159,7 +165,8 @@ class Login:
         raw_pwd = rand_string(8)
 
         user = self._get_or_create_user_model(ctx)
-        frontend_salted_pwd = _add_salt_and_hash(raw_pwd + str(ctx['user_id']), FRONTEND_SALT)
+        frontend_salted_pwd = _add_salt_and_hash(
+            raw_pwd + str(ctx['user_id']), FRONTEND_SALT)
         user.password = _add_salt_and_hash(frontend_salted_pwd, user.salt)
         user.privacy = 0
         user.deleted = False
@@ -167,7 +174,7 @@ class Login:
         user.save()
         # 踢掉过去的登录
         User_login.delete().where(
-            User_login.qqid==ctx['user_id'],
+            User_login.qqid == ctx['user_id'],
         ).execute()
         return raw_pwd
 
@@ -471,7 +478,7 @@ class Login:
                 user.save()
                 # 踢掉过去的登录
                 User_login.delete().where(
-                    User_login.qqid==qq,
+                    User_login.qqid == qq,
                 ).execute()
                 return await render_template(
                     'password.html',

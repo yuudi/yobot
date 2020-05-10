@@ -133,6 +133,13 @@
         </p>
         <p>
             <el-row>
+                <el-col :span="6">
+                    <el-checkbox v-model="setting.allow_bulk_private">允许进行批量私聊</el-checkbox>
+                </el-col>
+            </el-row>
+        </p>
+        <p>
+            <el-row>
                 <el-col :span="4">
                     <el-checkbox v-model="setting.auto_update">自动更新</el-checkbox>
                 </el-col>

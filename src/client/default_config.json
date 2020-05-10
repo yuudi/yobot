@@ -1,7 +1,7 @@
 {
     "host": "0.0.0.0",
     "port": 9222,
-    "access_token": null,
+    "access_token": "",
     "client_salt": null,
     "public_address": null,
     "public_basepath": "/yobot/",
@@ -10,6 +10,7 @@
     "black-list": [],
     "black-list-group": [],
     "setting-restrict": 3,
+    "allow_bulk_private": false,
     "auto_update": true,
     "update-time": "random",
     "clan_battle_mode": "web",

@@ -40,6 +40,8 @@
 
 `setting-restrict` 更新和重启指令需要的权限，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 `3`
 
+`allow_bulk_private` 允许公会战管理员发起批量私聊通知，默认值 `false`
+
 `auto_update` 自动更新，默认值 `true`
 
 `update-time` 自动更新时间，如 `03:30`，默认为随机的凌晨时间

@@ -16,7 +16,7 @@
 （[阿里云开启方法](https://help.aliyun.com/document_detail/25471.html) [腾讯云开启方法](https://cloud.tencent.com/document/product/213/39740)）
 如果是腾讯云 Windows 服务器，可能还需要放行 Windows 防火墙
 
-如果服务器没有公网地址，可以使用端口映射
+由于不同的服务器提供商所需的步骤不同，所以具体方法请通过搜索引擎搜索：【你的提供商+你的操作系统+如何开放端口】
 
 ::: warning
 

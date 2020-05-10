@@ -58,10 +58,12 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 请尽量使用git clone而不是download zip，否则无法自动更新版本
 
+进入目录 `cd yobot`
+
 安装依赖 `pip install -r src\client\requirements.txt`
 （如果在国内建议加上参数 `-i https://pypi.tuna.tsinghua.edu.cn/simple`）
 
-启动：`cd yobot\src\client & python main.py`
+启动：`cd src\client & python main.py`
 
 如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
 

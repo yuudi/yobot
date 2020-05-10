@@ -19,6 +19,7 @@ class Updater:
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.evn = glo_setting["verinfo"]["run-as"]
         self.path = glo_setting["dirname"]
+        self.working_path = os.path.abspath(".")
         self.ver = glo_setting["verinfo"]
         self.setting = glo_setting
 
@@ -60,19 +61,19 @@ class Updater:
             z.extractall(path=os.path.join(self.path, "temp", verstr))
         os.remove(os.path.join(self.path, "temp", fname))
         shutil.move(os.path.join(self.path, "temp", verstr, "yobot.exe"),
-                    os.path.join(self.path, "yobot.new.exe"))
+                    os.path.join(self.working_path, "yobot.new.exe"))
         cmd = '''
-            cd "{}"
+            cd '{}'
             ping 127.0.0.1 -n 2 >nul
             taskkill /pid {} /f >nul
             ping 127.0.0.1 -n 3 >nul
             del yobot.exe
             ren yobot.new.exe yobot.exe
             powershell Start-Process -FilePath "yobot.exe"
-            '''.format(self.path, os.getpid())
+            '''.format(self.working_path, os.getpid())
         with open(os.path.join(self.path, "update.bat"), "w") as f:
             f.write(cmd)
-        os.system('powershell Start-Process -FilePath "{}"'.format(
+        os.system("powershell Start-Process -FilePath '{}'".format(
             os.path.join(self.path, "update.bat")))
         sys.exit()
 
@@ -96,17 +97,17 @@ class Updater:
         verinfo = verinfo[test_version]
         if not (force or verinfo["version"] > self.ver["ver_id"]):
             return "已经是最新版本"
-        git_dir = os.path.dirname(os.path.dirname(self.path))
+        git_dir = os.path.dirname(os.path.dirname(self.working_path))
         cmd = '''
-        cd "{}"
+        cd '{}'
         taskkill /pid {} /f
         git pull
         ping 127.0.0.1 -n 3 >nul
-        powershell Start-Process -FilePath "python.exe" -ArgumentList "{}"
-        '''.format(self.path, os.getpid(), os.path.join(self.path, "main.py"))
+        powershell Start-Process -FilePath "python.exe" -ArgumentList '{}'
+        '''.format(self.path, os.getpid(), os.path.join(self.working_path, "main.py"))
         with open(os.path.join(git_dir, "update.bat"), "w") as f:
             f.write(cmd)
-        os.system('powershell Start-Process -FilePath "{}"'.format(
+        os.system("powershell Start-Process -FilePath '{}'".format(
             os.path.join(git_dir, "update.bat")))
         sys.exit()
 
@@ -130,7 +131,7 @@ class Updater:
         verinfo = verinfo[test_version]
         if not (force or verinfo["version"] > self.ver["ver_id"]):
             return "已经是最新版本"
-        git_dir = os.path.dirname(os.path.dirname(self.path))
+        git_dir = os.path.dirname(os.path.dirname(self.working_path))
         os.system(f'cd "{git_dir}" ; git pull')
         open('.YOBOT_RESTART', 'w').close()
         sys.exit(10)
@@ -152,18 +153,18 @@ class Updater:
                     ping 127.0.0.1 -n 2 >nul
                     taskkill /pid {} /f >nul
                     ping 127.0.0.1 -n 3 >nul
-                    powershell Start-Process -FilePath "{}"
-                    '''.format(self_pid, os.path.join(self.path, "yobot.exe"))
+                    powershell Start-Process -FilePath '{}'
+                    '''.format(self_pid, os.path.join(self.working_path, "yobot.exe"))
             elif self.evn == "py" or self.evn == "python":
                 cmd = '''
                     ping 127.0.0.1 -n 2 >nul
                     taskkill /pid {} /f >nul
                     ping 127.0.0.1 -n 3 >nul
-                    powershell Start-Process -FilePath "python.exe" -ArgumentList "{}"
-                    '''.format(self_pid, os.path.join(self.path, "main.py"))
+                    powershell Start-Process -FilePath "python.exe" -ArgumentList '{}'
+                    '''.format(self_pid, os.path.join(self.working_path, "main.py"))
             with open(os.path.join(self.path, "restart.bat"), "w") as f:
                 f.write(cmd)
-            os.system('powershell Start-Process -FilePath "{}"'.format(
+            os.system("powershell Start-Process -FilePath '{}'".format(
                       os.path.join(self.path, "restart.bat")))
             sys.exit(10)
         else:
