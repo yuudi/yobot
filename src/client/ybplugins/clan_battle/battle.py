@@ -327,7 +327,7 @@ class ClanBattle:
                behalfed: Optional[QQid] = None,
                *,
                extra_msg: Optional[str] = None,
-               comment={},
+               comment=None,
                previous_day=False,
                ) -> BossStatus:
         """
@@ -340,6 +340,8 @@ class ClanBattle:
             behalfed: the real member who did the challenge
             comment: extra infomation about the challenge
         """
+        if comment is None:
+            comment = {}
         if damage < 0:
             raise InputError('伤害不可以是负数')
         group = Clan_group.get_or_none(group_id=group_id)
@@ -437,7 +439,7 @@ class ClanBattle:
                behalfed: Optional[QQid] = None,
                *,
                extra_msg: Optional[str] = None,
-               comment={},
+               comment=None,
                previous_day=False,
                ) -> BossStatus:
         """
@@ -449,6 +451,8 @@ class ClanBattle:
             behalfed: the real member who did the challenge
             comment: extra infomation about the challenge
         """
+        if comment is None:
+            comment = {}
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
@@ -694,7 +698,7 @@ class ClanBattle:
             message=message+'\n=======\n请及时完成今日出刀',
         ))
 
-    def add_subscribe(self, group_id: Groupid, qqid: QQid, boss_num, comment={}):
+    def add_subscribe(self, group_id: Groupid, qqid: QQid, boss_num, comment=None):
         """
         subscribe a boss, get notification when boss is defeated.
 
@@ -706,6 +710,8 @@ class ClanBattle:
             boss_num: number of boss to subscribe, `0` for all
             comment: extra infomation about the subscribe
         """
+        if comment is None:
+            comment = {}
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
