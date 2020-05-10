@@ -2,19 +2,85 @@
 
 <head>
     <title>公会战 - 数据分析</title>
+    <meta name='viewport' content='width=1485' charset="utf-8" />
+    <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+    <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
+    <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+    <style>
+      .el-table td,
+      .el-table th {
+        text-align: center;
+      }
+      .el-popover {
+        white-space: pre-wrap;
+      }
+      .digit6{
+        color:blue;
+      }
+      .digit7{
+        color:green;
+      }
+      .digit8{
+        color:orange;
+      }
+      .digit9{
+        color:red;
+      }
+    </style>
 </head>
 
 <body>
-    <h1>建设中</h1>
-    <p><a href="#" onclick="javascript:history.go(-1);">返回</a></p>
-    <p><a href="./api/" style="color: #f0f0f0;">原始数据（json格式）</a></p>
-    <!--
-    本来像做一个全方位的数据分析，
-    但是有点麻烦我不想写了（主要是懒），
-    原始数据可以在 "./api/" 这里获取，
-    有没有大佬愿意写一下_(:з」∠)_
-    -->
-<script>console.log("本来像做一个全方位的数据分析，\n但是有点麻烦我不想写了（主要是懒），\n原始数据可以在 ./api/ 这里获取，\n有没有大佬愿意写一下_(:з」∠)_")</script>
+    <div id="app">
+        <el-page-header @back="location='..'" content></el-page-header>
+        <el-menu
+          :default-active="activeIndex"
+          class="el-menu-demo"
+          mode="horizontal"
+          @select="handleTitleSelect"
+        >
+          <el-menu-item index="1">面板</el-menu-item>
+          <el-menu-item index="2">预约</el-menu-item>
+          <el-menu-item index="3">查刀</el-menu-item>
+          <el-menu-item index="4">统计</el-menu-item>
+          <el-menu-item index="5">我的</el-menu-item>
+        </el-menu>
+        <h1 style="text-align:center">伤害统计</h1>
+        <span>伤害颜色：</span>
+        <a class="digit6">十万</a> |
+        <a class="digit7">百万</a> |
+        <a class="digit8">千万</a> |
+        <a class="digit9">亿</a>
+        <el-table :data="statisticsData" :default-sort="{prop: 'damage', order: 'descending'}">>
+          <el-table-column prop="qqid" label="QQ号" width="180" sortable></el-table-column>
+          <el-table-column prop="nickname" label="昵称" width="180" sortable></el-table-column>
+          <el-table-column prop="damage" label="总伤害" width="200" sortable>
+            <template v-if="scope.row" slot-scope="scope">
+              <a :class="`digit${scope.row.damage.toString().length}`">[[scope.row.damage]]</a>
+            </template>
+          </el-table-column>
+          <el-table-column fixed="right" label="操作" width="100">
+            <template slot-scope="scope">
+              <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-dialog title="伤害详情" :visible.sync="dialogTableVisible">
+          <el-table :data="gridData">
+            <el-table-column prop="qqid" label="QQ号" width="120"></el-table-column>
+            <el-table-column label="刀数据" width="200">
+              <template v-if="scope.row" slot-scope="scope">
+                <span v-html="csummary(scope.row)"></span>
+                <el-popover placement="top" effect="light" trigger="hover">
+                  [[ cdetail(scope.row) ]]
+                  <i class="el-icon-info" slot="reference"></i>
+                </el-popover>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-dialog>
+    </div>
 </body>
-
+<script>var csrf_token = "{{ session['csrf_token'] }}";</script>
+<script src="{{ url_for('yobot_static', filename='clan/statistics.js') }}"></script>
 </html>
