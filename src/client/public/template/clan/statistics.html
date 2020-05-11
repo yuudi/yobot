@@ -52,14 +52,14 @@
         <a class="digit8">千万</a> |
         <a class="digit9">亿</a>
         <el-table :data="statisticsData" :default-sort="{prop: 'damage', order: 'descending'}">>
-          <el-table-column prop="qqid" label="QQ号" width="180" sortable></el-table-column>
-          <el-table-column prop="nickname" label="昵称" width="180" sortable></el-table-column>
-          <el-table-column prop="damage" label="总伤害" width="200" sortable>
+          <el-table-column prop="qqid" label="QQ号" sortable></el-table-column>
+          <el-table-column prop="nickname" label="昵称" sortable></el-table-column>
+          <el-table-column prop="damage" label="总伤害" sortable>
             <template v-if="scope.row" slot-scope="scope">
               <a :class="`digit${scope.row.damage.toString().length}`">[[scope.row.damage]]</a>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" width="100">
+          <el-table-column fixed="right" label="操作">
             <template slot-scope="scope">
               <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
             </template>
@@ -67,8 +67,8 @@
         </el-table>
         <el-dialog title="伤害详情" :visible.sync="dialogTableVisible">
           <el-table :data="gridData">
-            <el-table-column prop="qqid" label="QQ号" width="120"></el-table-column>
-            <el-table-column label="刀数据" width="200">
+            <el-table-column prop="qqid" label="QQ号"></el-table-column>
+            <el-table-column label="刀数据">
               <template v-if="scope.row" slot-scope="scope">
                 <span v-html="csummary(scope.row)"></span>
                 <el-popover placement="top" effect="light" trigger="hover">
