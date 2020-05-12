@@ -11,7 +11,7 @@ services:
       && sh yobotg.sh
       "
     volumes:
-    - ./src/client:/code
+    - .:/code
     networks:
       - bot_net
 
