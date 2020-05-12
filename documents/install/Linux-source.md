@@ -1,12 +1,12 @@
 # Linux 源码运行
 
-由于酷Q机器人原生于Windows系统，所以Linux上运行只能使用wine（类似于虚拟机）来运行酷Q，使用Docker可以直接部署。  
+由于 酷Q 机器人原生于 Windows 系统，所以 Linux 上运行只能使用 wine（类似于虚拟机）来运行 酷Q，使用 Docker 可以直接部署。  
 
-由于wine与原生Windows差别较大，很多酷Q插件无法在wine中运行。
+由于 wine 与原生 Windows 差别较大，很多 酷Q 插件无法在 wine 中运行。
 
-Linux可以使用Docker部署（测试中），具体请看[这里](./docker.md)
+Linux 用户可以使用 Docker 部署（测试中），具体请看[这里](./docker.md)。
 
-~~Linux 用户建议使用mirai部署~~。mirai现在还不够稳定，再等一两个月吧。
+Linux 用户可以使用 mirai 部署（测试中），具体请看[这里](./mirai.md)。
 
 **Linux运行存在问题较多，不推荐使用**，如果你坚持使用Linux来部署机器人，可以参考本文步骤。
 
@@ -62,13 +62,15 @@ Linux可以使用Docker部署（测试中），具体请看[这里](./docker.md)
 
 请尽量使用 git clone 而不是 download zip ，否则无法自动更新版本
 
-安装依赖 `pip3 install -r src/client/requirements.txt`
+进入目录 `cd yobot`
+
+安装依赖 `pip3 install -r src/client/requirements.txt`  
 （如果在国内建议加上参数 `-i https://pypi.tuna.tsinghua.edu.cn/simple`）
 
 启动：
 
 ```shell
-cd yobot/src/client
+cd src/client
 
 # 建议使用sreen或类似的终端复用器
 screen -S yobot

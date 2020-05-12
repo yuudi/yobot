@@ -3,13 +3,13 @@
 <head>
     <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8" />
     <title>yobot用户信息</title>
-    <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
-    <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
-    <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
-    <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
-{% if user.qqid != visitor and visitor.authority_group >= 100 %}{# 不是本人且不是管理员 -#}
+{% if user.qqid != visitor and visitor.authority_group > 100 %}{# 不是本人且不是管理员 -#}
 <body>
     <h1>yobot用户信息</h1>
     <p>你无权查看这个页面</p>

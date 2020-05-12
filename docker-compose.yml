@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   bot:
     build: .
@@ -6,18 +6,18 @@ services:
       - "9222:9222"
     env_file: .env
     restart: on-failure
-    command: bash -c "
+    command: >
+      bash -c "
       python3 main.py > /dev/null 2 > /dev/null
       && sh yobotg.sh
       "
     volumes:
-    - .:/code
+      - .:/code
     networks:
       - bot_net
 
   cqhttp:
     image: richardchien/cqhttp:latest
-#    image: richardchien/cqhttp:4.5.0
     env_file: .env
     restart: on-failure
     environment:
@@ -44,10 +44,10 @@ services:
       - ./cqhttp:/home/user/coolq
     ports:
       - "9000:9000" # VNC端口
-#      - "5700:5700" # HTTP API 插件开放的端口
+      # - "5700:5700" # HTTP API 插件开放的端口
     networks:
       - bot_net
 
 networks:
-    bot_net:
-        driver: bridge
+  bot_net:
+    driver: bridge

@@ -6,6 +6,7 @@ import random
 import re
 import sqlite3
 import time
+from functools import lru_cache
 from typing import List, Union
 from urllib.parse import urljoin
 
@@ -127,6 +128,87 @@ class Gacha:
         db_conn.close()
         return reply
 
+    @lru_cache(maxsize=256)
+    def check_ssr(self, char):
+        prop = 0.
+        for p in self._pool["pool"].values():
+            prop += p["prop"]
+        prop = prop*0.05
+        for p in self._pool["pool"].values():
+            chars = [p.get("prefix", "")+x for x in p["pool"]]
+            if char in chars and p["prop"] < prop:
+                return True
+        return False
+
+    def thirtytimes(self, qqid: int, nickname: str) -> str:
+        # self.check_ver()  # no more updating
+        db_exists = os.path.exists(os.path.join(
+            self.setting["dirname"], "collections.db"))
+        db_conn = sqlite3.connect(os.path.join(
+            self.setting["dirname"], "collections.db"))
+        db = db_conn.cursor()
+        if not db_exists:
+            db.execute(
+                '''CREATE TABLE Colle(
+                qqid INT PRIMARY KEY,
+                colle BLOB,
+                times SMALLINT,
+                last_day CHARACTER(4),
+                day_times TINYINT)''')
+        today = time.strftime("%m%d")
+        sql_info = list(db.execute(
+            "SELECT colle,times,last_day,day_times FROM Colle WHERE qqid=?", (qqid,)))
+        mem_exists = (len(sql_info) == 1)
+        if mem_exists:
+            info = pickle.loads(sql_info[0][0])
+            times, last_day, day_times = sql_info[0][1:]
+        else:
+            info = {}
+            times, last_day, day_times = 0, "", 0
+        day_limit = self._pool["settings"]["day_limit"]
+        if today != last_day:
+            last_day = today
+            day_times = 0
+        if day_limit != 0 and day_times+30 >= day_limit:
+            return "{}今天剩余抽卡次数不足30次，不能抽一井".format(nickname, day_times)
+        reply = ""
+        result = ""
+        flag = False
+        for i in range(1, 31):
+            if day_limit != 0 and day_times >= day_limit:
+                reply += "{}抽到第{}发十连时已经达到今日抽卡上限，抽卡结果:".format(nickname, i)
+                break
+            single_result = self.result()
+            times += 1
+            day_times += 1
+            for char in single_result:
+                if char in info:
+                    info[char] += 1
+                    if self.check_ssr(char):
+                        result += "\n{}({})".format(char, info[char])
+                        flag = True
+                else:
+                    info[char] = 1
+                    if self.check_ssr(char):
+                        result += "\n{}(new)".format(char)
+                        flag = True
+        sql_info = pickle.dumps(info)
+        if mem_exists:
+            db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
+                       (sql_info, times, last_day, day_times, qqid))
+        else:
+            db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
+                       (qqid, sql_info, times, last_day, day_times))
+        if not result:
+            reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
+            return reply
+        if flag:
+            reply += "{}本次下井结果：".format(nickname)
+        reply += result
+        db_conn.commit()
+        db_conn.close()
+        return reply
+
     async def show_colleV2_async(self, qqid, nickname, cmd: Union[None, str] = None) -> str:
         if not os.path.exists(os.path.join(self.setting["dirname"], "collections.db")):
             return "没有仓库"
@@ -218,6 +300,8 @@ class Gacha:
             return 4
         elif cmd == "在线十连" or cmd == "在线抽卡":
             return 5
+        elif cmd == "抽一井" or cmd == "来一井":
+            return 6
         else:
             return 0
 
@@ -236,6 +320,10 @@ class Gacha:
             reply = None
         elif func_num == 1:
             reply = self.gacha(
+                qqid=msg["sender"]["user_id"],
+                nickname=msg["sender"]["card"])
+        elif func_num == 6:
+            reply = self.thirtytimes(
                 qqid=msg["sender"]["user_id"],
                 nickname=msg["sender"]["card"])
         elif func_num == 4:

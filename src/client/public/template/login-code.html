@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<head>
+    <title>yobot登录</title>
+</head>
+<!-- 某厂乱点用户链接导致一次性链接失效，加个中间件看看有没有用 -->
+
+<body>
+    <p>正在登录中……</p>
+</body>
+<script>
+    var h = window.location.hash;
+    if (!h) {
+        alert('登录错误：登录码丢失');
+    } else {
+        window.location = '../?' + h.split('?')[0].substr(1);
+    }
+</script>

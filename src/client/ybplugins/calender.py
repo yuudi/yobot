@@ -12,6 +12,12 @@ from bs4 import BeautifulSoup
 
 from .yobot_exceptions import InputError, ServerError
 
+_calender_url = {
+    "jp": "https://tools.yobot.win/calender/#jp",
+    "tw": "https://pcredivewiki.tw/",
+    "cn": "https://tools.yobot.win/calender/#cn",
+}
+
 
 class Event_timeline:
     def __init__(self):
@@ -73,7 +79,8 @@ class Event:
             print("刷新国服日程表成功")
         else:
             self.timeline = None
-            print(f"{rg}区域无日程表")
+            if rg != "default":
+                print(f"{rg}区域无日程表")
 
     def load_time_jp(self, timestamp) -> Arrow:
         tz = datetime.timezone(datetime.timedelta(hours=8))
@@ -184,6 +191,8 @@ class Event:
             daystr = date.format("MM月DD日")
             reply += "\n======{}======\n⨠{}".format(daystr, events_str)
             date += datetime.timedelta(days=1)
+        reply += "\n\n更多日程：()".format(
+            _calender_url.get(self.setting["calender_region"]))
         return reply
 
     @staticmethod

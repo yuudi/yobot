@@ -12,13 +12,13 @@ yobot搭建难度约等于搭建网站的难度，请量力而行
 
 选择一个安装教程：
 
-## Windows 服务器：运行包（新手推荐）
+## Windows 服务器：便携版（新手推荐）
 
 最简单的运行方法
 
 [快速使用](./Windows-quick-start.md)☚最简单
 
-[详细说明](./Windows-package.md)（一般不需要阅读这个）
+[详细说明](./Windows-portable.md)（一般不需要阅读这个）
 
 ## Windows 服务器：源码运行
 

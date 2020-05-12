@@ -12,6 +12,8 @@ var vm = new Vue({
         reportDate: null,
         activeIndex: '3',
         multipleSelection: [],
+        sendRemindVisible: false,
+        send_via_private: false,
         dropMemberVisible: false,
         today: 0,
     },
@@ -215,11 +217,15 @@ var vm = new Vue({
                 memberlist.push(row.qqid);
             });
             var thisvue = this;
-            axios.post('../api/', {
+            var payload = {
                 action: action,
                 csrf_token: csrf_token,
                 memberlist: memberlist,
-            }).then(function (res) {
+            };
+            if (action === 'send_remind') {
+                payload.send_private_msg = thisvue.send_via_private;
+            }
+            axios.post('../api/', payload).then(function (res) {
                 if (res.data.code != 0) {
                     if (res.data.code == 11) {
                         res.data.message = '你的权限不足';
