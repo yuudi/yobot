@@ -113,4 +113,55 @@ var vm = new Vue({
       }
     },
   },
+  template: `
+    <div id="app">
+    <el-page-header @back="location='..'" content></el-page-header>
+    <el-menu
+      :default-active="activeIndex"
+      class="el-menu-demo"
+      mode="horizontal"
+      @select="handleTitleSelect"
+    >
+      <el-menu-item index="1">面板</el-menu-item>
+      <el-menu-item index="2">预约</el-menu-item>
+      <el-menu-item index="3">查刀</el-menu-item>
+      <el-menu-item index="4">统计</el-menu-item>
+      <el-menu-item index="5">我的</el-menu-item>
+    </el-menu>
+    <h1 style="text-align:center">伤害统计</h1>
+    <span>伤害颜色：</span>
+    <a class="digit6">十万</a> |
+    <a class="digit7">百万</a> |
+    <a class="digit8">千万</a> |
+    <a class="digit9">亿</a>
+    <el-table :data="statisticsData" :default-sort="{prop: 'damage', order: 'descending'}">>
+      <el-table-column prop="qqid" label="QQ号" sortable></el-table-column>
+      <el-table-column prop="nickname" label="昵称" sortable></el-table-column>
+      <el-table-column prop="damage" label="总伤害" sortable>
+        <template v-if="scope.row" slot-scope="scope">
+          <a :class="'digit'+scope.row.damage.toString().length">{{scope.row.damage}}</a>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="操作">
+        <template slot-scope="scope">
+          <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-dialog title="伤害详情" :visible.sync="dialogTableVisible">
+      <el-table :data="gridData">
+        <el-table-column prop="qqid" label="QQ号"></el-table-column>
+        <el-table-column label="刀数据">
+          <template v-if="scope.row" slot-scope="scope">
+            <span v-html="csummary(scope.row)"></span>
+            <el-popover placement="top" effect="light" trigger="hover">
+              {{ cdetail(scope.row) }}
+              <i class="el-icon-info" slot="reference"></i>
+            </el-popover>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+    </div>
+  `,
 });
