@@ -8,8 +8,7 @@ services:
     restart: on-failure
     command: >
       bash -c "
-      python3 main.py > /dev/null 2 > /dev/null
-      && sh yobotg.sh
+      python3 main.py 2>&1 >/dev/null && sh yobotg.sh
       "
     volumes:
       - .:/code
