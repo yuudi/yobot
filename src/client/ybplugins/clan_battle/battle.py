@@ -1943,7 +1943,24 @@ class ClanBattle:
             return await render_template(
                 'clan/statistics.html',
             )
-
+        @app.route(
+            urljoin(self.setting['public_basepath'],
+                    'clan/<int:group_id>/statistics/1'),
+            methods=['GET'])
+        async def yobot_clan_boss(group_id):
+            if 'yobot_user' not in session:
+                return redirect(url_for('yobot_login', callback=request.path))
+            user = User.get_by_id(session['yobot_user'])
+            group = Clan_group.get_or_none(group_id=group_id)
+            if group is None:
+                return await render_template('404.html', item='公会'), 404
+            is_member = Clan_member.get_or_none(
+                group_id=group_id, qqid=session['yobot_user'])
+            if (not is_member and user.authority_group >= 10):
+                return await render_template('clan/unauthorized.html')
+            return await render_template(
+                'clan/statistics1.html',
+            )
         @app.route(
             urljoin(self.setting['public_basepath'],
                     'clan/<int:group_id>/statistics/api/'),
@@ -1960,7 +1977,7 @@ class ClanBattle:
             if (not is_member and user.authority_group >= 10):
                 return jsonify(code=11, message='Insufficient authority')
             report = self.get_report(group_id, None, None)
-            return jsonify(code=0, challenges=report)
+            return jsonify(code=0,game_server=group.game_server, challenges=report)
 
         @app.route(
             urljoin(self.setting['public_basepath'],

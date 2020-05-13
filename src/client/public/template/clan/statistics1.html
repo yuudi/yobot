@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<head>
+    <title>总统计</title>
+    <meta name='viewport' content='width=1485' charset="utf-8" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-button icon="el-icon-back" @click="javascript:history.go(-1);"></el-button>
+        <el-table :data="tableData" border >
+            <el-table-column prop="date" label="日期" width="120"></el-table-column>
+            <el-table-column prop="qqid" label="QQ号" width="120" sortable></el-table-column>
+            <el-table-column prop="nickname" label="昵称" width="200" sortable></el-table-column>
+            <el-table-column prop="damage" label="伤害" width="200" sortable></el-table-column>
+            <el-table-column prop="boss" label="boss" :filter-method="handleFilter" :filters="bosses" width="200"
+                sortable>
+            </el-table-column>
+
+            <el-table-column prop="status" label="状态" width="200" :filter-method="handleFilter"
+                :filters="[{ text: '普通', value: '普通' }, { text: '尾刀', value: '尾刀' },{ text: '剩余刀', value: '剩余刀' }]"
+                sortable></el-table-column>
+
+        </el-table>
+    </div>
+</body>
+<script>
+    function ts2ds(timestamp) {
+        var d = new Date();
+        d.setTime(timestamp * 1000);
+        return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+    }
+    var gs_offset = {
+        jp: 4,
+        tw: 5,
+        kr: 4,
+        cn: 5
+    };
+    var csrf_token = "{{ session['csrf_token'] }}";
+    var app = new Vue({
+        el: '#app',
+        data: {
+            tableData: [],
+            bosses: []
+        },
+        methods: {
+            handleFilter: function (value, row, column) {
+                const property = column['property'];
+                return row[property] === value;
+            }
+        },
+        mounted: function () {
+            _this = this
+            axios.all([
+                axios.get("../statistics/api"),
+                axios.post("../api", {
+                    action: 'get_member_list',
+                    csrf_token: csrf_token,
+                })
+            ]).then(axios.spread(function (stats, member) {
+                if (stats.data.code != 0) {
+                    _this.$alert(res.data.message, '获取数据失败');
+                    return
+                }
+                if (member.data.code != 0) {
+                    _this.$alert(res.data.message, '获取成员失败');
+                    return
+                }
+                qqidMap = member.data.members.reduce(function (map, i) {
+                    map[i.qqid] = i.nickname;
+                    return map
+                }, {})
+                max_boss_num = 0
+                game_server = stats.data.game_server
+                for (i of stats.data.challenges) {
+                    max_boss_num = (i.boss_num > max_boss_num) ? i.boss_num : max_boss_num
+                    let t = {}
+                    t.date = ts2ds(i.challenge_time - (gs_offset[game_server] * 3600))
+                    t.qqid = i.qqid
+                    t.nickname = qqidMap[i.qqid]
+                    t.boss = i.boss_num
+                    t.damage = i.damage
+                    if (i.health_ramain === 0) {
+                        t.status = "尾刀"
+                    } else if (i.is_continue) {
+                        t.status = "剩余刀"
+                    } else {
+                        t.status = "普通"
+                    }
+                    _this.tableData.push(t)
+                }
+                t = 1
+                while (t <= max_boss_num) {
+                    _this.bosses.push({
+                        text: t,
+                        value: t
+                    })
+                    t += 1
+                }
+            }))
+
+        }
+    })
+</script>
+
+
+</html>
