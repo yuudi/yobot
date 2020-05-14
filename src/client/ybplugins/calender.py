@@ -191,7 +191,7 @@ class Event:
             daystr = date.format("MM月DD日")
             reply += "\n======{}======\n⨠{}".format(daystr, events_str)
             date += datetime.timedelta(days=1)
-        reply += "\n\n更多日程：()".format(
+        reply += "\n\n更多日程：{}".format(
             _calender_url.get(self.setting["calender_region"]))
         return reply
 

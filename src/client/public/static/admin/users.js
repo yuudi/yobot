@@ -10,9 +10,6 @@ var vm = new Vue({
             value: 10,
             label: '公会战管理员',
         }, {
-            value: 2,
-            label: '机器人管理员',
-        }, {
             value: 1,
             label: '主人',
         }],

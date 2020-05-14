@@ -102,10 +102,12 @@ class ClanBattle:
             )
 
         # super-admin initialize
-        for sa_id in self.setting['super-admin']:
-            sa = User.get_or_create(qqid=sa_id)[0]
-            sa.authority_group = 1
-            sa.save()
+        User.update({User.authority_group: 100}).where(
+            User.authority_group == 1
+        ).execute()
+        User.update({User.authority_group: 1}).where(
+            User.authority_group.in_(self.setting['super-admin'])
+        ).execute()
 
     def _level_by_cycle(self, cycle, *, level_4=None, game_server=None):
         if cycle <= 3:
@@ -1011,6 +1013,8 @@ class ClanBattle:
                     c.challenge_pcrtime,
                     group.game_server,
                 ),
+                'challenge_pcrdate': c.challenge_pcrdate,
+                'challenge_pcrtime': c.challenge_pcrtime,
                 'cycle': c.boss_cycle,
                 'boss_num': c.boss_num,
                 'health_ramain': c.boss_health_ramain,
@@ -1206,7 +1210,7 @@ class ClanBattle:
                     group_id
                 )
             )
-            return '请登录面板查看：'+url
+            return '请在面板中查看：'+url
         elif match_num == 10:  # 预约
             match = re.match(r'^预约([1-5]) *(?:[\:：](.*))?$', cmd)
             if not match:
@@ -1951,6 +1955,7 @@ class ClanBattle:
             if group is None:
                 return jsonify(code=20, message='Group not exists')
             if not (group.privacy & 0x2):
+                # 不允许直接访问
                 if 'yobot_user' not in session:
                     return jsonify(code=10, message='Not logged in')
                 user = User.get_by_id(session['yobot_user'])
@@ -1961,9 +1966,10 @@ class ClanBattle:
             report = self.get_report(group_id, None, None)
             member_list = self.get_member_list(group_id)
             response = await make_response(jsonify(
-                code=0, 
-                challenges=report, 
+                code=0,
+                challenges=report,
                 members=member_list,
+                game_server=group.game_server,
             ))
             if (group.privacy & 0x2):
                 response.headers['Access-Control-Allow-Origin'] = '*'

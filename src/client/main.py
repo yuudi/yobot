@@ -101,8 +101,9 @@ def main():
             to_sends = func()
         if to_sends is None:
             return
-        tasks = [cqbot.send_msg(**kwargs) for kwargs in to_sends]
-        await asyncio.gather(*tasks)
+        for kwargs in to_sends:
+            await asyncio.sleep(5)
+            await cqbot.send_msg(**kwargs)
 
     jobs = bot.active_jobs()
     if jobs:

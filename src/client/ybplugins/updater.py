@@ -5,9 +5,10 @@ import random
 import shutil
 import sys
 import zipfile
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-import requests
+import aiohttp
+from aiocqhttp.api import Api
 from apscheduler.triggers.cron import CronTrigger
 
 
@@ -16,44 +17,65 @@ class Updater:
     Active = True
     Request = False
 
-    def __init__(self, glo_setting: dict, *args, **kwargs):
+    def __init__(self, glo_setting: dict, bot_api: Api, *args, **kwargs):
         self.evn = glo_setting["verinfo"]["run-as"]
         self.path = glo_setting["dirname"]
         self.working_path = os.path.abspath(".")
         self.ver = glo_setting["verinfo"]
         self.setting = glo_setting
+        self.api = bot_api
+        self.working = False
 
         with open(os.path.join(glo_setting['dirname'], 'yobot.pid'), 'w') as f:
             f.write(str(os.getpid()))
 
-    def windows_update(self, force: bool = False, test_ver: int = 0):
+
+    async def send_reply(self, context: Dict[str, Any],
+                    message: Union[str, Dict[str, Any], List[Dict[str, Any]]],
+                    **kwargs) -> Optional[Dict[str, Any]]:
+        context = context.copy()
+        context['message'] = message
+        context.update(kwargs)
+        if 'message_type' not in context:
+            if 'group_id' in context:
+                context['message_type'] = 'group'
+            elif 'discuss_id' in context:
+                context['message_type'] = 'discuss'
+            elif 'user_id' in context:
+                context['message_type'] = 'private'
+
+        return await self.api.send_msg(**context)
+
+    async def windows_update_async(self, force: bool = False, test_ver: int = 0):
         test_version = ["stable", "beta", "alpha"][test_ver]
         if not os.path.exists(os.path.join(self.path, "temp")):
             os.mkdir(os.path.join(self.path, "temp"))
         server_available = False
         for url in self.ver["check_url"]:
             try:
-                response = requests.get(url)
-            except requests.ConnectionError:
+                async with aiohttp.request('GET', url=url) as response:
+                    if response.status == 200:
+                        res = await response.text()
+                        server_available = True
+                        break
+            except:
                 continue
-            if response.status_code == 200:
-                server_available = True
-                break
         if not server_available:
             return "无法连接服务器"
-        verinfo = json.loads(response.text)
+        verinfo = json.loads(res)
         verinfo = verinfo[test_version]
         if not (force or verinfo["version"] > self.ver["ver_id"]):
             return "已经是最新版本"
         try:
-            download_file = requests.get(verinfo["url"])
+            async with aiohttp.request('GET', url=verinfo["url"]) as response:
+                if response.status != 200:
+                    return verinfo["url"] + " code: " + str(response.status)
+                content = await response.read()
         except:
             return "下载失败：{}".format(verinfo["url"])
-        if download_file.status_code != 200:
-            return verinfo["url"] + "code:" + str(download_file.status_code)
         fname = os.path.basename(verinfo["url"])
         with open(os.path.join(self.path, "temp", fname), "wb") as f:
-            f.write(download_file.content)
+            f.write(content)
         verstr = str(verinfo["version"])
         if not os.path.exists(os.path.join(self.path, "temp", verstr)):
             os.mkdir(os.path.join(self.path, "temp", verstr))
@@ -77,23 +99,25 @@ class Updater:
             os.path.join(self.path, "update.bat")))
         sys.exit()
 
-    def windows_update_git(self, force: bool = False, test_ver: int = 0):
+    async def windows_update_git_async(self, force: bool = False, test_ver: int = 0):
         test_version = ["stable", "beta", "alpha"][test_ver]
         if not force:
             pullcheck = self.check_commit()
             if pullcheck is not None:
                 return pullcheck
+        server_available = False
         for url in self.ver["check_url"]:
             try:
-                response = requests.get(url)
-            except requests.ConnectionError:
+                async with aiohttp.request('GET', url=url) as response:
+                    if response.status == 200:
+                        res = await response.text()
+                        server_available = True
+                        break
+            except:
                 continue
-            if response.status_code == 200:
-                server_available = True
-                break
         if not server_available:
             return "无法连接服务器"
-        verinfo = json.loads(response.text)
+        verinfo = json.loads(res)
         verinfo = verinfo[test_version]
         if not (force or verinfo["version"] > self.ver["ver_id"]):
             return "已经是最新版本"
@@ -111,7 +135,7 @@ class Updater:
             os.path.join(git_dir, "update.bat")))
         sys.exit()
 
-    def linux_update(self, force: bool = False, test_ver: int = 0):
+    async def linux_update_async(self, force: bool = False, test_ver: int = 0):
         test_version = ["stable", "beta", "alpha"][test_ver]
         if not force:
             pullcheck = self.check_commit()
@@ -119,15 +143,16 @@ class Updater:
                 return pullcheck
         for url in self.ver["check_url"]:
             try:
-                response = requests.get(url)
-            except requests.ConnectionError:
+                async with aiohttp.request('GET', url=url) as response:
+                    if response.status == 200:
+                        res = await response.text()
+                        server_available = True
+                        break
+            except:
                 continue
-            if response.status_code == 200:
-                server_available = True
-                break
         if not server_available:
             return "无法连接服务器"
-        verinfo = json.loads(response.text)
+        verinfo = json.loads(res)
         verinfo = verinfo[test_version]
         if not (force or verinfo["version"] > self.ver["ver_id"]):
             return "已经是最新版本"
@@ -168,8 +193,6 @@ class Updater:
                       os.path.join(self.path, "restart.bat")))
             sys.exit(10)
         else:
-            if self.evn == "nonebot-plugin":
-                return "作为插件无法这么做"
             open('.YOBOT_RESTART', 'w').close()
             sys.exit(10)
 
@@ -196,7 +219,7 @@ class Updater:
             return 0
         return match | ver
 
-    def execute(self, match_num: int, msg: dict = {}) -> dict:
+    async def execute_v2(self, match_num: int, msg: dict = {}) -> dict:
         if self.evn == "nonebot-plugin":
             return "作为插件无法这么做"
 
@@ -217,6 +240,9 @@ class Updater:
             return {"reply": reply, "block": True}
 
         if match_num == 0x40:
+            if self.evn == "nonebot-plugin":
+                return "作为插件无法这么做"
+            await self.send_reply(msg, '正在重新启动yobot')
             reply = self.restart()
             return {"reply": reply, "block": True}
         match = match_num & 0xf0
@@ -227,25 +253,48 @@ class Updater:
             force = True
         if platform.system() == "Windows":
             if self.evn == "exe":
-                reply = self.windows_update(force, ver)
+                await self.send_reply(msg, '开始自动下载更新')
+                reply = await self.windows_update_async(force, ver)
             elif self.evn == "py" or self.evn == "python":
-                reply = self.windows_update_git(force, ver)
+                await self.send_reply(msg, '开始自动拉取git更新')
+                reply = await self.windows_update_git_async(force, ver)
         else:
-            reply = self.linux_update(force, ver)
+            await self.send_reply(msg, '开始自动拉取git更新')
+            reply = await self.linux_update_async(force, ver)
         return {
             "reply": reply,
             "block": True
         }
 
-    def update_auto(self) -> List[Dict[str, Any]]:
+    async def execute_async(self, *args, **kwargs):
+        if self.working:
+            return '正在更新中，请稍等'
+        self.working = True
+        try:
+            return await self.execute_v2(*args, **kwargs)
+        except Exception as e:
+            raise e from e
+            print(e)
+        finally:
+            self.working = False
+
+    async def update_auto_async(self) -> List[Dict[str, Any]]:
         print("自动检查更新...")
-        if platform.system() == "Windows":
-            if self.evn == "exe":
-                reply = self.windows_update()
-            elif self.evn == "py" or self.evn == "python":
-                reply = self.windows_update_git()
-        else:
-            reply = self.linux_update()
+        if self.working:
+            print('正在更新中')
+        self.working = True
+        try:
+            if platform.system() == "Windows":
+                if self.evn == "exe":
+                    reply = await self.windows_update_async()
+                elif self.evn == "py" or self.evn == "python":
+                    reply = await self.windows_update_git_async()
+            else:
+                reply = await self.linux_update_async()
+        except Exception as e:
+            print(e)
+        finally:
+            self.working = False
         print(reply)
         return []
 
@@ -255,7 +304,7 @@ class Updater:
         time = self.setting.get("update-time", "03:30")
         hour, minute = time.split(":")
         trigger = CronTrigger(hour=hour, minute=minute)
-        job = (trigger, self.update_auto)
+        job = (trigger, self.update_auto_async)
         return (job,)
 
 

@@ -209,6 +209,15 @@ class Setting:
                     if ((m_user.authority_group <= user.authority_group) or
                             (data.get('authority_group', 999)) <= user.authority_group):
                         return jsonify(code=12, message='Exceed authorization is not allowed')
+                    if data.get('authority_group') == 1:
+                        self.setting['super-admin'].append(ctx['user_id'])
+                        save_setting = self.setting.copy()
+                        del save_setting['dirname']
+                        del save_setting['verinfo']
+                        config_path = os.path.join(
+                            self.setting['dirname'], 'yobot_config.json')
+                        with open(config_path, 'w', encoding='utf-8') as f:
+                            json.dump(save_setting, f, indent=4)
                     if m_user is None:
                         return jsonify(code=21, message='user not exist')
                     for key in data.keys():

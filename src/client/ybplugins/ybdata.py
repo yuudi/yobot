@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 5  # 目前版本
+_version = 6  # 目前版本
 
 MAX_TRY_TIMES = 3
 
@@ -200,5 +200,7 @@ def db_upgrade(old_version):
             migrator.add_column('user', 'must_change_password',
                                 BooleanField(default=True)),
         )
+    if old_version < 6:
+        User.update({User.authority_group: 1}).where(User.authority_group == 2).execute()
 
     DB_schema.replace(key='version', value=str(_version)).execute()

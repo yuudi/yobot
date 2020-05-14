@@ -13,11 +13,11 @@
 #### Windows 使用
 
 yobot 三代基于酷Q机器人和 httpapi 插件实现
-如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](https://pan.loli.com.se/api/files/onedrive/uploads/2020/05/01/CoolQ_With_Httpapi.7z)
+如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](http://download.yobot.xyz/tools/CoolQ_With_Httpapi.7z)
 
-如果你已经使用过酷Q机器人，可以下载[httpapi 插件](https://x.jingzhidh.com/Packed_httpapi.7z)
+如果你已经使用过酷Q机器人，可以下载[httpapi 插件](http://download.yobot.xyz/tools/Packed_httpapi.7z)
 
-如果你已经使用过 httpapi 插件，或者想额外开启一个 httpapi 插件，可以下载[httpapi 插件分身版](https://x.jingzhidh.com/mirror_of_httpapi.7z)
+如果你已经使用过 httpapi 插件，或者想额外开启一个 httpapi 插件，可以下载[httpapi 插件分身版](http://download.yobot.xyz/tools/mirror_of_httpapi.7z)
 
 ### 环境搭建
 
@@ -41,7 +41,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 ### Windows系统
 
-[点击下载便携版](https://tools.yobot.win/download-latest/)
+[点击下载便携版](http://tools.yobot.win/fetch-latest/)
 
 下载yobot便携版，创建一个文件夹解压，启动 yobot.exe 即可。如需更改端口，请启动一次后修改 yobot_config.json 中的 port 字段并重启。
 

@@ -70,7 +70,7 @@
       共[[ members.length ]]人，共[[ progressData.reduce((s,i)=>s+i.finished,0) ]]刀
       <a class="digit6">十万</a> <a class="digit7">百万</a> <a class="digit8">千万</a> <a class="digit9">亿</a>
       <el-button type="primary" @click="viewTails">尾刀一览</el-button>
-      <el-dialog title="尾刀一览" :visible.sync="tailsDataVisible">
+      <el-dialog title="未完成的尾刀一览" :visible.sync="tailsDataVisible">
         <template v-if="tailsData.length > 0">
           <el-table :data="tailsData">
             <el-table-column prop="qqid" label="QQ号" width="120" sortable></el-table-column>

@@ -65,3 +65,6 @@ plugins:
     normalSuffix: /
     indexSuffix: /
     notFoundPath: /404.html
+  vuepress-plugin-img-lazy:
+    useLoading: true
+  "@vuepress/plugin-back-to-top": true

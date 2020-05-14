@@ -33,7 +33,7 @@ else:
 
 
 class Yobot:
-    Version = "[v3.5.6]"
+    Version = "[v3.5.7_alpha_1]"
     Version_id = 127
     #  "git rev-list --count HEAD"
 
