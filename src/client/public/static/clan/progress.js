@@ -21,7 +21,7 @@ var vm = new Vue({
             axios.post('../api/', {
                 action: 'get_challenge',
                 csrf_token: csrf_token,
-                ts: null,
+                ts: (thisvue.get_today() / 1000) + 43200,
             }),
             axios.post('../api/', {
                 action: 'get_member_list',
@@ -42,12 +42,19 @@ var vm = new Vue({
                 m.detail = [];
             }
             thisvue.today = res.data.today;
+            thisvue.reportDate = thisvue.get_today();
             thisvue.refresh(res.data.challenges);
         })).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');
         });
     },
     methods: {
+        get_today: function () {
+            let d = new Date();
+            d -= 18000000;
+            d = new Date(d).setHours(0, 0, 0, 0);
+            return d;
+        },
         csummary: function (cha) {
             if (cha == undefined) {
                 return '';
