@@ -20,9 +20,9 @@ RUN mkdir /code
 # 添加环境变量
 #RUN export PYTHONPATH=$PYTHONPATH:/code
 
-ADD src/client/. /code
+ADD . /code
 
-WORKDIR /code
+WORKDIR /code/src/client
 
 RUN python3 main.py
 

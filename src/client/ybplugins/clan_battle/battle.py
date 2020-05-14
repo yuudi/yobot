@@ -106,7 +106,7 @@ class ClanBattle:
             User.authority_group == 1
         ).execute()
         User.update({User.authority_group: 1}).where(
-            User.authority_group.in_(self.setting['super-admin'])
+            User.qqid.in_(self.setting['super-admin'])
         ).execute()
 
     def _level_by_cycle(self, cycle, *, level_4=None, game_server=None):
@@ -1965,10 +1965,15 @@ class ClanBattle:
                     return jsonify(code=11, message='Insufficient authority')
             report = self.get_report(group_id, None, None)
             member_list = self.get_member_list(group_id)
+            groupinfo={
+                'group_id': group.group_id,
+                'group_name': group.group_name,
+                'game_server': group.game_server,
+            },
             response = await make_response(jsonify(
                 code=0,
                 challenges=report,
-                members=member_list,
+                groupinfo=groupinfo,
                 game_server=group.game_server,
             ))
             if (group.privacy & 0x2):
