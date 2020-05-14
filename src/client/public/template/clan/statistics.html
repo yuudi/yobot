@@ -5,17 +5,28 @@
 </head>
 
 <body>
-    <h1>建设中</h1>
-    <p><a href="./1/">统计1</a></p>
     <p><a href="#" onclick="javascript:history.go(-1);">返回</a></p>
-    <p style="color: #808080;">
+    <h1>建设中</h1>
+    <p><a href="./1/">统计1：出刀顺序表</a> by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></p>
+    <!--
+        不知道统计改怎么写，所以我就没写了
+        但还是有大佬写出来了有用的分析，感谢这些大佬的贡献
+        更多统计等待大佬们出主意，欢迎PR，可以内置到yobot里，也可以外部调用api进行分析
+    -->
+    <p>
         原始数据（json格式）<a href="./api/">查看</a> <a href="./api/" download>下载</a><br>
-        api地址：<span id="apiurl"></span>
+        api地址：<input id="apiurl"><input type="button" value="复制" id="copy">
     </p>
 
 <script>
-    document.getElementById("apiurl").innerText = window.location.href + "api/";
+    document.getElementById("apiurl").value = window.location.href + "api/";
+    document.getElementById("copy").addEventListener("click", e => {
+        document.getElementById("apiurl").select();
+        document.execCommand("Copy");
+        alert("已复制。");
+    })
 </script>
+
 </body>
 
 </html>

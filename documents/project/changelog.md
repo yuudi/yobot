@@ -1,14 +1,16 @@
 # 更新日志
 
+## 3.5.7
+
+- 开放统计api与数据下载
+- 统计1：出刀顺序表（[#75](https://github.com/yuudi/yobot/pull/75)）
+- 自动更新时有反馈
+- 修复[#69](https://github.com/yuudi/yobot/issues/69)、[#66](https://github.com/yuudi/yobot/issues/66)、[#55](https://github.com/yuudi/yobot/issues/55)
+
 ## 3.5.6
 
 - 重置密码功能[#35](https://github.com/yuudi/yobot/pull/35)
 - 群发私聊催刀（默认不开启）
-- 修复非公会成员仍可申请出刀、挂树[#37](https://github.com/yuudi/yobot/issues/37)
-- 修复出刀记录导出至excel[#51](https://github.com/yuudi/yobot/issues/51)
-- 修复越权设置他人身份[#55](https://github.com/yuudi/yobot/issues/55)
-- 修复某些情况下获取主人失败
-- 修复某些情况下自动重启失败
 
 ## 3.5.5
 

@@ -12,8 +12,12 @@
 <body>
     <div id="app">
         <el-button icon="el-icon-back" @click="javascript:history.go(-1);"></el-button>
-        <el-table :data="tableData" border >
-            <el-table-column prop="date" label="日期" width="120"></el-table-column>
+        <el-table :data="tableData">
+            <el-table-column prop="date" label="时间" width="180" sortable>
+                <template slot-scope="scope">
+                    [[ scope.row.date.toLocaleString() ]]
+                </template>
+            </el-table-column>
             <el-table-column prop="qqid" label="QQ号" width="120" sortable></el-table-column>
             <el-table-column prop="nickname" label="昵称" width="200" sortable></el-table-column>
             <el-table-column prop="damage" label="伤害" width="200" sortable></el-table-column>
@@ -22,28 +26,19 @@
             </el-table-column>
 
             <el-table-column prop="status" label="状态" width="200" :filter-method="handleFilter"
-                :filters="[{ text: '普通', value: '普通' }, { text: '尾刀', value: '尾刀' },{ text: '剩余刀', value: '剩余刀' }]"
+                :filters="[{ text: '普通', value: '普通' }, { text: '尾刀', value: '尾刀' },{ text: '剩余刀', value: '剩余刀' },{ text: '余尾刀', value: '余尾刀' }]"
                 sortable></el-table-column>
 
         </el-table>
     </div>
 </body>
 <script>
-    function pad2(num) {
-        return String(num).padStart(2, '0');
-    }
-    function ts2ds(timestamp) {
-        var d = new Date();
-        d.setTime(timestamp * 1000);
-        return d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate());
-    }
     var gs_offset = {
         jp: 4,
         tw: 5,
         kr: 4,
         cn: 5
     };
-    var csrf_token = "{{ session['csrf_token'] }}";
     var app = new Vue({
         el: '#app',
         data: {
@@ -51,6 +46,11 @@
             bosses: []
         },
         methods: {
+            ts2ds: function (timestamp) {
+                var d = new Date();
+                d.setTime(timestamp * 1000);
+                return d;
+            },
             handleFilter: function (value, row, column) {
                 const property = column['property'];
                 return row[property] === value;
@@ -72,7 +72,7 @@
                 for (i of stats.data.challenges) {
                     max_boss_num = (i.boss_num > max_boss_num) ? i.boss_num : max_boss_num
                     let t = {}
-                    t.date = ts2ds(i.challenge_time)
+                    t.date = _this.ts2ds(i.challenge_time)
                     t.qqid = i.qqid
                     t.nickname = qqidMap[i.qqid]
                     t.boss = i.boss_num
@@ -96,7 +96,8 @@
                 }
             }))
 
-        }
+        },
+        delimiters: ['[[', ']]'],
     })
 </script>
 
