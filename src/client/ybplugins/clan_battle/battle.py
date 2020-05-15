@@ -1932,9 +1932,9 @@ class ClanBattle:
 
         @app.route(
             urljoin(self.setting['public_basepath'],
-                    'clan/<int:group_id>/statistics/1/'),
+                    'clan/<int:group_id>/statistics/<int:sid>/'),
             methods=['GET'])
-        async def yobot_clan_boss(group_id):
+        async def yobot_clan_boss(group_id, sid):
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
             user = User.get_by_id(session['yobot_user'])
@@ -1946,7 +1946,7 @@ class ClanBattle:
             if (not is_member and user.authority_group >= 10):
                 return await render_template('clan/unauthorized.html')
             return await render_template(
-                'clan/statistics/statistics1.html',
+                f'clan/statistics/statistics{sid}.html',
             )
 
         @app.route(
