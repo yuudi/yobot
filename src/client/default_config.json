@@ -9,7 +9,7 @@
     "super-admin": [],
     "black-list": [],
     "black-list-group": [],
-    "setting-restrict": 3,
+    "setting-restrict": 2,
     "allow_bulk_private": false,
     "auto_update": true,
     "update-time": "random",

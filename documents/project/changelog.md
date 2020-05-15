@@ -1,25 +1,18 @@
 # 更新日志
 
-## 3.5.7
+## 3.6.0
 
 - 开放统计api与数据下载
 - 统计1：出刀顺序表（[#75](https://github.com/yuudi/yobot/pull/75)）
+- 统计2：出刀统计图（[#77](https://github.com/yuudi/yobot/pull/77)）
 - 自动更新时有反馈
+- 允许删除公会
+- 优化在线十连
 - 修复[#69](https://github.com/yuudi/yobot/issues/69)、[#66](https://github.com/yuudi/yobot/issues/66)、[#55](https://github.com/yuudi/yobot/issues/55)
 
-## 3.5.6
+## 3.5
 
 - 重置密码功能[#35](https://github.com/yuudi/yobot/pull/35)
-- 群发私聊催刀（默认不开启）
-
-## 3.5.5
-
-- 国服日程表
-- 删除用户
-
-## 3.5.1
-
-- 多端同时保存登录状态
 - 报刀留言功能
 
 ## 3.4
@@ -29,3 +22,11 @@
 ## 3.3
 
 - 公会战面板
+
+## 3.2
+
+- 可视化设置页面
+
+## 3.1
+
+- 定时推送

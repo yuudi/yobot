@@ -88,6 +88,17 @@
             </el-row>
         </p>
         <p>
+            机器人主人：
+            <ul>
+                <li v-for="(sadmin,i) in setting['super-admin']">
+                    <el-input v-model.number="setting['super-admin'][i]" placeholder="QQ号"></el-input>
+
+            </ul>
+            <el-button size="mini" icon="el-icon-circle-plus-outline" @click="setting['super-admin'].push(null)">添加
+            </el-button>
+            <el-button size="mini" icon="el-icon-remove-outline" @click="setting['super-admin'].pop()">删除 </el-button>
+        </p>
+        <p>
             机器人黑名单（QQ号）：
             <ul>
                 <li v-for="(black,i) in setting['black-list']">

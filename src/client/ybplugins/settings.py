@@ -284,13 +284,25 @@ class Setting:
                 action = req['action']
                 if action == 'get_data':
                     groups = []
-                    for group in Clan_group.select():
+                    for group in Clan_group.select().where(
+                        Clan_group.deleted == False,
+                    ):
                         groups.append({
                             'group_id': group.group_id,
                             'group_name': group.group_name,
                             'game_server': group.game_server,
                         })
                     return jsonify(code=0, data=groups)
+                if action == 'drop_group':
+                    User.update({
+                        User.clan_group_id: None,
+                    }).where(
+                        User.clan_group_id == req['group_id'],
+                    ).execute()
+                    Clan_group.delete().where(
+                        Clan_group.group_id == req['group_id'],
+                    ).execute()
+                    return jsonify(code=0, message='ok')
                 else:
                     return jsonify(code=32, message='unknown action')
             except KeyError as e:

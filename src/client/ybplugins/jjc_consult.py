@@ -121,14 +121,13 @@ class Consult:
 
         output_foler = os.path.join(self.setting['dirname'], 'output')
         num = len(os.listdir(output_foler)) + 1
-        os.mkdir(os.path.join(output_foler, str(num)))
-        filename = 'solution-{}.html'.format(random.randint(0, 999))
-        with open(os.path.join(output_foler, str(num), filename), 'w', encoding='utf-8') as f:
+        filename = 'solution-{}-{}.html'.format(num, random.randint(0, 999))
+        with open(os.path.join(output_foler, filename), 'w', encoding='utf-8') as f:
             f.write(page)
         addr = urljoin(
             self.setting['public_address'],
-            '{}output/{}/{}'.format(
-                self.setting['public_basepath'], num, filename))
+            '{}output/{}'.format(
+                self.setting['public_basepath'], filename))
         reply = '找到{}条解法：{}'.format(len(solution), addr)
         if self.setting['web_mode_hint']:
             reply += '\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'

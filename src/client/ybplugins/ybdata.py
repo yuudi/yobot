@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 7  # 目前版本
+_version = 8  # 目前版本
 
 MAX_TRY_TIMES = 3
 
@@ -60,6 +60,7 @@ class Clan_group(_BaseModel):
     game_server = CharField(max_length=2, default='cn')
     notification = IntegerField(default=0xffff)  # 需要接收的通知
     level_4 = BooleanField(default=False)  # 公会战是否存在4阶段
+    battle_id = IntegerField(default=0)
     apikey = CharField(max_length=16, default=rand_string)
     boss_cycle = SmallIntegerField(default=1)
     boss_num = SmallIntegerField(default=1)
@@ -68,6 +69,7 @@ class Clan_group(_BaseModel):
     boss_lock_type = IntegerField(default=0)  # 1出刀中，2其他
     challenging_start_time = BigIntegerField(default=0)
     challenging_comment = TextField(null=True)
+    deleted = BooleanField(default=False)
 
 
 class Clan_member(_BaseModel):
@@ -83,6 +85,7 @@ class Clan_member(_BaseModel):
 
 class Clan_challenge(_BaseModel):
     cid = AutoField(primary_key=True)
+    bid = IntegerField(default=0)
     gid = BigIntegerField()
     qqid = BigIntegerField()
     challenge_pcrdate = IntegerField()
@@ -94,6 +97,9 @@ class Clan_challenge(_BaseModel):
     is_continue = BooleanField()  # 此刀是结余刀
     message = TextField(null=True)
     behalf = IntegerField(null=True)
+
+    class Meta:
+        indexes = ((('bid', 'gid'), False),)
 
 
 class Clan_subscribe(_BaseModel):
@@ -168,7 +174,9 @@ def init(sqlite_filename):
         print('数据库版本高于程序版本，请升级yobot')
         raise SystemExit()
     if old_version < _version:
+        print('正在升级数据库')
         db_upgrade(old_version)
+        print('数据库升级完毕')
 
 
 def db_upgrade(old_version):
@@ -211,6 +219,16 @@ def db_upgrade(old_version):
                                 TextField(null=True)),
             migrator.add_column('clan_group', 'apikey',
                                 CharField(max_length=16, default=rand_string)),
+        )
+    if old_version < 8:
+        migrate(
+            migrator.add_column('clan_group', 'deleted',
+                                BooleanField(default=False)),
+            migrator.add_column('clan_group', 'battle_id',
+                                IntegerField(default=0)),
+            migrator.add_column('clan_challenge', 'bid',
+                                IntegerField(default=0)),
+            migrator.add_index('clan_challenge', ('bid', 'gid'), False)
         )
 
     DB_schema.replace(key='version', value=str(_version)).execute()

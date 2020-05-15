@@ -110,6 +110,7 @@ var vm = new Vue({
             this.today = -1;
         },
         refresh: function (challenges) {
+            challenges.sort((a, b) => a.qqid - b.qqid);
             this.progressData = [...this.members];
             // for (m of this.progressData) m.today_total_damage = 0;
             var thisvue = this;

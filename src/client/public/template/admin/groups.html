@@ -21,6 +21,11 @@
                     <a :href="'../../clan/' + scope.row.group_id + '/'"><i class="el-icon-more-outline"></i></a>
                 </template>
             </el-table-column>
+            <el-table-column label="删除" width="30">
+                <template slot-scope="scope">
+                    <el-button type="text" @click="delete_group(scope)" icon="el-icon-delete"></el-button>
+                </template>
+            </el-table-column>
         </el-table>
     </div>
 </body>
