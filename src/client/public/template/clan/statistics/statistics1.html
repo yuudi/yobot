@@ -33,12 +33,7 @@
     </div>
 </body>
 <script>
-    var gs_offset = {
-        jp: 4,
-        tw: 5,
-        kr: 4,
-        cn: 5
-    };
+    var DMG_TYPE = ['普通','剩余刀','尾刀','余尾刀']
     var app = new Vue({
         el: '#app',
         data: {
@@ -77,13 +72,7 @@
                     t.nickname = qqidMap[i.qqid]
                     t.boss = i.boss_num
                     t.damage = i.damage
-                    if (i.health_ramain === 0) {
-                        t.status = "尾刀"
-                    } else if (i.is_continue) {
-                        t.status = "剩余刀"
-                    } else {
-                        t.status = "普通"
-                    }
+                    t.status = DMG_TYPE[(i.health_ramain === 0)*2+(i.is_continue)]
                     _this.tableData.push(t)
                 }
                 t = 1

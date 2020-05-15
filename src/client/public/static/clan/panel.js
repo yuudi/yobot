@@ -205,9 +205,7 @@ var vm = new Vue({
             this.callapi({
                 action: 'addsubscribe',
                 boss_num: 0,
-                comment: {
-                    message: this.message,
-                },
+                message: this.message,
             });
             this.suspendVisible=false;
         },
@@ -228,9 +226,7 @@ var vm = new Vue({
             this.callapi({
                 action: 'addsubscribe',
                 boss_num: parseInt(this.subscribe),
-                comment: {
-                    message: this.message,
-                }
+                message: this.message,
             });
             this.subscribeFormVisible = false;
         },

@@ -15,11 +15,16 @@
     -->
     <p>
         原始数据（json格式）<a href="./api/">查看</a> <a href="./api/" download>下载</a><br>
+        {% if allow_api -%}
         api地址：<input id="apiurl"><input type="button" value="复制" id="copy">
+        {% else -%}
+        api访问已禁用，如需开启请前往<a href="../setting/">公会设置</a>
+        {% endif -%}
     </p>
 
 <script>
-    document.getElementById("apiurl").value = window.location.href + "api/";
+    var apikey = "{{ apikey }}";
+    document.getElementById("apiurl").value = window.location.href + "api/?apikey=" + apikey;
     document.getElementById("copy").addEventListener("click", e => {
         document.getElementById("apiurl").select();
         document.execCommand("Copy");

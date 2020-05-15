@@ -32,8 +32,8 @@
                 </span>
                 <p v-for="m in subscribers[bn-1]">
                     [[ find_name(m.qqid) ]]（[[ m.qqid ]]）
-                    <template v-if="m.comment.message">
-                        ：[[ m.comment.message ]]
+                    <template v-if="m.message">
+                        ：[[ m.message ]]
                     </template>
                 </p>
                 <p v-if="subscribers[bn-1].length == 0">

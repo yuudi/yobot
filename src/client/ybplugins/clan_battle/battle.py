@@ -332,7 +332,6 @@ class ClanBattle:
                behalfed: Optional[QQid] = None,
                *,
                extra_msg: Optional[str] = None,
-               comment=None,
                previous_day=False,
                ) -> BossStatus:
         """
@@ -343,10 +342,7 @@ class ClanBattle:
             qqid: qqid of member who do the record
             damage: the damage dealt to boss
             behalfed: the real member who did the challenge
-            comment: extra infomation about the challenge
         """
-        if comment is None:
-            comment = {}
         if damage < 0:
             raise InputError('伤害不可以是负数')
         group = Clan_group.get_or_none(group_id=group_id)
@@ -354,9 +350,9 @@ class ClanBattle:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
         if damage >= group.boss_health:
             raise InputError('伤害超出剩余血量，如击败请使用尾刀')
+        behalf = None
         if behalfed is not None:
-            nik = self._get_nickname_by_qqid(qqid) or qqid
-            comment['behalf'] = f'由{nik}代报。'
+            behalf = qqid
             qqid = behalfed
         user = User.get_or_create(
             qqid=qqid,
@@ -406,9 +402,7 @@ class ClanBattle:
             challenge_damage=damage,
             is_continue=is_continue,
             message=extra_msg,
-            comment=json.dumps(comment,
-                               separators=(',', ':'),
-                               ensure_ascii=False),
+            behalf=behalf,
         )
         group.boss_health -= damage
         # 如果当前正在挑战，则取消挑战
@@ -444,7 +438,6 @@ class ClanBattle:
                behalfed: Optional[QQid] = None,
                *,
                extra_msg: Optional[str] = None,
-               comment=None,
                previous_day=False,
                ) -> BossStatus:
         """
@@ -454,16 +447,13 @@ class ClanBattle:
             group_id: group id
             qqid: qqid of member who do the record
             behalfed: the real member who did the challenge
-            comment: extra infomation about the challenge
         """
-        if comment is None:
-            comment = {}
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
+        behalf = None
         if behalfed is not None:
-            nik = self._get_nickname_by_qqid(qqid) or qqid
-            comment['behalf'] = f'由{nik}代报。'
+            behalf = qqid
             qqid = behalfed
         user = User.get_or_create(
             qqid=qqid,
@@ -513,9 +503,7 @@ class ClanBattle:
             challenge_damage=group.boss_health,
             is_continue=is_continue,
             message=extra_msg,
-            comment=json.dumps(comment,
-                               separators=(',', ':'),
-                               ensure_ascii=False),
+            behalf=behalf,
         )
         if group.boss_num == 5:
             group.boss_num = 1
@@ -723,7 +711,7 @@ class ClanBattle:
                 message=message+f'\n=======\n{sender_name}提醒您及时完成今日出刀',
             ))
 
-    def add_subscribe(self, group_id: Groupid, qqid: QQid, boss_num, comment=None):
+    def add_subscribe(self, group_id: Groupid, qqid: QQid, boss_num, message=None):
         """
         subscribe a boss, get notification when boss is defeated.
 
@@ -733,10 +721,7 @@ class ClanBattle:
             group_id: group id
             qqid: qq id of subscriber
             boss_num: number of boss to subscribe, `0` for all
-            comment: extra infomation about the subscribe
         """
-        if comment is None:
-            comment = {}
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupError('本群未初始化，请发送“创建X服公会”')
@@ -760,9 +745,7 @@ class ClanBattle:
             gid=group_id,
             qqid=qqid,
             subscribe_item=boss_num,
-            comment=json.dumps(comment,
-                               separators=(',', ':'),
-                               ensure_ascii=False),
+            message=message,
         )
 
     def get_subscribe_list(self, group_id: Groupid, boss_num=None) -> List[Tuple[int, QQid, dict]]:
@@ -770,7 +753,7 @@ class ClanBattle:
         get the subscribe lists.
 
         return a list of subscribe infomation,
-        each item is a tuple of (boss_id, qq_id, comments)
+        each item is a tuple of (boss_id, qq_id, message)
 
         Args:
             group_id: group id
@@ -787,7 +770,7 @@ class ClanBattle:
             subscribe_list.append({
                 'boss': subscribe.subscribe_item,
                 'qqid': subscribe.qqid,
-                'comment': json.loads(subscribe.comment),
+                'message': subscribe.message,
             })
         return subscribe_list
 
@@ -827,9 +810,8 @@ class ClanBattle:
             (Clan_subscribe.subscribe_item == 0),
         ).order_by(Clan_subscribe.sid):
             msg = atqq(subscribe.qqid)
-            cmt = json.loads(subscribe.comment)
-            if cmt.get('message'):
-                msg += cmt['message']
+            if subscribe.message:
+                msg += subscribe.message
             notice.append(msg)
             subscribe.delete_instance()
         if notice:
@@ -1021,7 +1003,7 @@ class ClanBattle:
                 'damage': c.challenge_damage,
                 'is_continue': c.is_continue,
                 'message': c.message,
-                'comment': json.loads(c.comment),
+                'behalf': c.behalf,
             })
         return report
 
@@ -1332,7 +1314,7 @@ class ClanBattle:
                 return '没有人'+beh
             reply = beh+'的成员：\n' + '\n'.join(
                 self._get_nickname_by_qqid(m['qqid'])
-                + m.get('comment', {}).get('message', '')
+                + m.get('message', '')
                 for m in subscribers
             )
             return reply
@@ -1657,13 +1639,13 @@ class ClanBattle:
                         subscribers=subscribers)
                 elif action == 'addsubscribe':
                     boss_num = payload['boss_num']
-                    comment = payload.get('comment', {})
+                    message = payload.get('message')
                     try:
                         self.add_subscribe(
                             group_id,
                             user_id,
                             boss_num,
-                            comment,
+                            message,
                         )
                     except UserError as e:
                         _logger.info('网页 失败 {} {} {}'.format(
@@ -1686,16 +1668,16 @@ class ClanBattle:
                     else:
                         notice = '预约成功'
                         if group.notification & 0x40:
-                            message = '{}已预约{}号boss'.format(
+                            notice_message = '{}已预约{}号boss'.format(
                                 user.nickname,
                                 boss_num,
                             )
-                            if comment.get('message'):
-                                message += '\n留言：'+comment['message']
+                            if message:
+                                notice_message += '\n留言：'+message
                             asyncio.ensure_future(
                                 self.api.send_group_msg(
                                     group_id=group_id,
-                                    message=message,
+                                    message=notice_message,
                                 )
                             )
                     return jsonify(code=0, notice=notice)
@@ -1944,7 +1926,10 @@ class ClanBattle:
                 return await render_template('clan/unauthorized.html')
             return await render_template(
                 'clan/statistics.html',
+                allow_api=(group.privacy & 0x2),
+                apikey=group.apikey,
             )
+
         @app.route(
             urljoin(self.setting['public_basepath'],
                     'clan/<int:group_id>/statistics/1/'),
@@ -1963,6 +1948,7 @@ class ClanBattle:
             return await render_template(
                 'clan/statistics/statistics1.html',
             )
+
         @app.route(
             urljoin(self.setting['public_basepath'],
                     'clan/<int:group_id>/statistics/api/'),
@@ -1971,8 +1957,15 @@ class ClanBattle:
             group = Clan_group.get_or_none(group_id=group_id)
             if group is None:
                 return jsonify(code=20, message='Group not exists')
-            if not (group.privacy & 0x2):
-                # 不允许直接访问
+            apikey = request.args.get('apikey')
+            if apikey:
+                # 通过 apikey 外部访问
+                if not (group.privacy & 0x2):
+                    return jsonify(code=11, message='api not allowed')
+                if apikey != group.apikey:
+                    return jsonify(code=12, message='Invalid apikey')
+            else:
+                # 内部直接访问
                 if 'yobot_user' not in session:
                     return jsonify(code=10, message='Not logged in')
                 user = User.get_by_id(session['yobot_user'])
@@ -1982,7 +1975,7 @@ class ClanBattle:
                     return jsonify(code=11, message='Insufficient authority')
             report = self.get_report(group_id, None, None)
             member_list = self.get_member_list(group_id)
-            groupinfo={
+            groupinfo = {
                 'group_id': group.group_id,
                 'group_name': group.group_name,
                 'game_server': group.game_server,

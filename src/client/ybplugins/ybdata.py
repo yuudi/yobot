@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 6  # 目前版本
+_version = 7  # 目前版本
 
 MAX_TRY_TIMES = 3
 
@@ -60,6 +60,7 @@ class Clan_group(_BaseModel):
     game_server = CharField(max_length=2, default='cn')
     notification = IntegerField(default=0xffff)  # 需要接收的通知
     level_4 = BooleanField(default=False)  # 公会战是否存在4阶段
+    apikey = CharField(max_length=16, default=rand_string)
     boss_cycle = SmallIntegerField(default=1)
     boss_num = SmallIntegerField(default=1)
     boss_health = BigIntegerField(default=6000000)
@@ -92,7 +93,7 @@ class Clan_challenge(_BaseModel):
     challenge_damage = BigIntegerField()
     is_continue = BooleanField()  # 此刀是结余刀
     message = TextField(null=True)
-    comment = TextField(null=True)
+    behalf = IntegerField(null=True)
 
 
 class Clan_subscribe(_BaseModel):
@@ -100,7 +101,7 @@ class Clan_subscribe(_BaseModel):
     gid = BigIntegerField()
     qqid = IntegerField()
     subscribe_item = SmallIntegerField()
-    comment = TextField(null=True)
+    message = TextField(null=True)
 
     class Meta:
         indexes = (
@@ -112,7 +113,6 @@ class Character(_BaseModel):
     chid = IntegerField(primary_key=True)
     name = CharField(max_length=64)
     frequent = BooleanField(default=True)
-    comment = TextField()
 
 
 class Chara_nickname(_BaseModel):
@@ -127,7 +127,6 @@ class User_box(_BaseModel):
     rank = IntegerField()
     stars = IntegerField()
     equit = BooleanField()
-    comment = TextField()
 
     class Meta:
         primary_key = CompositeKey('qqid', 'chid')
@@ -202,5 +201,16 @@ def db_upgrade(old_version):
         )
     if old_version < 6:
         User.update({User.authority_group: 1}).where(User.authority_group == 2).execute()
+    if old_version < 7:
+        migrate(
+            migrator.drop_column('clan_challenge', 'comment'),
+            migrator.add_column('clan_challenge', 'behalf',
+                                IntegerField(null=True)),
+            migrator.drop_column('clan_subscribe', 'comment'),
+            migrator.add_column('clan_subscribe', 'message',
+                                TextField(null=True)),
+            migrator.add_column('clan_group', 'apikey',
+                                CharField(max_length=16, default=rand_string)),
+        )
 
     DB_schema.replace(key='version', value=str(_version)).execute()
