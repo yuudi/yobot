@@ -3,7 +3,7 @@
 <head>
     <title>公会战 - 数据分析</title>
     <meta name='viewport' content='width=1485' charset="utf-8" />
-    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+   <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
@@ -34,6 +34,18 @@
     <div id="app" style="margin: 10px">
         <el-page-header @back="location='..'" content="数据分析"></el-page-header>
         <h1 style="text-align:center">数据分析</h1>
+        <!--以后有用-->
+        <el-date-picker
+          v-model="range"
+          v-if="false"
+          type="daterange"
+          unlink-panels
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="pickerOptions"
+        >
+        </el-date-picker>
         <el-tabs v-model="selecting_tab">
             <el-tab-pane label="整体数据" name="total">
                 <div>
@@ -74,6 +86,33 @@
                     </el-table>
                 </div>
             </el-tab-pane>
+            <el-tab-pane label="公会图表" name="channel">
+                <div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 100%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="miss_chart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="last_chart"></div>
+                        </div>
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="total_time_chart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 100%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="boss_blood_chart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 100%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="boss_hit_chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </el-tab-pane>
             <el-tab-pane label="玩家数据" name="player">
                 <div>
                     <div style="display: flex; height: 450px">
@@ -100,6 +139,14 @@
                         </div>
                         <div v-show="selecting_tab != 'total'" style="width: 50%">
                             <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="sum_dmg_chart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="personal_progress_chart"></div>
+                        </div>
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="personal_time_chart"></div>
                         </div>
                     </div>
                 </div>

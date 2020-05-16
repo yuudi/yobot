@@ -19,7 +19,8 @@ from ..web_util import async_cached_func
 from ..ybdata import (Clan_challenge, Clan_group, Clan_member, Clan_subscribe,
                       User)
 from .exception import GroupError, InputError, UserError
-from .typing import BossStatus, ClanBattleReport, Groupid, Pcr_date, QQid
+from .typing import (
+    BossStatus, ClanBattleReport, Groupid, Pcr_date, Pcr_time, QQid)
 from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func
 
 _logger = logging.getLogger(__name__)
@@ -978,12 +979,14 @@ class ClanBattle:
 
         return
 
-    @timed_cached_func(max_len=64, max_age_seconds=60, ignore_self=True)
+    @timed_cached_func(max_len=64, max_age_seconds=10, ignore_self=True)
     def get_report(self,
                    group_id: Groupid,
                    battle_id: Union[str, int, None],
                    qqid: Optional[QQid] = None,
                    pcrdate: Optional[Pcr_date] = None,
+                   start_time: Optional[Pcr_time] = None,
+                   end_time: Optional[Pcr_time] = None,
                    ) -> ClanBattleReport:
         """
         get the records
@@ -992,6 +995,8 @@ class ClanBattle:
             group_id: group id
             qqid: user id of report
             pcrdate: pcrdate of report
+            start_time: start time of report
+            end_time: end time of report
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
@@ -1014,6 +1019,10 @@ class ClanBattle:
             expressions.append(Clan_challenge.qqid == qqid)
         if pcrdate is not None:
             expressions.append(Clan_challenge.challenge_pcrdate == pcrdate)
+        if start_time is not None:
+            expressions.append(Clan_challenge.challenge_pcrtime >= start_time)
+        if end_time is not None:
+            expressions.append(Clan_challenge.challenge_pcrtime <= end_time)
         for c in Clan_challenge.select().where(
             *expressions
         ):
@@ -2046,7 +2055,9 @@ class ClanBattle:
                     battle_id = None
                 else:
                     return jsonify(code=20, message=f'unexceptd value "{battle_id}" for battle_id')
-            report = self.get_report(group_id, battle_id, None, None)
+            start = int(request.args.get('start')) if request.args.get('start') else None
+            end = int(request.args.get('end')) if request.args.get('end') else None
+            report = self.get_report(group_id, None, None, start, end)
             member_list = self.get_member_list(group_id)
             groupinfo = {
                 'group_id': group.group_id,
