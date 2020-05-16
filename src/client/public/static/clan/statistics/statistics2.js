@@ -385,7 +385,7 @@ var vm = new Vue({
                     {
                         name: '血量',
                         type: 'line',
-                        smooth: true,
+                        // smooth: true,
                         data: temp6[0],
                         areaStyle: {},
                     }
