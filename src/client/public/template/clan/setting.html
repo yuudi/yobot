@@ -50,18 +50,36 @@
         <el-button @click="location='..'">返回</el-button>
       </el-form-item>
       <el-form-item>
+        现在档案编号：[[ battle_id ]]<br>
         <el-button type="primary" @click="export_data" icon="el-icon-download" size="mini">导出数据</el-button>
-          <el-button type="danger" @click="confirmVisible = true" icon="el-icon-delete" size="mini">重置数据</el-button>
-          <el-dialog title="警告" :visible.sync="confirmVisible">
-          <p>此操作会删除本次公会战所有数据</p>
-          <p>请提前保存好需要的数据</p>
+        {#- <el-button type="primary" @click="new_data_slot" icon="el-icon-document-add" size="mini">新建档案</el-button> -#}
+        <el-button type="primary" @click="get_data_slot_record_count();switchVisible = true" icon="el-icon-receiving" size="mini">切换档案</el-button>
+        <el-dialog title="切换档案" :visible.sync="switchVisible">
+          <ul>
+            <li v-for="item in data_slot_record_count">
+              [[ item.battle_id ]]号存档：[[ item.record_count ]]条记录
+            </li>
+          </ul>
+          <el-form>
+            <el-form-item label="切换至" label-width="120">
+              <el-input-number v-model="battle_id" :min="0"></el-input-number>
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="switchVisible = false">取消</el-button>
+            <el-button type="danger" @click="switch_data_slot">切换</el-button>
+          </span>
+        </el-dialog>
+        <el-button type="danger" @click="confirmVisible = true" icon="el-icon-delete" size="mini">删除数据</el-button>
+        <el-dialog title="警告" :visible.sync="confirmVisible">
+          <p>此操作会删除 [[ battle_id ]] 号存档中所有数据</p>
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="confirmVisible = false">取消</el-button>
-            <el-button type="danger" @click="delete_data">确定</el-button>
+            <el-button type="danger" @click="clear_data_slot">确定</el-button>
           </span>
         </el-dialog>
       </el-form-item>
-      </el-form>
+    </el-form>
   </div>
 </body>
 <script>var csrf_token = "{{ session['csrf_token'] }}";</script>

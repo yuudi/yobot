@@ -397,11 +397,11 @@ class ClanBattle:
         is_member.last_message = extra_msg
         is_member.save()
         if defeat:
-            boss_health_ramain=0
-            challenge_damage=group.boss_health
+            boss_health_ramain = 0
+            challenge_damage = group.boss_health
         else:
-            boss_health_ramain=group.boss_health-damage
-            challenge_damage=damage
+            boss_health_ramain = group.boss_health-damage
+            challenge_damage = damage
         challenge = Clan_challenge.create(
             gid=group_id,
             qqid=user.qqid,
@@ -571,9 +571,59 @@ class ClanBattle:
         group.game_server = game_server
         group.save()
 
-    def restart(self, group_id: Groupid):
+    def get_data_slot_record_count(self, group_id: Groupid):
         """
-        clear challenge data and reset boss status.
+        creat new new_data_slot for challenge data and reset boss status.
+
+        challenge data should be backuped and comfirm and
+        permission should be checked before this function is called.
+
+        Args:
+            group_id: group id
+        """
+        group = Clan_group.get_or_none(group_id=group_id)
+        if group is None:
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
+        counts = []
+        for c in Clan_challenge.select(
+            Clan_challenge.bid,
+            peewee.fn.COUNT(Clan_challenge.cid).alias('record_count'),
+        ).where(
+            Clan_challenge.gid == group_id
+        ).group_by(
+            Clan_challenge.bid,
+        ):
+            counts.append({
+                'battle_id': c.bid,
+                'record_count': c.record_count,
+            })
+        return counts
+
+    # def new_data_slot(self, group_id: Groupid):
+    #     """
+    #     creat new new_data_slot for challenge data and reset boss status.
+
+    #     challenge data should be backuped and comfirm and
+    #     permission should be checked before this function is called.
+
+    #     Args:
+    #         group_id: group id
+    #     """
+    #     group = Clan_group.get_or_none(group_id=group_id)
+    #     if group is None:
+    #         raise GroupError('本群未初始化，请发送“创建X服公会”')
+    #     group.boss_cycle = 1
+    #     group.boss_num = 1
+    #     group.boss_health = self.bossinfo[group.game_server][0][0]
+    #     group.battle_id += 1
+    #     group.save()
+    #     Clan_subscribe.delete().where(
+    #         Clan_subscribe.gid == group_id,
+    #     ).execute()
+
+    def clear_data_slot(self, group_id: Groupid, battle_id: Optional[int] = None):
+        """
+        clear data_slot for challenge data and reset boss status.
 
         challenge data should be backuped and comfirm and
         permission should be checked before this function is called.
@@ -587,14 +637,59 @@ class ClanBattle:
         group.boss_cycle = 1
         group.boss_num = 1
         group.boss_health = self.bossinfo[group.game_server][0][0]
-        group.battle_id += 1
+        group.challenging_member_qq_id = None
         group.save()
-        # Clan_challenge.delete().where(
-        #     Clan_challenge.gid == group_id,
-        # ).execute()
+        if battle_id is None:
+            battle_id = group.battle_id
+        Clan_challenge.delete().where(
+            Clan_challenge.gid == group_id,
+            Clan_challenge.bid == battle_id,
+        ).execute()
         Clan_subscribe.delete().where(
             Clan_subscribe.gid == group_id,
         ).execute()
+        _logger.info(f'群{group_id}的{battle_id}号存档已清空')
+
+    def switch_data_slot(self, group_id: Groupid, battle_id: int):
+        """
+        switch data_slot for challenge data and reset boss status.
+
+        challenge data should be backuped and comfirm and
+        permission should be checked before this function is called.
+
+        Args:
+            group_id: group id
+        """
+        group = Clan_group.get_or_none(group_id=group_id)
+        if group is None:
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
+        group.battle_id = battle_id
+        last_challenge = self._get_group_previous_challenge(group)
+        if last_challenge is None:
+            group.boss_cycle = 1
+            group.boss_num = 1
+            group.boss_health = self.bossinfo[group.game_server][0][0]
+        else:
+            group.boss_cycle = last_challenge.boss_cycle
+            group.boss_num = last_challenge.boss_num
+            group.boss_health = last_challenge.boss_health_ramain
+            if group.boss_health == 0:
+                if group.boss_num == 5:
+                    group.boss_num = 1
+                    group.boss_cycle += 1
+                else:
+                    group.boss_num += 1
+                group.boss_health = (
+                    self.bossinfo[group.game_server]
+                    [self._level_by_cycle(
+                        group.boss_cycle, game_server=group.game_server)]
+                    [group.boss_num-1])
+        group.challenging_member_qq_id = None
+        group.save()
+        Clan_subscribe.delete().where(
+            Clan_subscribe.gid == group_id,
+        ).execute()
+        _logger.info(f'群{group_id}切换至{battle_id}号存档')
 
     async def send_private_remind(self, member_list: List[QQid], content: str):
         for qqid in member_list:
@@ -1831,6 +1926,7 @@ class ClanBattle:
                         groupData={
                             'group_name': group.group_name,
                             'game_server': group.game_server,
+                            'battle_id': group.battle_id,
                         },
                         privacy=group.privacy,
                         notification=group.notification,
@@ -1843,8 +1939,25 @@ class ClanBattle:
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
                     return jsonify(code=0, message='success')
-                elif action == 'restart':
-                    self.restart(group_id)
+                elif action == 'get_data_slot_record_count':
+                    counts = self.get_data_slot_record_count(group_id)
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
+                    return jsonify(code=0, message='success', counts=counts)
+                # elif action == 'new_data_slot':
+                #     self.new_data_slot(group_id)
+                #     _logger.info('网页 成功 {} {} {}'.format(
+                #         user_id, group_id, action))
+                #     return jsonify(code=0, message='success')
+                elif action == 'clear_data_slot':
+                    battle_id = payload.get('battle_id')
+                    self.clear_data_slot(group_id, battle_id)
+                    _logger.info('网页 成功 {} {} {}'.format(
+                        user_id, group_id, action))
+                    return jsonify(code=0, message='success')
+                elif action == 'switch_data_slot':
+                    battle_id = payload['battle_id']
+                    self.switch_data_slot(group_id, battle_id)
                     _logger.info('网页 成功 {} {} {}'.format(
                         user_id, group_id, action))
                     return jsonify(code=0, message='success')
@@ -1929,6 +2042,8 @@ class ClanBattle:
                     battle_id = int(battle_id)
                 elif battle_id == 'all':
                     pass
+                elif battle_id == 'current':
+                    battle_id = None
                 else:
                     return jsonify(code=20, message=f'unexceptd value "{battle_id}" for battle_id')
             report = self.get_report(group_id, battle_id, None, None)
@@ -1937,6 +2052,7 @@ class ClanBattle:
                 'group_id': group.group_id,
                 'group_name': group.group_name,
                 'game_server': group.game_server,
+                'battle_id': group.battle_id,
             },
             response = await make_response(jsonify(
                 code=0,

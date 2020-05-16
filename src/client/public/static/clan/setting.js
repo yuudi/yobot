@@ -6,6 +6,8 @@ var vm = new Vue({
     data: {
         activeIndex: null,
         groupData: {},
+        battle_id: null,
+        data_slot_record_count: [],
         form: {
             game_server: null,
             privacy: {
@@ -25,6 +27,7 @@ var vm = new Vue({
                 sl: false,
             },
         },
+        switchVisible: false,
         confirmVisible: false,
     },
     mounted() {
@@ -35,6 +38,7 @@ var vm = new Vue({
         }).then(function (res) {
             if (res.data.code == 0) {
                 thisvue.groupData = res.data.groupData;
+                thisvue.battle_id = res.data.groupData.battle_id;
                 thisvue.form.game_server = res.data.groupData.game_server;
                 thisvue.form.privacy.allow_guest = Boolean(res.data.privacy & 0x1);
                 thisvue.form.privacy.allow_statistics_api = Boolean(res.data.privacy & 0x2);
@@ -83,24 +87,57 @@ var vm = new Vue({
         export_data: function (event) {
             window.location = '../statistics/api/';
         },
-        delete_data: function (event) {
+        call_api: function (payload) {
             var thisvue = this;
-            axios.post('./api/', {
-                action: 'restart',
-                csrf_token: csrf_token,
-            }).then(function (res) {
+            payload.csrf_token = csrf_token;
+            axios.post('./api/', payload).then(function (res) {
                 if (res.data.code == 0) {
                     thisvue.$notify({
                         title: '通知',
-                        message: '删除成功',
+                        message: '成功',
                     });
                 } else {
-                    thisvue.$alert(res.data.message, '删除失败');
+                    thisvue.$alert(res.data.message, '失败');
                 }
             }).catch(function (error) {
-                thisvue.$alert(error, '删除失败');
+                thisvue.$alert(error, '失败');
+            });
+        },
+        clear_data_slot: function (event) {
+            this.call_api({
+                action: 'clear_data_slot',
             });
             this.confirmVisible = false;
+        },
+        // new_data_slot: function (event) {
+        //     this.call_api({
+        //         action: 'new_data_slot',
+        //     });
+        // },
+        switch_data_slot: function (event) {
+            this.call_api({
+                action: 'switch_data_slot',
+                battle_id: this.battle_id,
+            });
+            this.switchVisible = false;
+        },
+        get_data_slot_record_count: function () {
+            if (this.data_slot_record_count.length !== 0) {
+                return
+            }
+            var thisvue = this;
+            axios.post('./api/', {
+                action: 'get_data_slot_record_count',
+                csrf_token: csrf_token,
+            }).then(function (res) {
+                if (res.data.code == 0) {
+                    thisvue.data_slot_record_count = res.data.counts;
+                } else {
+                    thisvue.$alert(res.data.message, '失败');
+                }
+            }).catch(function (error) {
+                thisvue.$alert(error, '失败');
+            });
         },
         handleSelect(key, keyPath) {
             switch (key) {

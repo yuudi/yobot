@@ -56,7 +56,7 @@ class User_login(_BaseModel):
 class Clan_group(_BaseModel):
     group_id = BigIntegerField(primary_key=True)
     group_name = TextField(null=True)
-    privacy = IntegerField(default=0)
+    privacy = IntegerField(default=2)  # 0x1：允许游客查看出刀表，0x2：允许api调用出刀表
     game_server = CharField(max_length=2, default='cn')
     notification = IntegerField(default=0xffff)  # 需要接收的通知
     level_4 = BooleanField(default=False)  # 公会战是否存在4阶段
@@ -208,7 +208,8 @@ def db_upgrade(old_version):
                                 BooleanField(default=True)),
         )
     if old_version < 6:
-        User.update({User.authority_group: 1}).where(User.authority_group == 2).execute()
+        User.update({User.authority_group: 1}).where(
+            User.authority_group == 2).execute()
     if old_version < 7:
         migrate(
             migrator.drop_column('clan_challenge', 'comment'),
