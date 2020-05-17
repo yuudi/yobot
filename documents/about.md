@@ -10,8 +10,10 @@ yobot 的编写出于学习目的，很高兴此工具能为大家提供帮助�
 QQ群：  
 770947581（满）  
 1044314369（满）  
-1067699252  
+1067699252（满）  
+774394459  
 
+[项目贡献者](./project/contributors.md)  
 [更新日志](./project/changelog.md)  
 [待办事项](./project/todo.md)  
 [开源许可](./project/open-source.md)  

@@ -5,7 +5,7 @@
 - 公会战数据多存档
 - 开放统计api与数据下载
 - 统计1：出刀顺序表（[#75](https://github.com/yuudi/yobot/pull/75)）
-- 统计2：出刀统计图（[#77](https://github.com/yuudi/yobot/pull/77)）
+- 统计2：出刀统计图（[#77](https://github.com/yuudi/yobot/pull/77)、[#79](https://github.com/yuudi/yobot/pull/79)）
 - 自动更新时有反馈
 - 允许删除公会
 - 优化在线十连

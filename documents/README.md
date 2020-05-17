@@ -65,6 +65,10 @@ yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷�
 
 <https://github.com/yuudi/yobot>
 
+## 贡献者
+
+[项目贡献者](./project/contributors.md)  
+
 ## 开源协议
 
 本工具使用了[这些](./project/open-source.md)开源软件和工具
