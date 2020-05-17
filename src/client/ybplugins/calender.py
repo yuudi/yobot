@@ -1,26 +1,25 @@
 import datetime
 import json
 import re
+import time
 
 import aiohttp
+import requests
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from arrow.arrow import Arrow
+from bs4 import BeautifulSoup
 
 from .yobot_exceptions import InputError, ServerError
-
-_calender_url = {
-    "jp": "https://tools.yobot.win/calender/#jp",
-    "tw": "https://pcredivewiki.tw/",
-    "cn": "https://tools.yobot.win/calender/#cn",
-}
 
 
 class Event_timeline:
     def __init__(self):
+        self.count = 0
         self._tineline = dict()
 
     def add_event(self, start_t: Arrow, end_t: Arrow, name):
+        self.count = self.count+1
         t = start_t
         while t <= end_t:
             daystr = t.format(fmt="YYYYMMDD", locale="zh_cn")
@@ -76,62 +75,38 @@ class Event:
             print("刷新国服日程表成功")
         else:
             self.timeline = None
-            if rg != "default":
-                print(f"{rg}区域无日程表")
+            print(f"{rg}区域无日程表")
 
-    # def load_time_jp(self, timestamp) -> Arrow:
-    #     tz = datetime.timezone(datetime.timedelta(hours=8))
-    #     d_time = datetime.datetime.fromtimestamp(timestamp, tz)
-    #     a_time = Arrow.fromdatetime(d_time)
-    #     if a_time.hour < 4:
-    #         a_time -= datetime.timedelta(hours=4)
-    #     return a_time
-
-    # async def load_timeline_jp_async(self):
-    #     event_source = "https://gamewith.jp/pricone-re/article/show/93857"
-    #     try:
-    #         async with aiohttp.request("GET", url=event_source) as response:
-    #             if response.status != 200:
-    #                 raise ServerError(f"服务器状态错误：{response.status}")
-    #             res = await response.text()
-    #     except aiohttp.client_exceptions.ClientError:
-    #         print("日程表加载失败")
-    #         return
-    #     soup = BeautifulSoup(res, features="html.parser")
-    #     events_ids = set()
-    #     timeline = Event_timeline()
-    #     for event in soup.select("[data-calendar]"):
-    #         e = json.loads(event["data-calendar"])
-    #         if e["id"] in events_ids:
-    #             continue
-    #         events_ids.add(e["id"])
-    #         timeline.add_event(
-    #             self.load_time_jp(e["start_time"]),
-    #             self.load_time_jp(e["end_time"]),
-    #             e["event_name"],
-    #         )
-    #     return timeline
-
-    def load_time_jp(self, timestr) -> Arrow:
-        d_time = datetime.datetime.strptime(timestr, r"%Y/%m/%d %H:%M:%S")
+    def load_time_jp(self, timestamp) -> Arrow:
+        tz = datetime.timezone(datetime.timedelta(hours=8))
+        d_time = datetime.datetime.fromtimestamp(timestamp, tz)
         a_time = Arrow.fromdatetime(d_time)
-        if a_time.time() < datetime.time(hour=4):
+        if a_time.hour < 4:
             a_time -= datetime.timedelta(hours=4)
         return a_time
 
     async def load_timeline_jp_async(self):
-        event_source = "http://tools.yobot.win/calender/jp.json"
-        async with aiohttp.request("GET", url=event_source) as response:
-            if response.status != 200:
-                raise ServerError(f"服务器状态错误：{response.status}")
-            res = await response.text()
-        events = json.loads(res)
+        event_source = "https://gamewith.jp/pricone-re/article/show/93857"
+        try:
+            async with aiohttp.request("GET", url=event_source) as response:
+                if response.status != 200:
+                    raise ServerError(f"服务器状态错误：{response.status}")
+                res = await response.text()
+        except aiohttp.client_exceptions.ClientError:
+            print("日程表加载失败")
+            return
+        soup = BeautifulSoup(res, features="html.parser")
+        events_ids = set()
         timeline = Event_timeline()
-        for e in events:
+        for event in soup.select("[data-calendar]"):
+            e = json.loads(event["data-calendar"])
+            if e["id"] in events_ids:
+                continue
+            events_ids.add(e["id"])
             timeline.add_event(
                 self.load_time_jp(e["start_time"]),
                 self.load_time_jp(e["end_time"]),
-                e["name"],
+                e["event_name"],
             )
         return timeline
 
@@ -166,7 +141,7 @@ class Event:
         return a_time
 
     async def load_timeline_cn_async(self):
-        event_source = "http://tools.yobot.win/calender/cn.json"
+        event_source = "http://api.v3.yobot.xyz/calender/cn.json"
         async with aiohttp.request("GET", url=event_source) as response:
             if response.status != 200:
                 raise ServerError(f"服务器状态错误：{response.status}")
@@ -211,20 +186,34 @@ class Event:
             daystr = date.format("MM月DD日")
             reply += "\n======{}======\n⨠{}".format(daystr, events_str)
             date += datetime.timedelta(days=1)
-        reply += "\n\n更多日程：{}".format(
-            _calender_url.get(self.setting["calender_region"]))
+        return reply
+
+    def get_all_events(self) -> str:
+        reply = "所有日程："
+        date = Arrow.now(tzinfo=self.timezone)
+        for i in range(self.timeline.count):
+            # reply+=len(self.timeline)
+            events = self.timeline.at(date)
+            events_str = "\n⨠".join(events)
+            if events_str == "":
+                events_str = "没有记录"
+            daystr = date.format("MM月DD日")
+            reply += "\n======{}======\n⨠{}".format(daystr, events_str)
+            date += datetime.timedelta(days=1)
         return reply
 
     @staticmethod
     def match(cmd: str) -> int:
-        if not cmd.startswith("日程"):
-            return 0
         if cmd == "日程" or cmd == "日程今日" or cmd == "日程今天":
             return 2
         if cmd == "日程明日" or cmd == "日程明天":
             return 3
         if cmd == "日程表" or cmd == "日程一周" or cmd == "日程本周":
             return 4
+        if cmd == "日程全" or cmd == "全日程" or cmd == "所有日程":
+            return 5
+        if not cmd.startswith("日程"):
+            return 0
         match = re.match(r"日程 ?(\d{1,2})月(\d{1,2})[日号]", cmd)
         if match:
             month = int(match.group(1))
@@ -251,6 +240,10 @@ class Event:
         # self.check_and_update()
         if match_num == 4:
             reply = self.get_week_events()
+            return {"reply": reply, "block": True}
+        # 我加的5，get_all
+        if match_num == 5:
+            reply = self.get_all_events()
             return {"reply": reply, "block": True}
         try:
             daystr, events = self.get_day_events(match_num)
