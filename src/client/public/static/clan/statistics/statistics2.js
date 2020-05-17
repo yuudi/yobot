@@ -445,7 +445,6 @@ var vm = new Vue({
                 series: {
                     name: '刀数',
                     type: 'bar',
-
                     animation: true,
                     lineStyle: {
                         width: 2
@@ -538,7 +537,8 @@ var vm = new Vue({
                         axisLabel: {
                             interval: 0,
                             rotate: 45
-                        }
+                        },
+                        boundaryGap: true,
                     }
                 ],
                 yAxis: [
