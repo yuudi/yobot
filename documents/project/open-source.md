@@ -11,6 +11,7 @@
 - peewee: <https://github.com/coleifer/peewee>
 - requests: <https://pypi.org/project/requests>
 - aiohttp: <https://github.com/aio-libs/aiohttp>
+- echart: <https://github.com/apache/incubator-echarts>
 - axios: <https://github.com/axios/axios>
 - beautifulsoup4: <http://www.crummy.com/software/BeautifulSoup/>
 - APscheduler: <https://github.com/agronholm/apscheduler>

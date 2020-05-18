@@ -50,6 +50,10 @@
 
 `gacha_private_on` 开启私聊抽卡功能，默认值 `false`
 
+`jjc_search` 竞技场查询，可选`nomae.net` `pcrdfans.com` `off`，默认值`nomae.net`
+
+`jjc_auth_key` pcrdfans.com 提供的查询授权码
+
 `news_jp_official` 开启日服官网新闻推送，默认值 `true`
 
 `news_jp_twitter` 开启日服推特新闻推送，默认值 `true`

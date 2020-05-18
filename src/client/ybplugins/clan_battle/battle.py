@@ -985,8 +985,8 @@ class ClanBattle:
                    battle_id: Union[str, int, None],
                    qqid: Optional[QQid] = None,
                    pcrdate: Optional[Pcr_date] = None,
-                   start_time: Optional[Pcr_time] = None,
-                   end_time: Optional[Pcr_time] = None,
+                   # start_time: Optional[Pcr_time] = None,
+                   # end_time: Optional[Pcr_time] = None,
                    ) -> ClanBattleReport:
         """
         get the records
@@ -1019,10 +1019,10 @@ class ClanBattle:
             expressions.append(Clan_challenge.qqid == qqid)
         if pcrdate is not None:
             expressions.append(Clan_challenge.challenge_pcrdate == pcrdate)
-        if start_time is not None:
-            expressions.append(Clan_challenge.challenge_pcrtime >= start_time)
-        if end_time is not None:
-            expressions.append(Clan_challenge.challenge_pcrtime <= end_time)
+        # if start_time is not None:
+        #     expressions.append(Clan_challenge.challenge_pcrtime >= start_time)
+        # if end_time is not None:
+        #     expressions.append(Clan_challenge.challenge_pcrtime <= end_time)
         for c in Clan_challenge.select().where(
             *expressions
         ):
@@ -1190,6 +1190,7 @@ class ClanBattle:
                     group_id,
                     user_id,
                     True,
+                    None,
                     behalf,
                     extra_msg=extra_msg,
                     previous_day=previous_day)
@@ -1530,6 +1531,7 @@ class ClanBattle:
                             status = self.challenge(group_id,
                                                     user_id,
                                                     True,
+                                                    None,
                                                     payload['behalf'],
                                                     extra_msg=payload.get(
                                                         'message'),
@@ -2055,9 +2057,10 @@ class ClanBattle:
                     battle_id = None
                 else:
                     return jsonify(code=20, message=f'unexceptd value "{battle_id}" for battle_id')
-            start = int(request.args.get('start')) if request.args.get('start') else None
-            end = int(request.args.get('end')) if request.args.get('end') else None
-            report = self.get_report(group_id, None, None, start, end)
+            # start = int(request.args.get('start')) if request.args.get('start') else None
+            # end = int(request.args.get('end')) if request.args.get('end') else None
+            # report = self.get_report(group_id, None, None, start, end)
+            report = self.get_report(group_id, None, None)
             member_list = self.get_member_list(group_id)
             groupinfo = {
                 'group_id': group.group_id,

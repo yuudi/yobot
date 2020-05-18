@@ -7,8 +7,9 @@
 <body>
     <p><a href="../">返回</a></p>
     <h1>建设中</h1>
-    <p><a href="./1/">统计1：出刀顺序表</a> by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></p>
-    <p><a href="./2/">统计2：数据图表</a> by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></p>
+    <p><a href="./1/">统计：出刀顺序表</a> by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></p>
+    <p><a href="./2/">统计：数据图表</a> by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></p>
+    <p><a href="#" target="_blank" id="pcrd-yobot-fe">统计：多维度分析</a>（需要开启api访问） by <a href="https://github.com/Tan90Qian">@Tan90Qian</a></p>
     <!--
         不知道统计改怎么写，所以我就没写了
         但还是有大佬写出来了有用的分析，感谢这些大佬的贡献
@@ -46,7 +47,9 @@
 
 <script>
     var apikey = "{{ apikey }}";
-    document.getElementById("apiurl").value = window.location.href + "api/?apikey=" + apikey;
+    var apiurl = window.location.href + "api/?apikey=" + apikey
+    document.getElementById("apiurl").value = apiurl;
+    document.getElementById("pcrd-yobot-fe").href = "http://tools.yobot.win/pcrd-yobot-fe/#" + encodeURIComponent(apiurl);
     document.getElementById("copy").addEventListener("click", e => {
         document.getElementById("apiurl").select();
         document.execCommand("Copy");

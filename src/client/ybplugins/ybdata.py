@@ -26,7 +26,7 @@ class User(_BaseModel):
     qqid = BigIntegerField(primary_key=True)
     nickname = TextField(null=True)
 
-    # 1:主人 2:机器人管理员 10:公会战管理员 100:成员
+    # 1:主人 10:公会战管理员 100:成员
     authority_group = IntegerField(default=100)
 
     privacy = IntegerField(default=MAX_TRY_TIMES)   # 密码错误次数

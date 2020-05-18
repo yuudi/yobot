@@ -163,7 +163,19 @@
             <el-checkbox v-model="setting.gacha_private_on">允许私聊抽卡</el-checkbox>
         </p>
         <p>
-            <el-checkbox v-model="setting.jjc_consult">允许竞技场查询</el-checkbox>
+            竞技场查询
+            <el-select v-model="setting.jjc_search">
+                <el-option label="关闭" value="off"></el-option>
+                <el-option label="nomae.net" value="nomae.net"></el-option>
+                <el-option label="pcrdfans.com" value="pcrdfans.com"></el-option>
+            </el-select>
+        </p>
+        <p :hidden="setting.jjc_search!='pcrdfans.com'">
+            <el-col :span="4">pcrdfans.com apikey</el-col>
+            <el-col :span="20">
+                <el-input v-model="setting.jjc_auth_key" placeholder="如果您没有apikey，请更换其他查询方式">
+                </el-input>
+            </el-col>
         </p>
         <p>
             新闻推送：

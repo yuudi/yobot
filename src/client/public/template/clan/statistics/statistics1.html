@@ -11,7 +11,7 @@
 
 <body>
     <div id="app">
-        <el-button icon="el-icon-back" @click="javascript:history.go(-1);"></el-button>
+        <el-button icon="el-icon-back" @click="location='..'"></el-button>
         <el-table :data="tableData">
             <el-table-column prop="date" label="时间" width="180" sortable>
                 <template slot-scope="scope">
