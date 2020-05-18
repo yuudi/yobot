@@ -992,7 +992,7 @@ var vm = new Vue({
         },
 
         get_player: function(qqid) {
-            return this.members.find(o => o.qqid === qqid);
+            return this.members.find(o => o.qqid === qqid) ?? {nickname:'未加入',qqid:qqid,sl:null};
         },
 
         player_damage: function(player_qqid) {
