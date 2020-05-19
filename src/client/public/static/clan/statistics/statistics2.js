@@ -607,7 +607,7 @@ var vm = new Vue({
                     if (clist[i].health_ramain != 0) {
                         damage = clist[i].damage;
                     } 
-                    else if (clist[i+1].is_continue) {
+                    else if (clist[i+1]?.is_continue) {
                         damage = clist[i].damage + clist[i+1].damage
                         i++;
                     }

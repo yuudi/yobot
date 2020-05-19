@@ -28,7 +28,7 @@
 
 ### 第二步
 
-点击下载[yobot便携版](http://tools.yobot.win/fetch-latest/)
+点击下载[yobot便携版](https://yobot.lanzous.com/b00nlr3ni)
 
 解压后双击“yobot.exe”启动服务，双方通信成功后出现如下的提示
 

@@ -41,7 +41,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 ### Windows系统
 
-[点击下载便携版](http://tools.yobot.win/fetch-latest/)
+[点击下载便携版](https://yobot.lanzous.com/b00nlr3ni)
 
 下载yobot便携版，创建一个文件夹解压，启动 yobot.exe 即可。如需更改端口，请启动一次后修改 yobot_config.json 中的 port 字段并重启。
 
