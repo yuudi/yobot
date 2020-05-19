@@ -160,6 +160,8 @@ class Switcher:
                 self.setting['public_address'],
                 '{}admin/setting/'.format(self.setting['public_basepath']))
         elif match_num == 0x400:
+            if self.setting["clan_battle_mode"] != "chat":
+                return '当前模式无法使用设置码'
             in_code = cmd[3:]
             res = self.get_url_content(self.code_api+in_code)
             if isinstance(res, int):
