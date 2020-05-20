@@ -1,5 +1,4 @@
 import asyncio
-import json
 import logging
 import os
 import random
@@ -19,8 +18,7 @@ from ..web_util import async_cached_func
 from ..ybdata import (Clan_challenge, Clan_group, Clan_member, Clan_subscribe,
                       User)
 from .exception import GroupError, InputError, UserError
-from .typing import (
-    BossStatus, ClanBattleReport, Groupid, Pcr_date, Pcr_time, QQid)
+from .typing import BossStatus, ClanBattleReport, Groupid, Pcr_date, QQid
 from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func
 
 _logger = logging.getLogger(__name__)
@@ -985,8 +983,8 @@ class ClanBattle:
                    battle_id: Union[str, int, None],
                    qqid: Optional[QQid] = None,
                    pcrdate: Optional[Pcr_date] = None,
-                   start_time: Optional[Pcr_time] = None,
-                   end_time: Optional[Pcr_time] = None,
+                   # start_time: Optional[Pcr_time] = None,
+                   # end_time: Optional[Pcr_time] = None,
                    ) -> ClanBattleReport:
         """
         get the records
@@ -1019,10 +1017,10 @@ class ClanBattle:
             expressions.append(Clan_challenge.qqid == qqid)
         if pcrdate is not None:
             expressions.append(Clan_challenge.challenge_pcrdate == pcrdate)
-        if start_time is not None:
-            expressions.append(Clan_challenge.challenge_pcrtime >= start_time)
-        if end_time is not None:
-            expressions.append(Clan_challenge.challenge_pcrtime <= end_time)
+        # if start_time is not None:
+        #     expressions.append(Clan_challenge.challenge_pcrtime >= start_time)
+        # if end_time is not None:
+        #     expressions.append(Clan_challenge.challenge_pcrtime <= end_time)
         for c in Clan_challenge.select().where(
             *expressions
         ):
@@ -1045,6 +1043,52 @@ class ClanBattle:
                 'behalf': c.behalf,
             })
         return report
+
+    @timed_cached_func(max_len=64, max_age_seconds=10, ignore_self=True)
+    def get_battle_member_list(self,
+    group_id: Groupid,
+                   battle_id: Union[str, int, None],
+                   ):
+        """
+        get the member lists for clan-battle report
+
+        return a list of member infomation,
+
+        Args:
+            group_id: group id
+        """
+        group = Clan_group.get_or_none(group_id=group_id)
+        if group is None:
+            raise GroupError('本群未初始化，请发送“创建X服公会”')
+        expressions = [
+            Clan_challenge.gid == group_id,
+        ]
+        if battle_id is None:
+            battle_id = group.battle_id
+        if isinstance(battle_id, str):
+            if battle_id == 'all':
+                pass
+            else:
+                raise InputError(
+                    f'unexceptd value "{battle_id}" for battle_id')
+        else:
+            expressions.append(Clan_challenge.bid == battle_id)
+        member_list = []
+        for u in Clan_challenge.select(
+            Clan_challenge.qqid,
+            User.nickname,
+        ).join(
+            User,
+            on=(Clan_challenge.qqid == User.qqid),
+            attr='user',
+        ).where(
+            *expressions
+        ).distinct():
+            member_list.append({
+                'qqid': u.qqid,
+                'nickname': u.user.nickname,
+            })
+        return member_list
 
     @timed_cached_func(max_len=16, max_age_seconds=3600, ignore_self=True)
     def get_member_list(self, group_id: Groupid) -> List[Dict[str, Any]]:
@@ -1190,6 +1234,7 @@ class ClanBattle:
                     group_id,
                     user_id,
                     True,
+                    None,
                     behalf,
                     extra_msg=extra_msg,
                     previous_day=previous_day)
@@ -1251,11 +1296,8 @@ class ClanBattle:
                 extra_msg = extra_msg.strip()
                 if not extra_msg:
                     extra_msg = None
-            msg = {}
-            if extra_msg:
-                msg['message'] = extra_msg
             try:
-                self.add_subscribe(group_id, user_id, boss_num, msg)
+                self.add_subscribe(group_id, user_id, boss_num, extra_msg)
             except (GroupError, UserError) as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
@@ -1270,11 +1312,8 @@ class ClanBattle:
                 extra_msg = extra_msg.strip()
                 if not extra_msg:
                     extra_msg = None
-            msg = {}
-            if extra_msg:
-                msg['message'] = extra_msg
             try:
-                self.add_subscribe(group_id, user_id, 0, msg)
+                self.add_subscribe(group_id, user_id, 0, extra_msg)
             except (GroupError, UserError) as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
@@ -1360,11 +1399,11 @@ class ClanBattle:
             subscribers = self.get_subscribe_list(group_id, match_num-20)
             if not subscribers:
                 return '没有人'+beh
-            reply = beh+'的成员：\n' + '\n'.join(
-                self._get_nickname_by_qqid(m['qqid'])
-                + m.get('message', '')
-                for m in subscribers
-            )
+            reply = beh+'的成员：\n'
+            for m in subscribers:
+                reply+=self._get_nickname_by_qqid(m['qqid'])
+                if m.get('message', ''):
+                    reply += '：'+ m.get['message']
             return reply
 
     def register_routes(self, app: Quart):
@@ -1530,6 +1569,7 @@ class ClanBattle:
                             status = self.challenge(group_id,
                                                     user_id,
                                                     True,
+                                                    None,
                                                     payload['behalf'],
                                                     extra_msg=payload.get(
                                                         'message'),
@@ -2055,10 +2095,12 @@ class ClanBattle:
                     battle_id = None
                 else:
                     return jsonify(code=20, message=f'unexceptd value "{battle_id}" for battle_id')
-            start = int(request.args.get('start')) if request.args.get('start') else None
-            end = int(request.args.get('end')) if request.args.get('end') else None
-            report = self.get_report(group_id, None, None, start, end)
-            member_list = self.get_member_list(group_id)
+            # start = int(request.args.get('start')) if request.args.get('start') else None
+            # end = int(request.args.get('end')) if request.args.get('end') else None
+            # report = self.get_report(group_id, None, None, start, end)
+            report = self.get_report(group_id, battle_id, None, None)
+            # member_list = self.get_member_list(group_id)
+            member_list = self.get_battle_member_list(group_id, battle_id)
             groupinfo = {
                 'group_id': group.group_id,
                 'group_name': group.group_name,

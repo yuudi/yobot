@@ -40,7 +40,7 @@ class Custom:
         '''
         # 注意：这个类加载时，asyncio事件循环尚未启动，且bot_api没有连接
         # 此时不要调用bot_api
-        # 此时没有running_loop，不要直接使用await或asyncio.creat_task
+        # 此时没有running_loop，不要直接使用await，请使用asyncio.ensure_future并指定loop=asyncio.get_event_loop()
 
         # 如果需要启用，请注释掉下面一行
         return

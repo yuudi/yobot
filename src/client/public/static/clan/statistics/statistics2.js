@@ -2,11 +2,16 @@
 * TODO:
 *  公会伤害成长曲线
 *  公会成员成长曲线合图
-*  公会成员总伤害对比表
-*  公会成员刀平均伤害对比表
-*  公会成员各Boss刀数统计
 *  各个玩家与BOSS均伤偏差值百分比统计
 */
+
+const numberFormatter = num => {
+    if (num < 10000)
+        return `${num.toLocaleString()}`
+    if (num < 100000000)
+        return `${(num / 10000).toLocaleString()} W`
+    return `${(num / 100000000).toLocaleString()} E`
+}
 
 if (!Object.defineProperty) {
     alert('浏览器版本过低');
@@ -82,6 +87,7 @@ var vm = new Vue({
         boss_hit_chart: null,
         personal_progress_chart: null,
         personal_time_chart: null,
+        total_damage_chart: null,
         is_loading: true,
         selecting_tab: "table",
         selecting_qqid: parseInt(qqid)
@@ -97,6 +103,7 @@ var vm = new Vue({
         this.boss_hit_chart = echarts.init(document.getElementById("boss_hit_chart"));
         this.personal_progress_chart = echarts.init(document.getElementById("personal_progress_chart"));
         this.personal_time_chart = echarts.init(document.getElementById("personal_time_chart"));
+        this.total_damage_chart = echarts.init(document.getElementById("total_damage_chart"));
         this.selecting_tab = "total";
         this.refresh_data();
     },
@@ -184,7 +191,11 @@ var vm = new Vue({
                 xAxis: {
                     data: temp[0],
                 },
-                yAxis: {},
+                yAxis: {
+                    axisLabel: {
+                        formatter: numberFormatter
+                    }
+                },
                 series: [{
                     name: '伤害',
                     type: 'bar',
@@ -226,9 +237,13 @@ var vm = new Vue({
                     data: ['伤害']
                 },
                 xAxis: {
-                    data: temp3[0],
+                    data: temp3[0]
                 },
-                yAxis: {},
+                yAxis: {
+                    axisLabel: {
+                        formatter: numberFormatter
+                    }
+                },
                 series: [{
                     name: '伤害',
                     type: 'bar',
@@ -350,7 +365,7 @@ var vm = new Vue({
                 yAxis: {
                     type: 'value',
                     axisLabel: {
-                        formatter: v => `${v / 10000} W`
+                        formatter: numberFormatter
                     },
                     axisPointer: {
                         snap: true
@@ -430,7 +445,6 @@ var vm = new Vue({
                 series: {
                     name: '刀数',
                     type: 'bar',
-
                     animation: true,
                     lineStyle: {
                         width: 2
@@ -488,6 +502,76 @@ var vm = new Vue({
                     }
                 }]
             };
+            let temp9 = this.members_damage_for_chart(this.global_table_data);
+            let option9 = {
+                title: {
+                    text: '成员伤害统计'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                toolbox: {
+                    feature: {
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                legend: {
+                    data: ['总伤害', '刀均伤害']
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: temp9[0],
+                        axisPointer: {
+                            type: 'shadow'
+                        },
+                        axisLabel: {
+                            interval: 0,
+                            rotate: 45
+                        },
+                        boundaryGap: true,
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '总伤害',
+                        axisLabel: {
+                            formatter: numberFormatter
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '刀均伤害',
+                        axisLabel: {
+                            formatter: numberFormatter
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '总伤害',
+                        type: 'bar',
+                        data: temp9[1]
+                    },
+                    {
+                        name: '刀均伤害',
+                        type: 'bar',
+                        yAxisIndex: 1,
+                        data: temp9[2]
+                    }
+                ]
+            };
+
 
             this.boss_dmg_chart.setOption(option);
             this.challenge_chart.setOption(option2);
@@ -497,6 +581,7 @@ var vm = new Vue({
             this.boss_blood_chart.setOption(option6);
             this.total_time_chart.setOption(option7);
             this.boss_hit_chart.setOption(option8);
+            this.total_damage_chart.setOption(option9);
         },
 
         resizeAll: function() {
@@ -508,6 +593,7 @@ var vm = new Vue({
             this.personal_progress_chart.resize();
             this.personal_time_chart.resize();
             this.boss_hit_chart.resize();
+            this.total_damage_chart.resize();
         },
 
         init_player_data: function() {
@@ -521,7 +607,7 @@ var vm = new Vue({
                     if (clist[i].health_ramain != 0) {
                         damage = clist[i].damage;
                     } 
-                    else if (clist[i+1].is_continue) {
+                    else if (clist[i+1]?.is_continue) {
                         damage = clist[i].damage + clist[i+1].damage
                         i++;
                     }
@@ -602,6 +688,9 @@ var vm = new Vue({
                 yAxis: {
                     type: 'value',
                     scale: true,
+                    axisLabel: {
+                        formatter: numberFormatter
+                    }
                 },
                 tooltip: {
                     trigger: 'axis',
@@ -870,6 +959,14 @@ var vm = new Vue({
             );
         },
 
+        members_damage_for_chart: function(global_table_data) {
+            const data = global_table_data.sort((a, b) => b.sum_dmg - a.sum_dmg);
+            const full = data.map(elem => elem.sum_dmg);
+            const average = data.map(elem => elem.avg_dmg);
+            const names = data.map(elem => elem.nickname);
+            return [names, full, average];
+        },
+
         average_damage: function(damage, contain_tail_and_continue) {
             let sum = this.sum(damage.normal_damage);
             let count = damage.count;
@@ -895,7 +992,7 @@ var vm = new Vue({
         },
 
         get_player: function(qqid) {
-            return this.members.find(o => o.qqid === qqid);
+            return this.members.find(o => o.qqid === qqid) ?? {nickname:'未加入',qqid:qqid,sl:null};
         },
 
         player_damage: function(player_qqid) {

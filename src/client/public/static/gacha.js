@@ -9,6 +9,7 @@ var experience = {
     "star1": 0,
     "diamond": 0,
 };
+var progress = false;
 (function () {
     var h = localStorage['gacha_experience'];
     if (h) {
@@ -52,7 +53,12 @@ async function reload() {
     experience.diamond += 1500;
 }
 async function gacha() {
+    if (progress) {
+        return;
+    }
+    progress = true;
     await reload();
     document.getElementById('result').innerHTML = `★3: ${experience.star3}<br>★2: ${experience.star2}<br>★1: ${experience.star1}<br>总耗钻: ${experience.diamond}`;
     localStorage['gacha_experience'] = [experience.star3, experience.star2, experience.star1, experience.diamond].join(',');
+    progress = false;
 }

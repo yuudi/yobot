@@ -53,20 +53,20 @@
     <h1>竞技场解法</h1>
     <p>防守队伍：</p>
     <div>
-        {% for chara in def_lst -%}
-        <img src="{{ public_base }}resource/icon/unit/{{ jpname2id.get(chara,0) + 30 }}.jpg">
+        {% for (chara_id, _) in def_lst -%}
+        <img src="{{ public_base }}resource/icon/unit/{{ chara_id }}31.jpg">
         {% endfor -%}
     </div>
-    <p>查找到{{ len(solution) }}条解法</p>
+    <p>{{ '国服' if region==2 else '台服' if region==3 else '日服' if region==4 else '' }}解法：</p>
     <table border="0">
         <tbody>
-            {% for team in solution -%}
+            {% for solution in result -%}
             <tr>
-                {% for chara in parse_team(team) -%}
+                {% for chara in solution.team -%}
                 <td valign="top">
-                    <img src="{{ public_base }}resource/icon/unit/{{ jpname2id.get(chara[0],0) + (60 if chara[1]==6 else 30) }}.jpg">
+                    <img src="{{ public_base }}resource/icon/unit/{{ chara.char_id }}{{ (61 if chara[1]==6 else 31) }}.jpg">
                     <div class="detail">
-                        {% if chara[1] == 6 -%}
+                        {% if chara.stars == 6 -%}
                         <div class="star" id="mark"></div>
                         <div class="star" id="mark"></div>
                         <div class="star" id="mark"></div>
@@ -74,10 +74,10 @@
                         <div class="star" id="mark"></div>
                         <div class="star_pink" id="mark"></div>
                         {% else -%}
-                        {% for i in range(chara[1]) -%}
+                        {% for i in range(chara.stars) -%}
                         <div class="star" id="mark"></div>
                         {% endfor -%}
-                        {% if chara[2] -%}
+                        {% if chara.equip -%}
                         <div class="equip" id="mark"></div>
                         {% endif -%}
                         {% endif -%}
@@ -85,14 +85,15 @@
                 </td>
                 {% endfor -%}
                 <td>
-                    👍{{ team['good'] }}<br>
-                    👎{{ team['bad'] }}<br>
-                    {{ team['updated'] }}
+                    👍{{ solution.good }}<br>
+                    👎{{ solution.bad }}<br>
+                    {{ solution.time }}
                 </td>
             </tr>
             {% endfor -%}
         </tbody>
     </table>
+    <div>数据来源<a href="{{ 'https://nomae.net/arenadb/' if search_source=='nomae.net' else 'https://www.pcrdfans.com/battle' }}/">{{ search_source }}</a></div>
 </body>
 
 </html>
