@@ -29,6 +29,8 @@ var vm = new Vue({
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              start.setHours(0, 0, 0, 0);
+              end.setHours(0, 0, 0, 0);
               picker.$emit('pick', [start, end]);
             }
           }, {
@@ -37,6 +39,8 @@ var vm = new Vue({
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 15);
+              start.setHours(0, 0, 0, 0);
+              end.setHours(0, 0, 0, 0);
               picker.$emit('pick', [start, end]);
             }
           },  {
@@ -45,6 +49,8 @@ var vm = new Vue({
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              start.setHours(0, 0, 0, 0);
+              end.setHours(0, 0, 0, 0);
               picker.$emit('pick', [start, end]);
             }
           }, {
@@ -53,6 +59,8 @@ var vm = new Vue({
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              start.setHours(0, 0, 0, 0);
+              end.setHours(0, 0, 0, 0);
               picker.$emit('pick', [start, end]);
             }
           }, {
@@ -61,69 +69,73 @@ var vm = new Vue({
               const end = new Date();
               const start = new Date();
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 365);
+              start.setHours(0, 0, 0, 0);
+              end.setHours(0, 0, 0, 0);
               picker.$emit('pick', [start, end]);
             }
           }]
         },
-        challenges: [],
+        allChallenges: [],
         activeIndex: '4',
-        challenge_map: {},
-        player_damage_cache: {},
-        total_damage: {},
-        contain_tail_and_continue: true,
-        global_table_data: [],
-        player_data: {
+        challengeMap: {},
+        challenges: [],
+        playerDamages: {},
+        totalDamage: {},
+        containTailAndContinue: true,
+        globalTableData: [],
+        playerData: {
             damage: [
                 
             ],
         },
-        color_list: ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'],                
-        challenge_chart: null,
-        boss_dmg_chart: null,
-        miss_chart: null,
-        last_chart: null,
-        boss_blood_chart: null,
-        total_time_chart: null,
-        boss_hit_chart: null,
-        personal_progress_chart: null,
-        personal_time_chart: null,
-        total_damage_chart: null,
-        is_loading: true,
-        selecting_tab: "table",
-        selecting_qqid: parseInt(qqid)
+        colorList: ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'],                
+        challengeChart: null,
+        bossDmgChart: null,
+        missChart: null,
+        lastChart: null,
+        bossBloodChart: null,
+        totalTimeChart: null,
+        bossHitChart: null,
+        personalProgressChart: null,
+        personalTimeChart: null,
+        totalDamageChart: null,
+        isLoading: true,
+        selectingTab: "table",
+        selectingQQid: parseInt(qqid)
     },
     mounted() {
-        this.boss_dmg_chart = echarts.init(document.getElementById("boss_dmg_chart"));
-        this.challenge_chart = echarts.init(document.getElementById("challenge_chart"));
-        this.sum_dmg_chart = echarts.init(document.getElementById("sum_dmg_chart"));
-        this.miss_chart = echarts.init(document.getElementById("miss_chart"));
-        this.last_chart = echarts.init(document.getElementById("last_chart"));
-        this.boss_blood_chart = echarts.init(document.getElementById("boss_blood_chart"));
-        this.total_time_chart = echarts.init(document.getElementById("total_time_chart"));
-        this.boss_hit_chart = echarts.init(document.getElementById("boss_hit_chart"));
-        this.personal_progress_chart = echarts.init(document.getElementById("personal_progress_chart"));
-        this.personal_time_chart = echarts.init(document.getElementById("personal_time_chart"));
-        this.total_damage_chart = echarts.init(document.getElementById("total_damage_chart"));
-        this.selecting_tab = "total";
-        this.refresh_data();
+        this.bossDmgChart = echarts.init(document.getElementById("bossDmgChart"));
+        this.challengeChart = echarts.init(document.getElementById("challengeChart"));
+        this.sumDmgChart = echarts.init(document.getElementById("sumDmgChart"));
+        this.missChart = echarts.init(document.getElementById("missChart"));
+        this.lastChart = echarts.init(document.getElementById("lastChart"));
+        this.bossBloodChart = echarts.init(document.getElementById("bossBloodChart"));
+        this.totalTimeChart = echarts.init(document.getElementById("totalTimeChart"));
+        this.bossHitChart = echarts.init(document.getElementById("bossHitChart"));
+        this.personalProgressChart = echarts.init(document.getElementById("personalProgressChart"));
+        this.personalTimeChart = echarts.init(document.getElementById("personalTimeChart"));
+        this.totalDamageChart = echarts.init(document.getElementById("totalDamageChart"));
+        this.selectingTab = "total";
+        this.fetchData();
     },
     watch: {
-        contain_tail_and_continue: function() {
+        containTailAndContinue: function() {
             this.init();
         },
-        selecting_qqid: function() {
-            this.init_chart(this.player_damage(this.selecting_qqid).boss_damage_list);
-            this.init_player_data();
+        selectingQQid: function() {
+            this.initChart(this.playerDamage(this.selectingQQid).bossDamageList);
+            this.initPlayerData();
         },
-        selecting_tab: function() {
+        selectingTab: function() {
             this.init();
             setTimeout("vm.resizeAll()", 100);
         },
-        range: function(value) {
+        range: function() {
+            this.refreshData();
             this.init();
-            console.log(value);
         },
     },
+
     methods: {
         // tools function
         sum: (iterable) => {
@@ -131,55 +143,69 @@ var vm = new Vue({
             iterable.forEach(v => sum += v);
             return sum;
         },
-        format_to2: (num) => { return (num >= 10) ?  num.toString() : '0' + num.toString() },
+        formatTo2: (num) => { return (num >= 10) ?  num.toString() : '0' + num.toString() },
 
-        refresh_data: function() {
+        fetchData: function() {
             const that = this;
             axios.get('../api/').then(res=> {
                 if (res.data.code != 0) {
                     that.$alert(res.data.message, '获取记录失败');
-                    that.is_loading = false;
+                    that.isLoading = false;
                     return;
                 }
-                that.challenges = res.data.challenges;
+                that.allChallenges = res.data.challenges;
                 that.members = res.data.members;
-                for (let challenge of that.challenges) {
-                    let arr = that.challenge_map[challenge.qqid];
-                    if (arr == undefined) {
-                        arr = [];
-                        that.challenge_map[challenge.qqid] = arr;
-                    }
-                    arr.push(challenge);
-                }
-                for (let member of that.members) {
-                    member.challenges = that.challenge_map[member.qqid];
-                }
-                that.sort_and_divide();
-                that.init();
-                that.is_loading = false;
+                that.refreshData();
             // }).catch(function (error) {
             //     thisvue.$alert(error, '获取数据失败');
-            //     thisvue.is_loading = false;
+            //     thisvue.isLoading = false;
             });
         },
 
-        init: function() {
-            this.__total_damage();
-            this.__global_table_data();
-            this.init_player_data();
-            if (this.selecting_tab === 'total') {
-                this.init_chart(this.total_damage.boss_damage_list);
+        filtedChallenge: function() {
+            if (!this.range) return this.allChallenges;
+            const leftRange = this.range[0].getTime() / 1000 + 18000;
+            const rightRange = this.range[1].getTime() / 1000 + 18000 + 86400;
+            return this.allChallenges.filter((elem) => {return elem.challenge_time <= rightRange && elem.challenge_time >= leftRange});
+        },
+
+        refreshData: function() {
+            this.challenges = this.filtedChallenge();
+            this.challengeMap = {};
+            for (let challenge of this.challenges) {
+                let arr = this.challengeMap[challenge.qqid];
+                if (arr == undefined) {
+                    arr = [];
+                    this.challengeMap[challenge.qqid] = arr;
+                }
+                arr.push(challenge);
             }
-            else if (this.selecting_tab === 'channel') {
-                this.init_chart(this.total_damage.boss_damage_list);
+            for (let member of this.members) {
+                member.challenges = this.challengeMap[member.qqid];
+            }
+            this.sortAndDivide();
+            this.init();
+            this.isLoading = false;
+        },
+
+        init: function() {
+            this.initTotalDamage();
+            this.initPlayerDamage();
+            this.initGlobalTableData();
+            this.initPlayerData();
+            if (this.selectingTab === 'total') {
+                this.initChart(this.totalDamage.bossDamageList);
+            }
+            else if (this.selectingTab === 'channel') {
+                this.initChart(this.totalDamage.bossDamageList);
             }
             else {
-                this.init_chart(this.player_damage(this.selecting_qqid).boss_damage_list);
+                this.initChart(this.playerDamage(this.selectingQQid).bossDamageList);
             }
         },
         // function for init
-        init_chart: function(boss_damage_list) {
-            let temp = this.boss_average_damage_for_chart(boss_damage_list, this.contain_tail_and_continue);
+        initChart: function(bossDamageList) {
+            let temp = this.bossAverageDamageForChart(bossDamageList, this.containTailAndContinue);
             let option = {
                 title: {
                     text: '不同 Boss 刀均伤害'
@@ -202,14 +228,14 @@ var vm = new Vue({
                     data: temp[1],
                     itemStyle: {
                         color: (params) => {
-                            let boss_id = parseInt(temp[0][params.dataIndex][0]) - 1;
-                            return this.color_list[boss_id];
+                            let bossId = parseInt(temp[0][params.dataIndex][0]) - 1;
+                            return this.colorList[bossId];
                         },
                     }
                 }]
             }
 
-            let temp2 = this.boss_challenge_count_for_chart(boss_damage_list, true);
+            let temp2 = this.bossChallengeCountForChart(bossDamageList, true);
             let option2 = {
                 title: {
                     text: '不同 Boss 出刀数'
@@ -221,13 +247,13 @@ var vm = new Vue({
                     data: temp2,
                     itemStyle: {
                         color: (params) => {
-                            let boss_id = parseInt(temp2[params.dataIndex].name[0]) - 1;
-                            return this.color_list[boss_id];
+                            let bossId = parseInt(temp2[params.dataIndex].name[0]) - 1;
+                            return this.colorList[bossId];
                         }
                     }
                 }]
             }
-            let temp3 = this.boss_sum_damage_for_chart(boss_damage_list);
+            let temp3 = this.bossSumDamageForChart(bossDamageList);
             let option3 = {
                 title: {
                     text: 'Boss 总伤害'
@@ -250,13 +276,13 @@ var vm = new Vue({
                     data: temp3[1],
                     itemStyle: {
                         color: (params) => {
-                            let boss_id = parseInt(temp3[0][params.dataIndex][0]) - 1;
-                            return this.color_list[boss_id];
+                            let bossId = parseInt(temp3[0][params.dataIndex][0]) - 1;
+                            return this.colorList[bossId];
                         },
                     }
                 }]
             }
-            let temp4 = this.boss_miss_for_chart(this.global_table_data);
+            let temp4 = this.bossMissForChart(this.globalTableData);
             let option4 = {
                 title: {
                     text: '成员出刀考勤'
@@ -291,7 +317,7 @@ var vm = new Vue({
                     }
                 }]
             }
-            let temp5 = this.boss_last_for_chart();
+            let temp5 = this.bossLastForChart();
             let option5 = {
                 title: {
                     text: '尾刀统计',
@@ -316,7 +342,7 @@ var vm = new Vue({
                     }
                 ]
             };
-            let temp6 = this.boss_blood_for_chart();
+            let temp6 = this.bossBloodForChart();
             let option6 = {
                 title: {
                     text: 'BOSS血量曲线',
@@ -406,7 +432,7 @@ var vm = new Vue({
                     }
                 ]
             };
-            let temp7 = this.time_for_chart(this.challenges);
+            let temp7 = this.timeForChart(this.challenges);
             let option7 = {
                 title: {
                     text: '出刀时间',
@@ -452,7 +478,7 @@ var vm = new Vue({
                     data: temp7
                 }
             }
-            let temp8 = this.boss_player_hit_count_for_chart();
+            let temp8 = this.bossPlayerHitCountForChart();
             let option8 = {
                 title: {
                     text: '成员BOSS出刀数'
@@ -502,7 +528,7 @@ var vm = new Vue({
                     }
                 }]
             };
-            let temp9 = this.members_damage_for_chart(this.global_table_data);
+            let temp9 = this.membersDamageForChart(this.globalTableData);
             let option9 = {
                 title: {
                     text: '成员伤害统计'
@@ -573,63 +599,73 @@ var vm = new Vue({
             };
 
 
-            this.boss_dmg_chart.setOption(option);
-            this.challenge_chart.setOption(option2);
-            this.sum_dmg_chart.setOption(option3);
-            this.miss_chart.setOption(option4);
-            this.last_chart.setOption(option5);
-            this.boss_blood_chart.setOption(option6);
-            this.total_time_chart.setOption(option7);
-            this.boss_hit_chart.setOption(option8);
-            this.total_damage_chart.setOption(option9);
+            this.bossDmgChart.setOption(option);
+            this.challengeChart.setOption(option2);
+            this.sumDmgChart.setOption(option3);
+            this.missChart.setOption(option4);
+            this.lastChart.setOption(option5);
+            this.bossBloodChart.setOption(option6);
+            this.totalTimeChart.setOption(option7);
+            this.bossHitChart.setOption(option8);
+            this.totalDamageChart.setOption(option9);
         },
 
         resizeAll: function() {
-            this.sum_dmg_chart.resize();
-            this.miss_chart.resize();
-            this.last_chart.resize();
-            this.boss_blood_chart.resize();
-            this.total_time_chart.resize();
-            this.personal_progress_chart.resize();
-            this.personal_time_chart.resize();
-            this.boss_hit_chart.resize();
-            this.total_damage_chart.resize();
+            this.sumDmgChart.resize();
+            this.missChart.resize();
+            this.lastChart.resize();
+            this.bossBloodChart.resize();
+            this.totalTimeChart.resize();
+            this.personalProgressChart.resize();
+            this.personalTimeChart.resize();
+            this.bossHitChart.resize();
+            this.totalDamageChart.resize();
         },
 
-        init_player_data: function() {
+        initPlayerData: function() {
             let max = 0, min = 2147483647, s = [0, 0, 0], c = [0, 0, 0];
-            let pchallenge = this.challenge_map[this.selecting_qqid];
-            for (let date in pchallenge) {
-                let clist = pchallenge[date];
-                let dmglist = []
-                for (let i = 0; i < clist.length; i++) {
-                    let damage = 0;
-                    if (clist[i].health_ramain != 0) {
-                        damage = clist[i].damage;
-                    } 
-                    else if (clist[i+1]?.is_continue) {
-                        damage = clist[i].damage + clist[i+1].damage
-                        i++;
+            let pchallenge = this.challengeMap[this.selectingQQid];
+            if (pchallenge != undefined) {
+                for (let date in pchallenge) {
+                    let clist = pchallenge[date];
+                    let dmglist = []
+                    for (let i = 0; i < clist.length; i++) {
+                        let damage = 0;
+                        if (clist[i].health_ramain != 0) {
+                            damage = clist[i].damage;
+                        } 
+                        else if (clist[i+1]?.is_continue) {
+                            damage = clist[i].damage + clist[i+1].damage
+                            i++;
+                        }
+                        if (max < damage) max = damage;
+                        if (min > damage) min = damage;
+                        dmglist.push(damage);
+                        dmglist.sort((a, b) => {return b - a});
                     }
-                    if (max < damage) max = damage;
-                    if (min > damage) min = damage;
-                    dmglist.push(damage);
-                    dmglist.sort((a, b) => {return b - a});
+                    for (let i = 0; i < dmglist.length; i++) {
+                        s[i] += dmglist[i];
+                        c[i]++;
+                    }
                 }
-                for (let i = 0; i < dmglist.length; i++) {
-                    s[i] += dmglist[i];
-                    c[i]++;
-                }
+                this.playerData.damage = [
+                    {label: '最高单次伤害', value: max},
+                    {label: '最低单次伤害', value: min},
+                    {label: '伤害最高刀均伤害', value: Math.floor(s[0] / c[0])},
+                    {label: '伤害次高刀均伤害', value: Math.floor(s[1] / c[1])},
+                    {label: '伤害最低刀均伤害', value: Math.floor(s[2] / c[2])}
+                ]
+            } else {
+                this.playerData.damage = [
+                    {label: '最高单次伤害', value: 0},
+                    {label: '最低单次伤害', value: 0},
+                    {label: '伤害最高刀均伤害', value: 0},
+                    {label: '伤害次高刀均伤害', value: 0},
+                    {label: '伤害最低刀均伤害', value: 0}
+                ]
             }
-            this.player_data.damage = [
-                {label: '最高单次伤害', value: max},
-                {label: '最低单次伤害', value: min},
-                {label: '伤害最高刀均伤害', value: Math.floor(s[0] / c[0])},
-                {label: '伤害次高刀均伤害', value: Math.floor(s[1] / c[1])},
-                {label: '伤害最低刀均伤害', value: Math.floor(s[2] / c[2])}
-            ]
-            const player_challs = this.challenges.filter(c => c.qqid == this.selecting_qqid);
-            const param1 = this.time_for_chart(player_challs);
+            const playerChalls = this.challenges.filter(c => c.qqid == this.selectingQQid);
+            const param1 = this.timeForChart(playerChalls);
             const option1 = {
                 title: {
                     text: '出刀时间',
@@ -676,7 +712,7 @@ var vm = new Vue({
                     data: param1
                 }
             };
-            const param2 = this.day_damage_for_chart(player_challs);
+            const param2 = this.dayDamageForChart(playerChalls);
             const option2 = {
                 title: {
                   text: "伤害成长曲线"
@@ -713,74 +749,115 @@ var vm = new Vue({
                 ]
             };
 
-            this.personal_time_chart.setOption(option1)
-            this.personal_progress_chart.setOption(option2)
+            this.personalTimeChart.setOption(option1)
+            this.personalProgressChart.setOption(option2)
 
         },
 
-        __total_damage: function() {
-            this.total_damage = [];
-            let boss_damage_list = {};
-            let result = {normal_damage: [], continue_damage: [], tail_damage: [], count: 0, count_continue: 0, count_tail: 0};
+        initTotalDamage: function() {
+            this.totalDamage = [];
+            let bossDamageList = {};
+            let result = {normalDamage: [], continueDamage: [], tailDamage: [], count: 0, countContinue: 0, countTail: 0};
             for (let challenge of this.challenges) {
-                let dict = boss_damage_list[challenge.boss_num];
+                let dict = bossDamageList[challenge.boss_num];
                 if (dict == undefined) {
-                    dict = {normal_damage: [], continue_damage: [], tail_damage: [], count: 0, count_continue: 0, count_tail: 0}
-                    boss_damage_list[challenge.boss_num] = dict;
+                    dict = {normalDamage: [], continueDamage: [], tailDamage: [], count: 0, countContinue: 0, countTail: 0}
+                    bossDamageList[challenge.boss_num] = dict;
                 }
                 let damage = challenge.damage;
                 if (challenge.health_ramain == 0) {
-                    result.tail_damage.push(damage);
-                    result.count_tail++;
-                    dict.tail_damage.push(damage);
-                    dict.count_tail++;
+                    result.tailDamage.push(damage);
+                    result.countTail++;
+                    dict.tailDamage.push(damage);
+                    dict.countTail++;
                     continue;
                 }
                 if (challenge.is_continue) {
-                    result.continue_damage.push(damage);
-                    result.count_continue++;
-                    dict.continue_damage.push(damage);
-                    dict.count_continue++;
+                    result.continueDamage.push(damage);
+                    result.countContinue++;
+                    dict.continueDamage.push(damage);
+                    dict.countContinue++;
                     continue;
                 }
-                result.normal_damage.push(damage);
+                result.normalDamage.push(damage);
                 result.count++;
-                dict.normal_damage.push(damage);
+                dict.normalDamage.push(damage);
                 dict.count++;
             }
-            result.boss_damage_list = boss_damage_list;
-            this.total_damage = result;
+            result.bossDamageList = bossDamageList;
+            this.totalDamage = result;
         },
 
-        __global_table_data: function () {
-            this.global_table_data = [];
-            for (let member of this.members) {
-                let sum = this.total_sum_damage();
-                let pdmg = this.player_damage(member.qqid);
-                let player_sum = this.player_sum_damage(member.qqid);
+        initPlayerDamage: function () {
+            for (const elem of this.members) {
+                const playerQQid = elem.qqid;
+                let challenges = this.challengeMap[playerQQid];
+                let bossDamageList = {};
+                let result = {normalDamage: [], continueDamage: [], tailDamage: [], count: 0, countContinue: 0, countTail: 0};
+                for (let day in challenges) {
+                    for (let challenge of challenges[day]) {
+                        let dict = bossDamageList[challenge.boss_num];
+                        if (dict == undefined) {
+                            dict = {normalDamage: [], continueDamage: [], tailDamage: [], count: 0, countContinue: 0, countTail: 0}
+                            bossDamageList[challenge.boss_num] = dict;
+                        }
+                        let damage = challenge.damage;
+                        if (challenge.health_ramain == 0) {
+                            result.tailDamage.push(damage);
+                            result.countTail++;
+                            dict.tailDamage.push(damage);
+                            dict.countTail++;
+                            continue;
+                        }
+                        if (challenge.is_continue) {
+                            result.continueDamage.push(damage);
+                            result.countContinue++;
+                            dict.continueDamage.push(damage);
+                            dict.countContinue++;
+                            continue;
+                        }
+                        result.normalDamage.push(damage);
+                        result.count++;
+                        dict.normalDamage.push(damage);
+                        dict.count++;
+                    }
+                }
+                result.bossDamageList = bossDamageList;
+                this.playerDamages[playerQQid] = result;
+            }
+        },
+
+        initGlobalTableData: function () {
+            this.globalTableData = [];
+            for (const member of this.members) {
+                const sum = this.totalSumDamage();
+                const pdmg = this.playerDamage(member.qqid);
+                const playerSum = this.playerSumDamage(member.qqid);
+                const tempAvgDmg = this.playerAverageDamage(member.qqid, this.containTailAndContinue);
+                const tempSumDmgRate = (100 * playerSum / sum);
                 let dict = {
                     qqid: member.qqid,
                     nickname: member.nickname,
-                    count: pdmg.count + pdmg.count_continue / 2 + pdmg.count_tail / 2,
-                    count_continue: pdmg.count_continue,
-                    count_tail: pdmg.count_tail,
-                    avg_dmg: this.player_average_damage(member.qqid, this.contain_tail_and_continue),
-                    sum_dmg: player_sum,
-                    sum_dmg_rate: (100 * player_sum / sum).toFixed(2) + '%'
+                    count: pdmg.count + pdmg.countContinue / 2 + pdmg.countTail / 2,
+                    countContinue: pdmg.countContinue,
+                    countTail: pdmg.countTail,
+                    avgDmg: isNaN(tempAvgDmg) ? 0 : tempAvgDmg,
+                    sumDmg: playerSum,
+                    sumDmgRate: isNaN(tempSumDmgRate) ? '--' : tempSumDmgRate.toFixed(2) + '%'
                 }
-                this.global_table_data.push(dict);
+                this.globalTableData.push(dict);
             }
         },
 
-        ts_to_day: function (ts) {
+        tsToDay: function (ts) {
             // 减去5点
             let date = new Date((ts - 18000) * 1000);
-            return date.getFullYear() + '-' + this.format_to2(date.getMonth() + 1) + '-' + this.format_to2(date.getDate());
+            return date.getFullYear() + '-' + this.formatTo2(date.getMonth() + 1) + '-' + this.formatTo2(date.getDate());
         },
-        sort_challenge_by_time: function(c1, c2) {
+        sortChallengeByTime: function(c1, c2) {
             return c1.challenge_time - c2.challenge_time;
         },
-        sort_and_divide: function() {
+        sortAndDivide: function() {
             for (let m of this.members) {
                 let detail = {};
                 let challenges = m.challenges;
@@ -788,31 +865,31 @@ var vm = new Vue({
                     continue;
                 }
                 for (let challenge of challenges) {
-                    if (detail[this.ts_to_day(challenge.challenge_time)] == undefined) {
-                        detail[this.ts_to_day(challenge.challenge_time)] = [];
+                    if (detail[this.tsToDay(challenge.challenge_time)] == undefined) {
+                        detail[this.tsToDay(challenge.challenge_time)] = [];
                     }
-                    detail[this.ts_to_day(challenge.challenge_time)].push(challenge);
+                    detail[this.tsToDay(challenge.challenge_time)].push(challenge);
                 }
                 for (let key in detail) {
-                    detail[key].sort(this.sort_challenge_by_time);
+                    detail[key].sort(this.sortChallengeByTime);
                 }
                 m.challenges = detail;
-                this.challenge_map[m.qqid] = detail;
+                this.challengeMap[m.qqid] = detail;
             }
         },
 
-        total_average_damage: function(contain_tail_and_continue = false) {
-            return this.average_damage(this.total_damage, contain_tail_and_continue);
+        totalAverageDamage: function(containTailAndContinue = false) {
+            return this.averageDamage(this.totalDamage, containTailAndContinue);
         },
-        player_average_damage: function(player_qqid, contain_tail_and_continue = false) {
-            return this.average_damage(this.player_damage(player_qqid), contain_tail_and_continue);
+        playerAverageDamage: function(playerQQid, containTailAndContinue = false) {
+            return this.averageDamage(this.playerDamage(playerQQid), containTailAndContinue);
         },
 
-        boss_average_damage_for_chart: function(boss_damage_list, contain_tail_and_continue = false) {
+        bossAverageDamageForChart: function(bossDamageList, containTailAndContinue = false) {
             let l1 = [], l2 = [];
-            for (let index in boss_damage_list) {
-                let damage = boss_damage_list[index];
-                let ret = this.average_damage(damage, contain_tail_and_continue);
+            for (let index in bossDamageList) {
+                let damage = bossDamageList[index];
+                let ret = this.averageDamage(damage, containTailAndContinue);
                 if (!isNaN(ret)) {
                     l1.push(index + "号Boss");
                     l2.push(ret);
@@ -820,16 +897,16 @@ var vm = new Vue({
             }
             return [l1, l2];
         },
-        boss_miss_for_chart: function(global_table_data) {
-            const counts = global_table_data.map(elem => elem.count);
-            const names = global_table_data.map(elem => elem.nickname);
+        bossMissForChart: function(globalTableData) {
+            const counts = globalTableData.map(elem => elem.count);
+            const names = globalTableData.map(elem => elem.nickname);
             return [names, counts];
         },
-        boss_last_for_chart: function() {
+        bossLastForChart: function() {
             const map = {};
             for (const i in this.challenges) {
                 if (this.challenges[i].is_continue) {
-                    const name = this.get_player(this.challenges[i].qqid).nickname;
+                    const name = this.getPlayer(this.challenges[i].qqid).nickname;
                     if (name in map)
                         map[name] += 1;
                     else
@@ -838,43 +915,43 @@ var vm = new Vue({
             }
             return Object.keys(map).map(name => ({name: name, value: map[name]}));
         },
-        boss_blood_for_chart: function() {
+        bossBloodForChart: function() {
             const challs = this.challenges.sort((a, b) => a.challenge_time - b.challenge_time);
             let bosses = [];
-            let now_boss, last_position, last_circle;
+            let nowBoss, lastPosition, lastCircle;
             for (const i in challs) {
-                if (now_boss === undefined)
-                    now_boss = challs[i].boss_num;
-                if (last_position === undefined)
-                    last_position = challs[i].challenge_time * 1000;
-                if (last_circle === undefined)
-                    last_circle = challs[i].cycle;
-                if (challs[i].boss_num !== now_boss) {
+                if (nowBoss === undefined)
+                    nowBoss = challs[i].boss_num;
+                if (lastPosition === undefined)
+                    lastPosition = challs[i].challenge_time * 1000;
+                if (lastCircle === undefined)
+                    lastCircle = challs[i].cycle;
+                if (challs[i].boss_num !== nowBoss) {
                     const time = challs[i].challenge_time * 1000;
                     bosses.push({
-                        gte: last_position,
+                        gte: lastPosition,
                         lt: time,
-                        color: this.color_list[now_boss - 1],
-                        label: `${last_circle}周目${now_boss}王`
+                        color: this.colorList[nowBoss - 1],
+                        label: `${lastCircle}周目${nowBoss}王`
                     });
-                    now_boss = challs[i].boss_num;
-                    last_position = time;
-                    last_circle = challs[i].cycle;
+                    nowBoss = challs[i].boss_num;
+                    lastPosition = time;
+                    lastCircle = challs[i].cycle;
                 }
             }
-            if (now_boss && last_position) {
+            if (nowBoss && lastPosition) {
                 bosses.push({
-                    gte: last_position,
-                    color: this.color_list[now_boss - 1]
+                    gte: lastPosition,
+                    color: this.colorList[nowBoss - 1]
                 });
             }
             return [challs.map(c => [c.challenge_time * 1000, c.health_ramain]), bosses];
         },
-        boss_sum_damage_for_chart: function(boss_damage_list) {
+        bossSumDamageForChart: function(bossDamageList) {
             let l1 = [], l2 = [];
-            for (let index in boss_damage_list) {
-                let damage = boss_damage_list[index];
-                let ret = this.sum_damage(damage);
+            for (let index in bossDamageList) {
+                let damage = bossDamageList[index];
+                let ret = this.sumDamage(damage);
                 if (!isNaN(ret)) {
                     l1.push(index + "号Boss");
                     l2.push(ret);
@@ -882,46 +959,46 @@ var vm = new Vue({
             }
             return [l1, l2];
         },
-        boss_challenge_count_for_chart: function(boss_damage_list, contain_tail_and_continue = false) {
+        bossChallengeCountForChart: function(bossDamageList, containTailAndContinue = false) {
             let l1 = []
-            for (let index in boss_damage_list) {
-                let damage = boss_damage_list[index];
-                let ret = damage.count + (contain_tail_and_continue ? (damage.count_continue + damage.count_tail) / 2 : 0);
+            for (let index in bossDamageList) {
+                let damage = bossDamageList[index];
+                let ret = damage.count + (containTailAndContinue ? (damage.countContinue + damage.countTail) / 2 : 0);
                 if (ret != 0) l1.push({name: index + "号Boss", value: ret});
             }
             return l1;
         },
-        boss_player_hit_count_for_chart: function() {
+        bossPlayerHitCountForChart: function() {
             const names = [], counter = {};
             const hanzi = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
-            const max_boss_num = Math.max.apply(Math, [0, ...this.challenges.map(c => c.boss_num)]);
-            const bosses = [...Array(max_boss_num || 0).keys()].map(k => `${k in hanzi ? hanzi[k] : k}王`).reverse()
+            const maxBossNum = Math.max.apply(Math, [0, ...this.challenges.map(c => c.boss_num)]);
+            const bosses = [...Array(maxBossNum || 0).keys()].map(k => `${k in hanzi ? hanzi[k] : k}王`).reverse()
 
             this.challenges.forEach(c => {
                 const boss = c.boss_num;
-                const name = this.get_player(c.qqid).nickname;
+                const name = this.getPlayer(c.qqid).nickname;
                 if (!(boss in counter)) {
                     counter[boss] = {}
                 }
-                const boss_count = counter[boss];
-                if (!(name in boss_count)) {
-                    boss_count[name] = 0
+                const bossCount = counter[boss];
+                if (!(name in bossCount)) {
+                    bossCount[name] = 0
                 }
-                const is_full = c.health_ramain && !c.is_continue;
-                boss_count[name] += is_full ? 1 : 0.5;
+                const isFull = c.health_ramain && !c.is_continue;
+                bossCount[name] += isFull ? 1 : 0.5;
             })
             const result = [];
-            const get_nickname_index = name => {
+            const getNicknameIndex = name => {
                 if (!names.includes(name))
                     names.push(name)
                 return names.findIndex(n => n === name);
             }
-            const get_boss_index = num => max_boss_num - parseInt(num);
+            const getBossIndex = num => maxBossNum - parseInt(num);
             Object.keys(counter).forEach(num => {
                 Object.keys(counter[num]).forEach(name => {
                     result.push([
-                        get_boss_index(num),
-                        get_nickname_index(name),
+                        getBossIndex(num),
+                        getNicknameIndex(name),
                         counter[num][name]
                     ])
                 })
@@ -934,7 +1011,7 @@ var vm = new Vue({
                 })
             ];
         },
-        time_for_chart: function(challenges) {
+        timeForChart: function(challenges) {
             const time = {};
             [...Array(24).keys()].forEach(i => time[i] = 0);
             for (const i in challenges) {
@@ -943,10 +1020,10 @@ var vm = new Vue({
             }
             return Object.values(time);
         },
-        day_damage_for_chart: function(challenges) {
+        dayDamageForChart: function(challenges) {
             const dates = {};
             challenges.forEach(c => {
-                const date = this.ts_to_day(c.challenge_time);
+                const date = this.tsToDay(c.challenge_time);
                 if (date in dates) {
                     dates[date] += c.damage;
                 } else {
@@ -959,81 +1036,46 @@ var vm = new Vue({
             );
         },
 
-        members_damage_for_chart: function(global_table_data) {
-            const data = global_table_data.sort((a, b) => b.sum_dmg - a.sum_dmg);
-            const full = data.map(elem => elem.sum_dmg);
-            const average = data.map(elem => elem.avg_dmg);
+        membersDamageForChart: function(globalTableData) {
+            const data = globalTableData.sort((a, b) => b.sumDmg - a.sumDmg);
+            const full = data.map(elem => elem.sumDmg);
+            const average = data.map(elem => elem.avgDmg);
             const names = data.map(elem => elem.nickname);
             return [names, full, average];
         },
 
-        average_damage: function(damage, contain_tail_and_continue) {
-            let sum = this.sum(damage.normal_damage);
+        averageDamage: function(damage, containTailAndContinue) {
+            let sum = this.sum(damage.normalDamage);
             let count = damage.count;
-            if (contain_tail_and_continue) {
-                sum += this.sum(damage.continue_damage) + this.sum(damage.tail_damage);
-                count += (damage.count_continue + damage.count_tail) / 2;
+            if (containTailAndContinue) {
+                sum += this.sum(damage.continueDamage) + this.sum(damage.tailDamage);
+                count += (damage.countContinue + damage.countTail) / 2;
             }
             return Math.floor(sum / count);
         },
 
-        total_sum_damage: function() {
-            return this.sum_damage(this.total_damage);
+        totalSumDamage: function() {
+            return this.sumDamage(this.totalDamage);
         },
-        player_sum_damage: function(player_qqid) {
-            return this.sum_damage(this.player_damage(player_qqid));
+        playerSumDamage: function(playerQQid) {
+            return this.sumDamage(this.playerDamage(playerQQid));
         },
-        sum_damage: function(damage) {
-            return this.sum(damage.normal_damage) + this.sum(damage.continue_damage) + this.sum(damage.tail_damage);
-        },
-
-        challenge_count: function(damage, contain_tail_and_continue) {
-            return damage.count + (contain_tail_and_continue ? (damage.count_tail + damage.count_continue) / 2 : 0);
+        sumDamage: function(damage) {
+            return this.sum(damage.normalDamage) + this.sum(damage.continueDamage) + this.sum(damage.tailDamage);
         },
 
-        get_player: function(qqid) {
+        challengeCount: function(damage, containTailAndContinue) {
+            return damage.count + (containTailAndContinue ? (damage.countTail + damage.countContinue) / 2 : 0);
+        },
+
+        getPlayer: function(qqid) {
             return this.members.find(o => o.qqid === qqid) ?? {nickname:'未加入',qqid:qqid,sl:null};
         },
 
-        player_damage: function(player_qqid) {
-            if (this.player_damage_cache[player_qqid] != undefined) return this.player_damage_cache[player_qqid];
-
-            let challenges = this.challenge_map[player_qqid];
-            let boss_damage_list = {};
-            let result = {normal_damage: [], continue_damage: [], tail_damage: [], count: 0, count_continue: 0, count_tail: 0};
-            for (let day in challenges) {
-                for (let challenge of challenges[day]) {
-                    let dict = boss_damage_list[challenge.boss_num];
-                    if (dict == undefined) {
-                        dict = {normal_damage: [], continue_damage: [], tail_damage: [], count: 0, count_continue: 0, count_tail: 0}
-                        boss_damage_list[challenge.boss_num] = dict;
-                    }
-                    let damage = challenge.damage;
-                    if (challenge.health_ramain == 0) {
-                        result.tail_damage.push(damage);
-                        result.count_tail++;
-                        dict.tail_damage.push(damage);
-                        dict.count_tail++;
-                        continue;
-                    }
-                    if (challenge.is_continue) {
-                        result.continue_damage.push(damage);
-                        result.count_continue++;
-                        dict.continue_damage.push(damage);
-                        dict.count_continue++;
-                        continue;
-                    }
-                    result.normal_damage.push(damage);
-                    result.count++;
-                    dict.normal_damage.push(damage);
-                    dict.count++;
-                }
-            }
-            result.boss_damage_list = boss_damage_list;
-            this.player_damage_cache[player_qqid] = result;
-            return result;
+        playerDamage: function(playerQQid) {
+            return this.playerDamages[playerQQid];
         },
-        get_today: function () {
+        getToday: function () {
             let d = new Date();
             d -= 18000000;
             d = new Date(d).setHours(0, 0, 0, 0);
