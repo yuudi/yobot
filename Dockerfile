@@ -1,29 +1,43 @@
-FROM python:3.7
-LABEL author="winrey"
+FROM python:3.7-slim-buster
+LABEL maintainer="AzurCrystal"
 
-#print()时在控制台正常显示中文
+ARG PUID=1000
 ENV PYTHONIOENCODING=utf-8
+RUN set -x \ 
+        && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+        && echo 'Asia/Shanghai' >/etc/timezone \
+        && { \
+                echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free"; \
+                echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free"; \
+                echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free"; \
+                echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free"; \
+        } > /etc/apt/sources.list \
+        && rm -rf /var/lib/apt/lists/* \
+        && apt-get clean \
+        && apt-get update \
+        && apt-get install git -y --no-install-recommends --no-install-suggests \
+        && useradd -u $PUID -m yobot \
+        && su yobot -c \
+                "mkdir -p /home/yobot \
+                && cd /home/yobot \
+                && git clone https://gitee.com/yobot/yobot.git \
+                && { \
+                        echo '#!/bin/sh'; \
+                        echo 'cd /home/yobot/yobot/src/client && python3 /home/yobot/yobot/src/client/main.py && sh /home/yobot/yobot/src/client/yobotg.sh'; \
+                } > /home/yobot/entry.sh \
+		&& chmod 755 /home/yobot/entry.sh \
+		&& chmod +x /home/yobot/entry.sh" \
+        && pip3 install --no-cache-dir -r /home/yobot/yobot/src/client/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+        && apt-get clean autoclean \
+        && apt-get autoremove -y \
+        && rm -rf /var/lib/apt/lists/*
 
-# 设置系统时间与时区
-RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-    echo 'Asia/Shanghai' >/etc/timezone
+USER yobot
 
-# 安装需要的python库
-ADD src/client/requirements.txt /build/requirements.txt
+WORKDIR /home/yobot
 
-RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ -r /build/requirements.txt \
-    && rm /build/requirements.txt
+EXPOSE 9222
 
-# 代码复制过来后的路径
-RUN mkdir /code
+VOLUME /home/yobot/yobot
 
-# 添加环境变量
-#RUN export PYTHONPATH=$PYTHONPATH:/code
-
-ADD . /code
-
-WORKDIR /code/src/client
-
-RUN python3 main.py
-
-CMD ["sh", "yobotg.sh"]
+ENTRYPOINT /home/yobot/entry.sh
