@@ -133,14 +133,17 @@ class ClanBattle:
         return user.nickname or str(qqid)
 
     def _get_group_previous_challenge(self, group: Clan_group):
-        try:
-            lc = Clan_challenge.select(
-                peewee.fn.MAX(Clan_challenge.cid)
+        Clan_challenge_alias = Clan_challenge.alias()
+        query = Clan_challenge.select().where(
+            Clan_challenge.cid == Clan_challenge_alias.select(
+                peewee.fn.MAX(Clan_challenge_alias.cid)
             ).where(
-                Clan_challenge.gid == group.group_id,
-                Clan_challenge.bid == group.battle_id,
-            ).scalar()
-            return Clan_challenge.get_by_id(lc)
+                Clan_challenge_alias.gid == group.group_id,
+                Clan_challenge_alias.bid == group.battle_id,
+            )
+        )
+        try:
+            return query.get()
         except peewee.DoesNotExist:
             return None
 
@@ -1046,9 +1049,9 @@ class ClanBattle:
 
     @timed_cached_func(max_len=64, max_age_seconds=10, ignore_self=True)
     def get_battle_member_list(self,
-    group_id: Groupid,
-                   battle_id: Union[str, int, None],
-                   ):
+                               group_id: Groupid,
+                               battle_id: Union[str, int, None],
+                               ):
         """
         get the member lists for clan-battle report
 
@@ -1401,9 +1404,9 @@ class ClanBattle:
                 return '没有人'+beh
             reply = beh+'的成员：\n'
             for m in subscribers:
-                reply+=self._get_nickname_by_qqid(m['qqid'])
-                if m.get('message', ''):
-                    reply += '：'+ m.get['message']
+                reply += '\n'+self._get_nickname_by_qqid(m['qqid'])
+                if m.get('message'):
+                    reply += '：' + m['message']
             return reply
 
     def register_routes(self, app: Quart):

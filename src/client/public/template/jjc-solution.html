@@ -93,7 +93,11 @@
             {% endfor -%}
         </tbody>
     </table>
-    <div>数据来源<a href="{{ 'https://nomae.net/arenadb/' if search_source=='nomae.net' else 'https://www.pcrdfans.com/battle' }}/">{{ search_source }}</a></div>
+    {% if search_source=="nomae.net" -%}
+    <div>数据来源<a href="https://nomae.net/arenadb/">nomae.net</a></div>
+    {% elif search_source=="pcrdfans.com" -%}
+    <div>数据来源<a href="https://www.pcrdfans.com/battle">公主连结Re: Dive Fan Club</a></div>
+    {% endif -%}
 </body>
 
 </html>
