@@ -11,4 +11,3 @@ expiringdict>=1.2.0
 aiocqhttp>=0.6.8
 quart>=0.6.15
 jinja2~=2.10
-numpy~=1.17.2
