@@ -214,7 +214,7 @@ class Consult:
         result = search['data']['result']
         return list(map(self._parse_pcrdfans_team, result))
 
-    def get_this_season(rank):
+    def get_this_season(self, rank):
         """
         this_season[1:11] = 50
         this_season[11:101] = 10
