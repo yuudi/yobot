@@ -5,6 +5,7 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urljoin
+import numpy as np
 
 import aiohttp
 import requests
@@ -214,6 +215,41 @@ class Consult:
         result = search['data']['result']
         return list(map(self._parse_pcrdfans_team, result))
 
+    def miner(self, cmd: str):
+        this_season = np.zeros(15001)
+        all_season = np.zeros(15001)
+
+        this_season[1:11] = 50
+        this_season[11:101] = 10
+        this_season[101:201] = 5
+        this_season[201:501] = 3
+        this_season[501:1001] = 2
+        this_season[1001:2001] = 2
+        this_season[2001:4000] = 1
+        this_season[4000:8000:100] = 50
+        this_season[8100:15001:100] = 15
+
+        all_season[1:11] = 500
+        all_season[11:101] = 50
+        all_season[101:201] = 30
+        all_season[201:501] = 10
+        all_season[501:1001] = 5
+        all_season[1001:2001] = 3
+        all_season[2001:4001] = 2
+        all_season[4001:7999] = 1
+        all_season[8100:15001:100] = 30
+        cmd = cmd.lstrip()
+        if cmd.isdigit() and 15001 >= int(cmd) >= 1:
+            rank = int(cmd)
+            rank = np.clip(rank, 1, 15001)
+            s_all = int(all_season[1:rank].sum())
+            s_this = int(this_season[1:rank].sum())
+            reply = "当前排名为:{}\n最高排名奖励还剩 {} 钻\n历届最高排名还剩 {} 钻".format(rank, s_this, s_all)
+            return reply
+        else:
+            reply = "请输入1～15001之间的整数"
+            return reply
+
     @staticmethod
     def match(cmd: str) -> int:
         if not cmd.startswith("jjc"):
@@ -228,6 +264,8 @@ class Consult:
             return 3
         elif cmd.startswith("jjc日服"):
             return 4
+        elif cmd.startswith("jjc钻石"):
+            return 6
         else:
             return 0
 
@@ -239,6 +277,8 @@ class Consult:
             return None
         elif match_num == 5:
             reply = "请接5个昵称，空格分隔"
+        elif match_num == 6:
+            reply = self.miner(msg["raw_message"][5:])
         else:
             try:
                 anlz = self.user_input(msg["raw_message"][5:])
