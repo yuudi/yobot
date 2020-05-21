@@ -3,11 +3,7 @@
 
 加载方法：
 
-1.将这个项目整个文件夹放在nonebot插件目录下
-
-2.将这个项目转化为插件
-运行`python nonebot_plugin.py make_plugin`
-如果使用git，记得`git commit -a`
+将这个项目整个文件夹放在nonebot插件目录下即可
 """
 
 import sys
@@ -73,8 +69,9 @@ async def send_it(func):
         to_sends = func()
     if to_sends is None:
         return
-    tasks = [cqbot.send_msg(**kwargs) for kwargs in to_sends]
-    await asyncio.gather(*tasks)
+    for kwargs in to_sends:
+        await asyncio.sleep(5)
+        await cqbot.send_msg(**kwargs)
 
 jobs = bot.active_jobs()
 if jobs:

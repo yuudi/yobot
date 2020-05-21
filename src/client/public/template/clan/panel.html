@@ -3,10 +3,10 @@
 <head>
   <title>公会战</title>
   <meta name='viewport' content='width=480' charset="utf-8" />
-  <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
-  <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
-  <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
-  <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
   <style>
     body{
       text-align:center;
@@ -184,6 +184,8 @@
           <el-col :span="6"><el-button type="danger" size="small" @click="startmodify">修改状态</el-button></el-col>
           <el-col :span="6"><a href='./setting/'><el-button type="info" size="small" @click="leavePage=true">设置</el-button></a></el-col>
           <el-dialog title="修改状态" :visible.sync="statusFormVisible">
+            <el-alert title="如果要清空数据，请在“设置”中操作，否则会导致分析数据不准确"
+              type="warning" :hidden="(bossData.cycle!=1)||(bossData.num!=1)"></el-alert>
             <el-form>
               <el-form-item label="周目数" label-width="120">
                 <el-input-number v-model="bossData.cycle" :min="1"></el-input-number>
@@ -207,6 +209,9 @@
       </el-main>
     </el-container>
   </div>
+  <footer style="text-align: center">
+    powered by <a href="https://github.com/yuudi/yobot">yobot</a>
+  </footer>
 </body>
 <script>var csrf_token = "{{ session['csrf_token'] }}";</script>
 <script src="{{ url_for('yobot_static', filename='clan/panel.js') }}"></script>

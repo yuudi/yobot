@@ -30,23 +30,23 @@ yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷�
 
 新版助手提供了一个网页面板，面板上可以进行更多操作
 
-![主面板](https://x.jingzhidh.com/img/yobot/poYvQO.jpg)
+![主面板](https://assets.yobot.win/img/poYvQO.jpg)
 
-![数据面板](https://x.jingzhidh.com/img/yobot/HOh17P.jpg)
+![数据面板](https://assets.yobot.win/img/HOh17P.jpg)
 
 ### 新闻推送
 
 机器人主动发送游戏新闻与活动提醒
 
-![游戏活动提醒](https://x.jingzhidh.com/img/yobot/5bd8d1f5ac68ffde.jpg)
+![游戏活动提醒](https://assets.yobot.win/img/5bd8d1f5ac68ffde.jpg)
 
-![数据面板](https://x.jingzhidh.com/img/yobot/HOh17P.jpg)
+![数据面板](https://assets.yobot.win/img/HOh17P.jpg)
 
 ### 日程查询
 
 机器人主动发送游戏新闻与活动提醒
 
-![游戏活动提醒](https://x.jingzhidh.com/img/yobot/J04GEB.jpg)
+![游戏活动提醒](https://assets.yobot.win/img/J04GEB.jpg)
 
 ### 模拟抽卡
 
@@ -55,7 +55,7 @@ yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷�
 还可以自定义修改卡池
 （怕打扰可以关闭此功能）
 
-![模拟抽卡](https://x.jingzhidh.com/img/yobot/u4OLHH.png)
+![模拟抽卡](https://assets.yobot.win/img/u4OLHH.png)
 
 ### 更多功能
 
@@ -64,6 +64,10 @@ yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷�
 ## 源码
 
 <https://github.com/yuudi/yobot>
+
+## 贡献者
+
+[项目贡献者](./project/contributors.md)  
 
 ## 开源协议
 

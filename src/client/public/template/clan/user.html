@@ -3,10 +3,10 @@
 <head>
   <title>出刀记录</title>
   <meta name='viewport' content='width=1100' charset="utf-8" />
-  <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
-  <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
-  <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
-  <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
   <style>
     .el-table td,
     .el-table th {
@@ -49,13 +49,13 @@
         <el-table-column label="第一刀">
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[0]" slot-scope="scope">
-              <span v-html="csummary(scope.row.detail[0])"></span>
+              <a v-html="csummary(scope.row.detail[0])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[0]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[1]" slot-scope="scope">
-              <span v-html="csummary(scope.row.detail[1])"></span>
+              <a v-html="csummary(scope.row.detail[1])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[1]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
@@ -63,13 +63,13 @@
         <el-table-column label="第二刀">
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[2]" slot-scope="scope">
-              <span v-html="csummary(scope.row.detail[2])"></span>
+              <a v-html="csummary(scope.row.detail[2])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[2]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[3]" slot-scope="scope">
-              <span v-html="csummary(scope.row.detail[3])"></span>
+              <a v-html="csummary(scope.row.detail[3])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[3]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
@@ -77,13 +77,13 @@
         <el-table-column label="第三刀">
           <el-table-column label="尾刀" width="150">
             <template v-if="scope.row.detail[4]" slot-scope="scope">
-              <span v-html="csummary(scope.row.detail[4])"></span>
+              <a v-html="csummary(scope.row.detail[4])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[4]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
           <el-table-column label="剩余刀" width="150">
             <template v-if="scope.row.detail[5]" slot-scope="scope">
-              <span v-html="csummary(scope.row.detail[5])"></span>
+              <a v-html="csummary(scope.row.detail[5])"></a>
               <el-popover placement="top" effect="light" trigger="hover">[[ cdetail(scope.row.detail[5]) ]]<i class="el-icon-info" slot="reference"></i></el-popover>
             </template>
           </el-table-column>
@@ -96,6 +96,9 @@
     </template>
     <p><a href="{{ url_for('yobot_user_info', qqid=qqid) }}">查看用户：[[ nickname ]]</a></p>
   </div>
+  <footer style="text-align: center">
+    powered by <a href="https://github.com/yuudi/yobot">yobot</a>
+  </footer>
 </body>
 <script>var csrf_token = "{{ session['csrf_token'] }}";</script>
 <script src="{{ url_for('yobot_static', filename='clan/user.js') }}"></script>

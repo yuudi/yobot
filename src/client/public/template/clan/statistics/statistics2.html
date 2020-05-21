@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<head>
+    <title>公会战 - 数据分析</title>
+    <meta name='viewport' content='width=1485' charset="utf-8" />
+   <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+    <style>
+        .el-table td,
+        .el-table th {
+          text-align: center;
+        }
+        .el-popover {
+          white-space: pre-wrap;
+        }
+        .digit6{
+          color:blue;
+        }
+        .digit7{
+          color:green;
+        }
+        .digit8{
+          color:orange;
+        }
+        .digit9{
+          color:red;
+        }
+    </style>    
+</head>
+
+<body>
+    <div id="app" style="margin: 10px">
+        <el-page-header @back="location='..'" content="数据分析"></el-page-header>
+        <h1 style="text-align:center">数据分析</h1>
+        <!--以后有用-->
+        <el-date-picker
+          v-model="range"
+          type="daterange"
+          unlink-panels
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="pickerOptions"
+        >
+        </el-date-picker>
+        <el-tabs v-model="selectingTab">
+            <el-tab-pane label="整体数据" name="total">
+                <div>
+                    <p>
+                        <a>共[[ members.length ]]人，[[ challengeCount(totalDamage, true) ]]刀</a>
+                        <el-checkbox style="margin-left: 20px;" v-model="containTailAndContinue"></el-checkbox>
+                        <a>刀均伤害中计入尾刀和剩余刀</a>
+                        <a style="margin-left: 20px">&nbsp;</a>
+                        <a class="digit6">十万</a> <a class="digit7">百万</a> <a class="digit8">千万</a> <a class="digit9">亿</a>
+                    </p>
+                    <el-table v-loading="isLoading" :data="globalTableData" style="width: 100%" stripe border :default-sort = "{prop: 'sumDmg', order: 'descending'}">
+                        <el-table-column prop="qqid" label="QQ号" width="125" sortable ></el-table-column>
+                        <el-table-column prop="nickname" label="昵称" width="200" sortable ></el-table-column>
+                        <el-table-column prop="count" width="120" sortable >
+                            <template slot="header" slot-scope="scope">
+                                <a>刀数</a>
+                                <el-popover placement="top" effect="light" trigger="hover">刀数=正常刀+（补偿刀+尾刀）/2<i class="el-icon-question" slot="reference"></i></el-popover>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="countTail" label="尾刀" width="120" sortable ></el-table-column>
+                        <el-table-column prop="countContinue" label="补偿刀" width="120" sortable ></el-table-column>
+                        <el-table-column prop="avgDmg" width="270" sortable sort-by="avgDmg" >
+                            <template slot="header" slot-scope="scope">
+                                <a>刀均伤害</a>
+                                <el-popover v-if="!containTailAndContinue" placement="top" effect="light" trigger="hover">当前刀均伤害未计入尾刀和补偿刀<i class="el-icon-question" slot="reference"></i></el-popover>
+                                <el-popover v-if="containTailAndContinue" placement="top" effect="light" trigger="hover">当前刀均伤害已计入尾刀和补偿刀<i class="el-icon-question" slot="reference"></i></el-popover>
+                            </template>
+                            <template slot-scope="scope">
+                                <a :class='"digit" + scope.row.avgDmg.toString().length'>[[scope.row.avgDmg]]</a>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="sumDmg" label="总伤害" width="270" sortable sort-by="sumDmg" >
+                            <template slot-scope="scope">
+                                <a :class='"digit" + scope.row.sumDmg.toString().length'>[[scope.row.sumDmg]]</a>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="sumDmgRate" label="总伤害占比" min-width="150" sortable ></el-table-column>
+                    </el-table>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="公会图表" name="channel">
+                <div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 100%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="missChart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="lastChart"></div>
+                        </div>
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="totalTimeChart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 100%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="bossBloodChart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 100%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="bossHitChart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 100%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="totalDamageChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="玩家数据" name="player">
+                <div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 50%;">
+                            <p>
+                                <a>选择玩家：</a>
+                                <el-select v-model="selectingQQid" placeholder="请选择">
+                                    <el-option
+                                        v-for="member in members"
+                                        :key="member.qqid"
+                                        :label="member.nickname"
+                                        :value="member.qqid">
+                                    </el-option>
+                                </el-select>
+                                <el-checkbox style="margin-left: 20px;" v-model="containTailAndContinue"></el-checkbox>
+                                <a>刀均伤害中计入尾刀和剩余刀</a>
+                            </p>
+                            <div style="width: 80%;">
+                                <el-table :data="playerData.damage" :show-header="false">
+                                    <el-table-column prop="label" label=""></el-table-column>
+                                    <el-table-column prop="value" label=""></el-table-column>
+                                </el-table>
+                            </div>
+                        </div>
+                        <div v-show="selectingTab != 'total'" style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="sumDmgChart"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; height: 450px">
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="personalProgressChart"></div>
+                        </div>
+                        <div style="width: 50%">
+                            <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 400px;" id="personalTimeChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+        <div style="display: flex; height: 400px">
+            <div style="width: 50%">
+                <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 100%;" id="bossDmgChart"></div>
+            </div>
+            <div style="width: 50%">
+                <div style="margin: 10px; padding: 20px; border: 1px solid #EBEEF5; height: 100%;" id="challengeChart"></div>
+            </div>
+        </div>
+    </div>
+    
+    
+</body>
+
+<script>var csrfToken = "{{ session['csrf_token'] }}"; var qqid = "{{ session['yobot_user'] }}"</script>
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.7.0/echarts.min.js"></script>
+<script src="{{ url_for('yobot_static', filename='clan/statistics/statistics2.js') }}"></script>
+
+
+</html>

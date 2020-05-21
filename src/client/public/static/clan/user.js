@@ -1,8 +1,11 @@
 var gs_offset = { jp: 4, tw: 5, kr: 4, cn: 5 };
+function pad2(num) {
+    return String(num).padStart(2, '0');
+}
 function ts2ds(timestamp) {
     var d = new Date();
     d.setTime(timestamp * 1000);
-    return d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate();
+    return d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate());
 }
 var vm = new Vue({
     el: '#app',
@@ -105,9 +108,9 @@ var vm = new Vue({
                 icons[0].remove();
             }
             var uri = 'data:application/vnd.ms-excel;base64,';
-            var ctx = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>'+document.getElementsByTagName('thead')[0].innerHTML+document.getElementsByTagName('tbody')[0].innerHTML+'</table></body></html>';
+            var ctx = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>' + document.getElementsByTagName('thead')[0].innerHTML + document.getElementsByTagName('tbody')[0].innerHTML + '</table></body></html>';
             window.location.href = uri + window.btoa(unescape(encodeURIComponent(ctx)));
-            document.documentElement.innerHTML='请在Excel中查看（如果无法打开，请安装最新版本Excel）';
+            document.documentElement.innerHTML = '请在Excel中查看（如果无法打开，请安装最新版本Excel）\n或者将整个表格复制，粘贴到Excel中使用';
         },
         handleTitleSelect(key, keyPath) {
             switch (key) {

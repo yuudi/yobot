@@ -25,7 +25,7 @@ sudo bash scripts/install-docker.sh
 ## 拷贝、修改项目配置
 ```shell script
 cp .env.example .env
-nano .env
+nano .env  # 或者使用 vim 等其他编辑器
 ```
 将`VNC_PWD=Yobot123`中的`Yobot123`改为你自己的密码，用于登录酷Q后台。  
 之后将您要登录的QQ号填在`QQ_ACCOUNT=`后面。  
@@ -52,7 +52,14 @@ sudo docker-compose restart
 如果您不能访问这个链接，请检查服务器是否成功启动、安全组设置是否放通全部端口。  
 之后请登录您的QQ，如遇"下载Chrome"字样提示，请取消从重新登录。
 
-登录后向您的bot用QQ发送`V`，如果您收到版本号回复，即为部署成功、
-如果需要开启web，请看[这里](../usage/web-mode.md)
+## 验证安装
 
+向机器人发送“version”，机器人会回复当前版本
 
+## 开启web
+
+见[开启 web](../usage/web-mode.md)
+
+## 常见问题
+
+见 [FAQ](../usage/faq.md)

@@ -5,16 +5,53 @@
 </head>
 
 <body>
-    <h1>建设中</h1>
-    <p><a href="#" onclick="javascript:history.go(-1);">返回</a></p>
-    <p><a href="./api/" style="color: #f0f0f0;">原始数据（json格式）</a></p>
+    <p><a href="../">返回</a></p>
+    <h1>数据分析</h1>
+    <p><a href="./1/">统计：出刀顺序表</a> by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></p>
+    <p><a href="./2/">统计：数据图表</a> by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></p>
+    <p><a href="#" target="_blank" id="pcrd-yobot-fe">统计：多维度分析</a>（需要开启api访问） by <a href="https://github.com/Tan90Qian">@Tan90Qian</a></p>
+    <p>
+        原始数据（json格式）<br>
+        <a href="./api/">查看本轮</a> <a href="./api/" download>下载本轮</a><br>
+        <a href="./api/?battle_id=all">查看全部</a> <a href="./api/?battle_id=all" download>下载全部</a><br>
+        {% if allow_api -%}
+        api地址：<input id="apiurl"><input type="button" value="复制" id="copy">
+        {% else -%}
+        api访问已禁用，如需开启请前往<a href="../setting/">公会设置</a>
+        {% endif -%}
+    </p>
     <!--
-    本来像做一个全方位的数据分析，
-    但是有点麻烦我不想写了（主要是懒），
-    原始数据可以在 "./api/" 这里获取，
-    有没有大佬愿意写一下_(:з」∠)_
+        api说明：
+        公会战管理员在设置中开启“允许外部api调用”后，可在外部直接调用，
+        也可以直接下载json文件
+        
+        参数：
+
+        apikey：外部调用时必填
+        battle_id：整数，公会战的场次号码，填“current”获取当前，填“all”则获取所有，默认值“current”
+
+        返回数据：
+
+        code：0是成功，其他值是失败
+        api_version：api版本号，整数
+        message：失败原因
+        groupinfo：群组信息
+        members：成员列表
+        challenges：出刀记录表
     -->
-<script>console.log("本来像做一个全方位的数据分析，\n但是有点麻烦我不想写了（主要是懒），\n原始数据可以在 ./api/ 这里获取，\n有没有大佬愿意写一下_(:з」∠)_")</script>
+
+<script>
+    var apikey = "{{ apikey }}";
+    var apiurl = window.location.href + "api/?apikey=" + apikey
+    document.getElementById("apiurl").value = apiurl;
+    document.getElementById("pcrd-yobot-fe").href = "http://tools.yobot.win/pcrd-yobot-fe/#" + encodeURIComponent(apiurl);
+    document.getElementById("copy").addEventListener("click", e => {
+        document.getElementById("apiurl").select();
+        document.execCommand("Copy");
+        alert("已复制。");
+    })
+</script>
+
 </body>
 
 </html>

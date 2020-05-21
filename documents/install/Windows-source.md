@@ -8,9 +8,10 @@
 
 ## 准备服务器
 
-虽然在自己电脑运行也可以，不过最好能租一个服务器，以便长期挂机和提供web服务
+服务器能保证24小时在线和提供web服务
 
-[服务器推荐](./server.md)
+[服务器推荐](./server.md)  
+服务器操作系统建议选择 Windows 7 或 Windows Server 2008
 
 ## 安装酷Q机器人
 
@@ -19,11 +20,11 @@
 #### Windows 使用
 
 yobot 三代基于酷Q机器人和 httpapi 插件实现
-如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](https://pan.loli.com.se/api/files/onedrive/uploads/2020/05/01/CoolQ_With_Httpapi.7z)
+如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](http://download.yobot.xyz/tools/CoolQ_With_Httpapi.7z)
 
-如果你已经使用过酷Q机器人，可以下载[httpapi 插件](https://x.jingzhidh.com/Packed_httpapi.7z)
+如果你已经使用过酷Q机器人，可以下载[httpapi 插件](http://download.yobot.xyz/tools/Packed_httpapi.7z)
 
-如果你已经使用过 httpapi 插件，或者想额外开启一个 httpapi 插件，可以下载[httpapi 插件分身版](https://x.jingzhidh.com/mirror_of_httpapi.7z)
+如果你已经使用过 httpapi 插件，或者想额外开启一个 httpapi 插件，可以下载[httpapi 插件分身版](http://download.yobot.xyz/tools/mirror_of_httpapi.7z)
 
 ### 环境搭建
 
@@ -41,7 +42,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 配置正确后，启动 httpapi 插件后会反复出现如下都提示
 
-![配置正确图片](https://x.jingzhidh.com/img/yobot/8ba6b840bab3ac25.jpg)
+![配置正确图片](https://assets.yobot.win/img/8ba6b840bab3ac25.jpg)
 
 ## 运行yobot服务
 
@@ -57,16 +58,18 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 请尽量使用git clone而不是download zip，否则无法自动更新版本
 
+进入目录 `cd yobot`
+
 安装依赖 `pip install -r src\client\requirements.txt`
 （如果在国内建议加上参数 `-i https://pypi.tuna.tsinghua.edu.cn/simple`）
 
-启动：`cd yobot\src\client & python main.py`
+启动：`cd src\client & python main.py`
 
 如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
 
-![windows下正确启动图](https://x.jingzhidh.com/img/yobot/aaf38d1a5cbc1c87.jpg)
+![windows下正确启动图](https://assets.yobot.win/img/aaf38d1a5cbc1c87.jpg)
 
-![windows下正确yobot与httpapi成功通信](https://x.jingzhidh.com/img/yobot/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://assets.yobot.win/img/8179fdd1e46690b2.jpg)
 
 ### 验证安装
 

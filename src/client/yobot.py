@@ -27,14 +27,14 @@ else:
                            switcher, templating, updater, web_util, ybdata,
                            yobot_msg, custom)
 
-# 本项目构建的框架非常粗糙且幼稚，不建议各位把时间浪费本项目上
+# 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
 # https://nonebot.cqp.moe/
 
 
 class Yobot:
-    Version = "[v3.5.5]"
-    Version_id = 108
+    Version = "[v3.6.1]"
+    Version_id = 159
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -105,8 +105,8 @@ class Yobot:
         # initialize web path
         if not self.glo_setting.get("public_address"):
             try:
-                res = requests.get("http://members.3322.org/dyndns/getip")
-                ipaddr = res.text.strip()
+                res = requests.get("http://ip-api.com/json/?fields=8192")
+                ipaddr = res.json()["query"]
             except:
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
                     s.connect(("8.8.8.8", 53))

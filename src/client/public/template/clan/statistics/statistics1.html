@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<head>
+    <title>总统计</title>
+    <meta name='viewport' content='width=1485' charset="utf-8" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-button icon="el-icon-back" @click="location='..'"></el-button>
+        <el-table :data="tableData">
+            <el-table-column prop="date" label="时间" width="180" sortable>
+                <template slot-scope="scope">
+                    [[ scope.row.date.toLocaleString() ]]
+                </template>
+            </el-table-column>
+            <el-table-column prop="qqid" label="QQ号" width="120" sortable></el-table-column>
+            <el-table-column prop="nickname" label="昵称" width="200" sortable></el-table-column>
+            <el-table-column prop="damage" label="伤害" width="200" sortable></el-table-column>
+            <el-table-column prop="boss" label="boss" :filter-method="handleFilter" :filters="bosses" width="200"
+                sortable>
+            </el-table-column>
+
+            <el-table-column prop="status" label="状态" width="200" :filter-method="handleFilter"
+                :filters="[{ text: '普通', value: '普通' }, { text: '尾刀', value: '尾刀' },{ text: '剩余刀', value: '剩余刀' },{ text: '余尾刀', value: '余尾刀' }]"
+                sortable></el-table-column>
+
+        </el-table>
+    </div>
+</body>
+<script>
+    var DMG_TYPE = ['普通','剩余刀','尾刀','余尾刀']
+    var app = new Vue({
+        el: '#app',
+        data: {
+            tableData: [],
+            bosses: []
+        },
+        methods: {
+            ts2ds: function (timestamp) {
+                var d = new Date();
+                d.setTime(timestamp * 1000);
+                return d;
+            },
+            handleFilter: function (value, row, column) {
+                const property = column['property'];
+                return row[property] === value;
+            }
+        },
+        mounted: function () {
+            _this = this
+            axios.get("../../statistics/api/").then((function (stats) {
+                if (stats.data.code != 0) {
+                    _this.$alert(res.data.message, '获取数据失败');
+                    return
+                }
+                qqidMap = stats.data.members.reduce(function (map, i) {
+                    map[i.qqid] = i.nickname;
+                    return map
+                }, {})
+                max_boss_num = 0
+                game_server = stats.data.groupinfo.game_server
+                for (i of stats.data.challenges) {
+                    max_boss_num = (i.boss_num > max_boss_num) ? i.boss_num : max_boss_num
+                    let t = {}
+                    t.date = _this.ts2ds(i.challenge_time)
+                    t.qqid = i.qqid
+                    t.nickname = qqidMap[i.qqid]
+                    t.boss = i.boss_num
+                    t.damage = i.damage
+                    t.status = DMG_TYPE[(i.health_ramain === 0)*2+(i.is_continue)]
+                    _this.tableData.push(t)
+                }
+                t = 1
+                while (t <= max_boss_num) {
+                    _this.bosses.push({
+                        text: t,
+                        value: t
+                    })
+                    t += 1
+                }
+            }))
+
+        },
+        delimiters: ['[[', ']]'],
+    })
+</script>
+
+
+</html>

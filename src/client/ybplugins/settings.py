@@ -192,7 +192,7 @@ class Setting:
                 if action == 'get_data':
                     users = []
                     for user in User.select().where(
-                        User.deleted==False,
+                        User.deleted == False,
                     ):
                         users.append({
                             'qqid': user.qqid,
@@ -205,12 +205,24 @@ class Setting:
                     return jsonify(code=0, data=users)
                 elif action == 'modify_user':
                     data = req['data']
-                    user = User.get_or_none(qqid=data['qqid'])
-                    if user is None:
+                    m_user: User = User.get_or_none(qqid=data['qqid'])
+                    if ((m_user.authority_group <= user.authority_group) or
+                            (data.get('authority_group', 999)) <= user.authority_group):
+                        return jsonify(code=12, message='Exceed authorization is not allowed')
+                    if data.get('authority_group') == 1:
+                        self.setting['super-admin'].append(ctx['user_id'])
+                        save_setting = self.setting.copy()
+                        del save_setting['dirname']
+                        del save_setting['verinfo']
+                        config_path = os.path.join(
+                            self.setting['dirname'], 'yobot_config.json')
+                        with open(config_path, 'w', encoding='utf-8') as f:
+                            json.dump(save_setting, f, indent=4)
+                    if m_user is None:
                         return jsonify(code=21, message='user not exist')
                     for key in data.keys():
-                        setattr(user, key, data[key])
-                    user.save()
+                        setattr(m_user, key, data[key])
+                    m_user.save()
                     return jsonify(code=0, message='success')
                 elif action == 'delete_user':
                     user = User.get_or_none(qqid=req['data']['qqid'])
@@ -272,13 +284,25 @@ class Setting:
                 action = req['action']
                 if action == 'get_data':
                     groups = []
-                    for group in Clan_group.select():
+                    for group in Clan_group.select().where(
+                        Clan_group.deleted == False,
+                    ):
                         groups.append({
                             'group_id': group.group_id,
                             'group_name': group.group_name,
                             'game_server': group.game_server,
                         })
                     return jsonify(code=0, data=groups)
+                if action == 'drop_group':
+                    User.update({
+                        User.clan_group_id: None,
+                    }).where(
+                        User.clan_group_id == req['group_id'],
+                    ).execute()
+                    Clan_group.delete().where(
+                        Clan_group.group_id == req['group_id'],
+                    ).execute()
+                    return jsonify(code=0, message='ok')
                 else:
                     return jsonify(code=32, message='unknown action')
             except KeyError as e:

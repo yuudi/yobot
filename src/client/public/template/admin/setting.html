@@ -2,10 +2,10 @@
 
 <head>
     <title>yobot设置</title>
-    <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
-    <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
-    <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
-    <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
 <body>
@@ -133,6 +133,13 @@
         </p>
         <p>
             <el-row>
+                <el-col :span="6">
+                    <el-checkbox v-model="setting.allow_bulk_private">允许进行批量私聊</el-checkbox>
+                </el-col>
+            </el-row>
+        </p>
+        <p>
+            <el-row>
                 <el-col :span="4">
                     <el-checkbox v-model="setting.auto_update">自动更新</el-checkbox>
                 </el-col>
@@ -156,7 +163,19 @@
             <el-checkbox v-model="setting.gacha_private_on">允许私聊抽卡</el-checkbox>
         </p>
         <p>
-            <el-checkbox v-model="setting.jjc_consult">允许竞技场查询</el-checkbox>
+            竞技场查询
+            <el-select v-model="setting.jjc_search">
+                <el-option label="关闭" value="off"></el-option>
+                <el-option label="nomae.net" value="nomae.net"></el-option>
+                <el-option label="pcrdfans.com" value="pcrdfans.com"></el-option>
+            </el-select>
+        </p>
+        <p :hidden="setting.jjc_search!='pcrdfans.com'">
+            <el-col :span="4">pcrdfans.com apikey</el-col>
+            <el-col :span="20">
+                <el-input v-model="setting.jjc_auth_key" placeholder="如果您没有apikey，请更换其他查询方式">
+                </el-input>
+            </el-col>
         </p>
         <p>
             新闻推送：

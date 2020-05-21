@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<head>
+    <title>yobot登录</title>
+</head>
+
+<body>
+    <p>正在登录中……</p>
+    <script>
+        var h = window.location.hash;
+        if (!h) {
+            alert('登录错误：登录码丢失');
+        } else {
+            window.location = '../?' + h.split('?')[0].substr(1);
+        }
+    </script>
+    <noscript>您的浏览器版本过低，请更换浏览器</noscript>
+</body>

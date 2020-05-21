@@ -23,9 +23,15 @@ themeConfig:
     - text: 安装方法
       items:
         - text: 使用酷Q安装
-          link: /install/cq/
+          items:
+            - text: 安装教程
+              link: /install/cq/
+            - text: httpapi配置说明
+              link: /install/config/
         - text: 使用mirai安装
-          link: /install/mirai/
+          items:
+            - text: 安装教程
+              link: /install/mirai/
     - text: 使用方法
       items:
         - text: 功能表
@@ -38,6 +44,8 @@ themeConfig:
           link: /usage/manual/
         - text: 安全性
           link: /usage/security/
+        - text: 多实例
+          link: /usage/multi-instance/
     - text: 常见问题
       link: /usage/faq/
     - text: 链接无法打开
@@ -46,12 +54,17 @@ themeConfig:
       items:
         - text: 关于
           link: /about/
+        - text: 开源软件许可
+          link: /project/open-source/
         - text: 更新日志
           link: /project/changelog/
         - text: 待办事项
-          link: /project/todo/
+          link: https://github.com/yuudi/yobot/projects/1
 plugins:
   vuepress-plugin-clean-urls:
     normalSuffix: /
     indexSuffix: /
     notFoundPath: /404.html
+  vuepress-plugin-img-lazy:
+    useLoading: true
+  "@vuepress/plugin-back-to-top": true

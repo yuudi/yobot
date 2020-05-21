@@ -2,11 +2,7 @@
 
 ## 配置文件位置
 
-运行包版：在 `yobot.exe` 同目录下的 `yobot_config.json`
-
-源码版：在 `src/client/yobot_config.json`
-
-插件版：在 `<插件目录>/yobot/src/client/yobot_data/yobot_config.json`
+运行一次后自动生成，位置在运行目录下的 `yobot_data/yobot_config.json`  
 
 ## 配置格式
 
@@ -44,6 +40,8 @@
 
 `setting-restrict` 更新和重启指令需要的权限，`0`仅主人，`1`群主，`2`管理员，`3`所有人，默认值 `3`
 
+`allow_bulk_private` 允许公会战管理员发起批量私聊通知，默认值 `false`
+
 `auto_update` 自动更新，默认值 `true`
 
 `update-time` 自动更新时间，如 `03:30`，默认为随机的凌晨时间
@@ -51,6 +49,10 @@
 `gacha_on` 开启群聊抽卡功能，默认值 `false`
 
 `gacha_private_on` 开启私聊抽卡功能，默认值 `false`
+
+`jjc_search` 竞技场查询，可选`nomae.net` `pcrdfans.com` `off`，默认值`nomae.net`
+
+`jjc_auth_key` pcrdfans.com 提供的查询授权码
 
 `news_jp_official` 开启日服官网新闻推送，默认值 `true`
 

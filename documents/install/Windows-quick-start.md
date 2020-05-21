@@ -1,21 +1,22 @@
-# Windows 运行包（快速上手版）
+# Windows 便携版（快速上手版）
 
 ## 参考视频
 
-在 windows 下使用运行包安装可以参考[演示视频](https://x.jingzhidh.com/3/Tutorial.mp4)  
+在 windows 下使用便携版安装可以参考[演示视频](http://download.yobot.xyz/media/Tutorial.mp4)  
 （视频中网站为旧版，不影响安装过程）
 
 ## 准备服务器
 
-虽然在自己电脑运行也可以，不过最好能租一个服务器，以便长期挂机和提供web服务
+服务器能保证24小时在线和提供web服务
 
-[服务器推荐](./server.md)
+[服务器推荐](./server.md)  
+服务器操作系统建议选择 Windows 7 或 Windows Server 2008
 
 ## 安装
 
 ### 第一步
 
-点击下载[酷Q-httpapi 整合包](https://pan.loli.com.se/api/files/onedrive/uploads/2020/05/01/CoolQ_With_Httpapi.7z)
+点击下载[酷Q-httpapi 整合包](http://download.yobot.xyz/tools/CoolQ_With_Httpapi.7z)
 
 解压后双击“CQA.exe”，输入账号密码（注意账号风险，请勿使用重要的QQ号）
 
@@ -23,15 +24,15 @@
 
 启动 httpapi 插件后会反复出现如下的提示
 
-![httpapi启用图片](https://x.jingzhidh.com/img/yobot/8ba6b840bab3ac25.jpg)
+![httpapi启用图片](https://assets.yobot.win/img/8ba6b840bab3ac25.jpg)
 
 ### 第二步
 
-点击下载[yobot运行包](https://download-latest.yobot.workers.dev)
+点击下载[yobot便携版](https://yobot.lanzous.com/b00nlr3ni)
 
 解压后双击“yobot.exe”启动服务，双方通信成功后出现如下的提示
 
-![windows下正确yobot与httpapi成功通信](https://x.jingzhidh.com/img/yobot/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://assets.yobot.win/img/8179fdd1e46690b2.jpg)
 
 ### 验证安装
 

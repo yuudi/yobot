@@ -3,10 +3,10 @@
 <head>
   <title>公会战设置</title>
   <meta name='viewport' content='width=480' charset="utf-8" />
-  <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
-  <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
-  <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
-  <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
 <body>
@@ -29,8 +29,9 @@
           <el-option label="国服" value="cn"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="出刀表无需登录">
-        <el-checkbox v-model="form.allow_guest"></el-checkbox>
+      <el-form-item label="隐私设置">
+        <el-checkbox v-model="form.privacy.allow_guest">出刀表无需登录</el-checkbox>
+        <el-checkbox v-model="form.privacy.allow_statistics_api">允许api获取数据</el-checkbox>
       </el-form-item>
       <el-form-item label="通知到群">
         <el-checkbox v-model="form.notify.challenge">伤害上报</el-checkbox>
@@ -49,19 +50,40 @@
         <el-button @click="location='..'">返回</el-button>
       </el-form-item>
       <el-form-item>
+        现在档案编号：[[ battle_id ]]<br>
         <el-button type="primary" @click="export_data" icon="el-icon-download" size="mini">导出数据</el-button>
-          <el-button type="danger" @click="confirmVisible = true" icon="el-icon-delete" size="mini">重置数据</el-button>
-          <el-dialog title="警告" :visible.sync="confirmVisible">
-          <p>此操作会删除本次公会战所有数据</p>
-          <p>请提前保存好需要的数据</p>
+        {#- <el-button type="primary" @click="new_data_slot" icon="el-icon-document-add" size="mini">新建档案</el-button> -#}
+        <el-button type="primary" @click="get_data_slot_record_count();switchVisible = true" icon="el-icon-receiving" size="mini">切换档案</el-button>
+        <el-dialog title="切换档案" :visible.sync="switchVisible">
+          <ul>
+            <li v-for="item in data_slot_record_count">
+              [[ item.battle_id ]]号存档：[[ item.record_count ]]条记录
+            </li>
+          </ul>
+          <el-form>
+            <el-form-item label="切换至" label-width="120">
+              <el-input-number v-model="battle_id" :min="0"></el-input-number>
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="switchVisible = false">取消</el-button>
+            <el-button type="danger" @click="switch_data_slot">切换</el-button>
+          </span>
+        </el-dialog>
+        <el-button type="danger" @click="confirmVisible = true" icon="el-icon-delete" size="mini">删除数据</el-button>
+        <el-dialog title="警告" :visible.sync="confirmVisible">
+          <p>此操作会删除 [[ battle_id ]] 号存档中所有数据</p>
           <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="confirmVisible = false">取消</el-button>
-            <el-button type="danger" @click="delete_data">确定</el-button>
+            <el-button type="danger" @click="clear_data_slot">确定</el-button>
           </span>
         </el-dialog>
       </el-form-item>
-      </el-form>
+    </el-form>
   </div>
+  <footer style="text-align: center">
+    powered by <a href="https://github.com/yuudi/yobot">yobot</a>
+  </footer>
 </body>
 <script>var csrf_token = "{{ session['csrf_token'] }}";</script>
 <script src="{{ url_for('yobot_static', filename='clan/setting.js') }}"></script>

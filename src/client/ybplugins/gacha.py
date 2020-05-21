@@ -6,6 +6,7 @@ import random
 import re
 import sqlite3
 import time
+from functools import lru_cache
 from typing import List, Union
 from urllib.parse import urljoin
 
@@ -127,10 +128,15 @@ class Gacha:
         db_conn.close()
         return reply
 
+    @lru_cache(maxsize=256)
     def check_ssr(self, char):
+        prop = 0.
+        for p in self._pool["pool"].values():
+            prop += p["prop"]
+        prop = prop*0.05
         for p in self._pool["pool"].values():
             chars = [p.get("prefix", "")+x for x in p["pool"]]
-            if char in chars and p["prop"] < 20:
+            if char in chars and p["prop"] < prop:
                 return True
         return False
 
@@ -163,15 +169,14 @@ class Gacha:
         if today != last_day:
             last_day = today
             day_times = 0
-        if day_limit != 0 and day_times >= day_limit:
-            return "{}今天已经抽了{}次了，明天再来吧".format(nickname, day_times)
+        if day_limit != 0 and day_times+30 >= day_limit:
+            return "{}今天剩余抽卡次数不足30次，不能抽一井".format(nickname, day_times)
         reply = ""
         result = ""
-        flag = True
-        for i in range(1,31):
+        flag = False
+        for i in range(1, 31):
             if day_limit != 0 and day_times >= day_limit:
                 reply += "{}抽到第{}发十连时已经达到今日抽卡上限，抽卡结果:".format(nickname, i)
-                flag = False
                 break
             single_result = self.result()
             times += 1
@@ -181,17 +186,19 @@ class Gacha:
                     info[char] += 1
                     if self.check_ssr(char):
                         result += "\n{}({})".format(char, info[char])
+                        flag = True
                 else:
                     info[char] = 1
                     if self.check_ssr(char):
                         result += "\n{}(new)".format(char)
-            sql_info = pickle.dumps(info)
-            if mem_exists:
-                db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
-                           (sql_info, times, last_day, day_times, qqid))
-            else:
-                db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
-                           (qqid, sql_info, times, last_day, day_times))
+                        flag = True
+        sql_info = pickle.dumps(info)
+        if mem_exists:
+            db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
+                       (sql_info, times, last_day, day_times, qqid))
+        else:
+            db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
+                       (qqid, sql_info, times, last_day, day_times))
         if not result:
             reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
             return reply

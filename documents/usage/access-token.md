@@ -6,8 +6,8 @@
 
 ## 如何修改机器人的 access token
 
-进入yobot的[配置文件](./configuration.md)，将其中 `access_token` 修改为任意字符串（尽量复杂）
+进入yobot的[配置文件](./configuration.md)，将其中 `access_token` 修改为任意字符串（尽量复杂，别忘了双引号）
 
 进入httpapi的`<应用目录/config/<general|qq号>.json`（如下图），将其中 `access_token` 修改为刚才一样的字符串
 
-![httpapi配置文件](https://x.jingzhidh.com/img/yobot/f6772ec9.png)
+![httpapi配置文件](https://assets.yobot.win/img/f6772ec9.png)
