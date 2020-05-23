@@ -159,9 +159,11 @@ var vm = new Vue({
                     that.selectingQQid = that.members[0].qqid;
                 }
                 that.refreshData();
-            // }).catch(function (error) {
-            //     thisvue.$alert(error, '获取数据失败');
-            //     thisvue.isLoading = false;
+            }).catch(function (error) {
+                that.$alert(error, '获取数据失败，请联系维护人员');
+                that.isLoading = false;
+                console.error(error);
+                console.error(error.stack);
             });
         },
 
@@ -607,7 +609,10 @@ var vm = new Vue({
             this.sumDmgChart.setOption(option3);
             this.missChart.setOption(option4);
             this.lastChart.setOption(option5);
-            this.bossBloodChart.setOption(option6);
+            try{
+                // 这里有时会出现一个错误，原因未知
+                this.bossBloodChart.setOption(option6);
+            }catch(e){console.error(e)}
             this.totalTimeChart.setOption(option7);
             this.bossHitChart.setOption(option8);
             this.totalDamageChart.setOption(option9);
