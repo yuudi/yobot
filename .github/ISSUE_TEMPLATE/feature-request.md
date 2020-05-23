@@ -2,7 +2,7 @@
 name: Feature request / 建议
 about: Suggest an idea for this project
 title: "[Feature request] 标题"
-labels: ''
+labels: 'enhancement'
 assignees: ''
 
 ---
