@@ -17,6 +17,7 @@
 
 [@winrey](https://github.com/winrey)  
 [@yyuueexxiinngg](https://github.com/yyuueexxiinngg)  
+[@AzurCrystal](https://github.com/AzurCrystal)  
 
 ## Bug Report
 

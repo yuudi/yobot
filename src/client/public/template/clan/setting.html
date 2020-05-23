@@ -55,6 +55,7 @@
         {#- <el-button type="primary" @click="new_data_slot" icon="el-icon-document-add" size="mini">新建档案</el-button> -#}
         <el-button type="primary" @click="get_data_slot_record_count();switchVisible = true" icon="el-icon-receiving" size="mini">切换档案</el-button>
         <el-dialog title="切换档案" :visible.sync="switchVisible">
+          <el-alert title="你可以切换存档编号，以记录不同期的公会战数据，这样能保留历史数据，也可以在统计里随时查看" type="info" close-text="知道了"></el-alert>
           <ul>
             <li v-for="item in data_slot_record_count">
               [[ item.battle_id ]]号存档：[[ item.record_count ]]条记录

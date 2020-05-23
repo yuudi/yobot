@@ -11,7 +11,8 @@ head:
       href: /logo/logo.ico
 themeConfig:
   logo: /logo/logo.png
-  search: false
+  search: true
+  searchMaxSuggestions: 10
   smoothScroll: true
   repo: https://github.com/yuudi/yobot
   docsDir: documents
@@ -58,6 +59,8 @@ themeConfig:
           link: /project/open-source/
         - text: 更新日志
           link: /project/changelog/
+        - text: 项目贡献者
+          link: /project/contributors/
         - text: 待办事项
           link: https://github.com/yuudi/yobot/projects/1
 plugins:

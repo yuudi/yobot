@@ -335,7 +335,6 @@ def get_version(base_version: str, base_commit:  int) -> dict:
             "check_url": [
                 "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
                 "https://yuudi.github.io/yobot/v3/ver.json",
-                "http://api.yobot.xyz/v3/version/"
             ]
         }
     try:
@@ -374,7 +373,6 @@ def get_version(base_version: str, base_commit:  int) -> dict:
             "check_url": [
                 "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
                 "https://yuudi.github.io/yobot/v3/ver.json",
-                "http://api.yobot.xyz/v3/version/"
             ],
         }
     except Exception as e:
