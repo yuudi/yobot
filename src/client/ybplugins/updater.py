@@ -134,6 +134,8 @@ class Updater:
         sys.exit()
 
     async def linux_update_async(self, force: bool = False, test_ver: int = 0):
+        if self.evn == "linux-exe":
+            return "Linux 便携版暂时无法自动更新"
         test_version = ["stable", "beta", "alpha"][test_ver]
         pullcheck = self.check_commit(force)
         if pullcheck is not None:
@@ -326,7 +328,7 @@ def rand_vername(seed, length=2):
 def get_version(base_version: str, base_commit:  int) -> dict:
     if "_MEIPASS" in dir(sys):
         return {
-            "run-as": "exe",
+            "run-as": "exe" if platform.system() == "Windows" else "linux-exe",
             "ver_name": "yobot{}便携版".format(base_version),
             "ver_id": 3300 + base_commit,
             "check_url": [
