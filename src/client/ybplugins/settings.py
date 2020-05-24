@@ -95,7 +95,7 @@ class Setting:
             if user.authority_group >= 10:
                 return await render_template(
                     'unauthorized.html',
-                    limit='机器人管理员',
+                    limit='主人',
                     uath=user.authority_group,
                 )
             return await render_template('admin/pool-setting.html')
@@ -156,7 +156,7 @@ class Setting:
             if user.authority_group >= 10:
                 return await render_template(
                     'unauthorized.html',
-                    limit='机器人管理员',
+                    limit='主人',
                     uath=user.authority_group,
                 )
             return await render_template('admin/users.html')
@@ -249,7 +249,7 @@ class Setting:
             if user.authority_group >= 10:
                 return await render_template(
                     'unauthorized.html',
-                    limit='机器人管理员',
+                    limit='主人',
                     uath=user.authority_group,
                 )
             return await render_template('admin/groups.html')

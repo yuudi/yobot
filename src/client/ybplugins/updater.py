@@ -29,10 +29,9 @@ class Updater:
         with open(os.path.join(glo_setting['dirname'], 'yobot.pid'), 'w') as f:
             f.write(str(os.getpid()))
 
-
     async def send_reply(self, context: Dict[str, Any],
-                    message: Union[str, Dict[str, Any], List[Dict[str, Any]]],
-                    **kwargs) -> Optional[Dict[str, Any]]:
+                         message: Union[str, Dict[str, Any], List[Dict[str, Any]]],
+                         **kwargs) -> Optional[Dict[str, Any]]:
         context = context.copy()
         context['message'] = message
         context.update(kwargs)
@@ -101,10 +100,9 @@ class Updater:
 
     async def windows_update_git_async(self, force: bool = False, test_ver: int = 0):
         test_version = ["stable", "beta", "alpha"][test_ver]
-        if not force:
-            pullcheck = self.check_commit()
-            if pullcheck is not None:
-                return pullcheck
+        pullcheck = self.check_commit(force)
+        if pullcheck is not None:
+            return pullcheck
         server_available = False
         for url in self.ver["check_url"]:
             try:
@@ -137,10 +135,9 @@ class Updater:
 
     async def linux_update_async(self, force: bool = False, test_ver: int = 0):
         test_version = ["stable", "beta", "alpha"][test_ver]
-        if not force:
-            pullcheck = self.check_commit()
-            if pullcheck is not None:
-                return pullcheck
+        pullcheck = self.check_commit(force)
+        if pullcheck is not None:
+            return pullcheck
         for url in self.ver["check_url"]:
             try:
                 async with aiohttp.request('GET', url=url) as response:
@@ -161,12 +158,12 @@ class Updater:
         open('.YOBOT_RESTART', 'w').close()
         sys.exit(10)
 
-    def check_commit(self):
+    def check_commit(self, force: bool = False):
         if not self.ver["commited"]:
             if self.ver["ver_name"] == "无法检测版本":
                 return "没有版本信息，无法更新"
             return "存在未提交的修改，无法自动更新"
-        if self.ver["extra_commit"]:
+        if not force and self.ver["extra_commit"]:
             return "存在额外的提交，建议手动更新\n发送“强制更新”以忽略检查"
         return None
 
@@ -351,7 +348,7 @@ def get_version(base_version: str, base_commit:  int) -> dict:
         return {
             "run-as": "python",
             "commited": False,
-            "ver_name": "无法检测版本"
+            "ver_name": f"无法检测版本{base_version}"
         }
     try:
         vername = "yobot{}源码版".format(base_version)
@@ -380,5 +377,5 @@ def get_version(base_version: str, base_commit:  int) -> dict:
         return {
             "run-as": "python",
             "commited": False,
-            "ver_name": "无法检测版本"
+            "ver_name": f"无法检测版本{base_version}"
         }
