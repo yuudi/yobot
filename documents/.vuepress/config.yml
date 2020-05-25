@@ -1,5 +1,5 @@
 base: /
-dest: ../docs
+dest: ./dist
 title: yobot
 description: 公主链接群聊机器人
 head:

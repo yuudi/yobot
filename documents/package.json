@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "dev": "vuepress dev . --host=127.0.0.1 --open",
+    "build": "vuepress build ."
+  },
+  "devDependencies": {
+    "@vuepress/plugin-back-to-top": "^1.5.0",
+    "vuepress": "^1.5.0",
+    "vuepress-plugin-clean-urls": "^1.1.1",
+    "vuepress-plugin-img-lazy": "^1.0.3"
+  }
+}
