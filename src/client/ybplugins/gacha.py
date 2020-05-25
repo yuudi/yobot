@@ -171,10 +171,11 @@ class Gacha:
             day_times = 0
         reply = ""
         result = ""
-        flag = False
+        flag_fully_30_times = True
         for i in range(1, 31):
             if day_limit != 0 and day_times >= day_limit:
                 reply += "{}抽到第{}发十连时已经达到今日抽卡上限，抽卡结果:".format(nickname, i)
+                flag_fully_30_times = False
                 break
             single_result = self.result()
             times += 1
@@ -184,12 +185,10 @@ class Gacha:
                     info[char] += 1
                     if self.check_ssr(char):
                         result += "\n{}({})".format(char, info[char])
-                        flag = True
                 else:
                     info[char] = 1
                     if self.check_ssr(char):
                         result += "\n{}(new)".format(char)
-                        flag = True
         sql_info = pickle.dumps(info)
         if mem_exists:
             db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
@@ -198,9 +197,12 @@ class Gacha:
             db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
                        (qqid, sql_info, times, last_day, day_times))
         if not result:
-            reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
+            if flag_fully_30_times:
+                reply += "\n{}太非了，本次下井没有抽到ssr。".format(nickname)
+            else:
+                reply += "\n本次没有抽到ssr。".format(nickname)
             return reply
-        if flag:
+        if flag_fully_30_times:
             reply += "{}本次下井结果：".format(nickname)
         reply += result
         db_conn.commit()
