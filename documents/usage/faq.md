@@ -85,6 +85,16 @@ yobot 自动添加第一个登录的用户为最高权限，如果需要手动�
 Nginx: `proxy_set_header X-Real-IP $remote_addr;`  
 Apache: `RemoteIPHeader X-Real-IP`
 
+### 使用docker-compose运行后提示 " [Errno 13] Permission denied: 'yobotg.sh' "
+
+请参考[Docker部署](../install/docker.md)
+此类情况均是由root账户直接运行docker实例造成的。
+在源码根目录中执行：
+```shell script
+chown -R 1000:1000 .
+```
+以解决该问题。
+
 ### 这里没有我的问题
 
 可以在[这里](https://github.com/yuudi/yobot/issues)提问，提问前可以阅读[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)
