@@ -6,12 +6,8 @@ services:
       - "9222:9222"
     env_file: .env
     restart: on-failure
-    command: >
-      bash -c "
-      python3 main.py 2>&1 >/dev/null && sh yobotg.sh
-      "
     volumes:
-      - .:/code
+      - .:/home/yobot/yobot
     networks:
       - bot_net
 
