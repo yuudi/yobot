@@ -20,12 +20,12 @@ if __package__:
     from .ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                             jjc_consult, login, marionette, push_news, settings,
                             switcher, templating, updater, web_util, ybdata,
-                            yobot_msg, custom)
+                            yobot_msg, custom, miner)
 else:
     from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
-                           yobot_msg, custom)
+                           yobot_msg, custom, miner)
 
 # 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.1_rc2]"
-    Version_id = 158
+    Version = "[v3.6.2_beta]"
+    Version_id = 177
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -60,7 +60,7 @@ class Yobot:
                 sys._MEIPASS, "packedfiles", "default_config.json")
         else:
             default_config_f_path = os.path.join(
-                os.path.dirname(__file__), "default_config.json")
+                os.path.dirname(__file__), "packedfiles", "default_config.json")
         with open(default_config_f_path, "r", encoding="utf-8") as config_file:
             self.glo_setting = json.load(config_file)
         if not os.path.exists(config_f_path):
@@ -73,7 +73,7 @@ class Yobot:
                     sys._MEIPASS, "packedfiles", "default_boss.json")
             else:
                 default_boss_filepath = os.path.join(
-                    os.path.dirname(__file__), "default_boss.json")
+                    os.path.dirname(__file__), "packedfiles", "default_boss.json")
             shutil.copyfile(default_boss_filepath, boss_filepath)
         pool_filepath = os.path.join(dirname, "pool3.json")
         if not os.path.exists(pool_filepath):
@@ -82,7 +82,7 @@ class Yobot:
                     sys._MEIPASS, "packedfiles", "default_pool.json")
             else:
                 default_pool_filepath = os.path.join(
-                    os.path.dirname(__file__), "default_pool.json")
+                    os.path.dirname(__file__), "packedfiles", "default_pool.json")
             shutil.copyfile(default_pool_filepath, pool_filepath)
         with open(config_f_path, "r+", encoding="utf-8") as config_file:
             cfg = json.load(config_file)
@@ -220,6 +220,7 @@ class Yobot:
 
         # load new plugins
         self.plug_new = [
+            miner.Miner(**kwargs),
             custom.Custom(**kwargs),
         ]
 

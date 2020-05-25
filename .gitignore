@@ -7,6 +7,7 @@ src/client/*/
 !src/client/ybplugins/
 !src/client/yybplugins/
 !src/client/public/
+!src/client/packedfiles/
 src/client/.*
 src/client/*.json
 !src/client/default_*
@@ -15,7 +16,6 @@ src/client/*.db
 src/client/*.db-*
 src/client/*.ics
 src/client/*.pid
-src/client/*.spec
 src/client/test.py
 .env
 cqhttp

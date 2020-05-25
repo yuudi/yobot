@@ -15,14 +15,17 @@ loop=true
 while $loop
 do
     loop=false
-    python3 main.py -g
+    {} -g
     if [ -f .YOBOT_RESTART ]
     then
         loop=true
         rm .YOBOT_RESTART
     fi
 done
-""")
+""".format(
+    './yobot' if '_MEIPASS' in dir(sys) else 'python3 main.py'
+)
+)
         print('请通过"sh yobotg.sh"启动')
         sys.exit()
     if os.path.exists('.YOBOT_RESTART'):

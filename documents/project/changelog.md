@@ -1,5 +1,11 @@
 # 更新日志
 
+## 3.6.2
+
+- 按日计算的统计图表（[#99](https://github.com/yuudi/yobot/pull/99)）
+- 优化 Dockerfile（[#97](https://github.com/yuudi/yobot/pull/97)）
+- 挖矿计算（[#103](https://github.com/yuudi/yobot/pull/103)）
+
 ## 3.6.1
 
 - 竞技场查询支持pcrdfans
@@ -9,11 +15,9 @@
 ## 3.6.0
 
 - 公会战数据多存档
-- 开放统计api与数据下载
+- 开放统计
 - 统计：出刀顺序表（[#75](https://github.com/yuudi/yobot/pull/75)）
 - 统计：出刀统计图（[#77](https://github.com/yuudi/yobot/pull/77)、[#79](https://github.com/yuudi/yobot/pull/79)）
-- 自动更新时有反馈
-- 允许删除公会
 
 ## 3.5
 

@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import json
 import re
@@ -50,9 +49,6 @@ class Event:
         self.timezone = datetime.timezone(datetime.timedelta(hours=0))
 
         self.timeline = None
-
-        loop = asyncio.get_event_loop()
-        asyncio.ensure_future(self.load_timeline_async(), loop=loop)
 
     def load_timeline(self, rg):
         raise RuntimeError("no more sync calling")
@@ -248,7 +244,8 @@ class Event:
                 reply = "未设置区服，请发送“{}设置”".format(
                     self.setting.get("preffix_string", ""))
             else:
-                reply = "日程表未初始化"
+                reply = "日程表未初始化\n\n更多日程：{}".format(
+                    _calender_url.get(self.setting["calender_region"]))
             return {"reply": reply, "block": True}
         if match_num == 1:
             return {"reply": "", "block": True}
@@ -304,4 +301,9 @@ class Event:
         hour, minute = time.split(":")
         trigger = CronTrigger(hour=hour, minute=minute)
         job = (trigger, self.send_daily_async)
-        return (job,)
+        init_trigger = DateTrigger(
+            datetime.datetime.now() +
+            datetime.timedelta(seconds=5)
+        )  # 启动5秒后初始化
+        init_job = (init_trigger, self.load_timeline_async)
+        return (job, init_job)

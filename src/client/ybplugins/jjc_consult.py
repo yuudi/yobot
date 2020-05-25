@@ -85,7 +85,7 @@ class Consult:
                 result = await self.search_pcrdfans_async(def_lst, region)
             else:
                 return f"错误的配置项：{search_source}"
-        except (RuntimeError,ValueError) as e:
+        except (RuntimeError, ValueError) as e:
             return str(e)
 
         if len(result) == 0:

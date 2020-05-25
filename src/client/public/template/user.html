@@ -15,7 +15,7 @@
         <p>欢迎{{ user.nickname }}</p>
         <div>上次登录：[[ from_ts({{ session.get('last_login_time') }}) ]] at {{ session.get('last_login_ipaddr') }}（[[ addr.join('') ]]）
         </div>
-        {% if user.authority_group < 100 -%}
+        {% if user.authority_group < 10 -%}
         <el-row>
             <a href="{{ url_for('yobot_setting') }}">
                 <el-button type="primary">设置</el-button>

@@ -2,7 +2,23 @@
 
 ## 运行环境
 
-python最低要求为`python3.6`
+python最低要求为 `python3.6`
+
+## 打包
+
+安装 `pyinstaller`
+
+```sh
+pip install pyinstaller
+```
+
+打包程序
+
+```sh
+pyinstaller main.spec
+```
+
+在 `dist` 中找到目标文件
 
 ## 扩展
 
