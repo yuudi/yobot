@@ -16,5 +16,4 @@ QQ群：
 
 [项目贡献者](./project/contributors.md)  
 [更新日志](./project/changelog.md)  
-[待办事项](./project/todo.md)  
 [开源许可](./project/open-source.md)  

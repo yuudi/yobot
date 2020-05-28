@@ -21,7 +21,10 @@
             <el-form>
                 <el-form-item label="域名" label-width="120">
                     <el-input v-model="applyName" placeholder="字母、数字" maxlength="16" show-word-limit>
-                        <template slot="append">.yobot.xyz</template>
+                        <el-select v-model="domain" slot="append" placeholder="选择后缀" style="width: 150px">
+                            <el-option label=".yobot.xyz" value=".yobot.xyz"></el-option>
+                            <el-option label=".xcw.best" value=".xcw.best"></el-option>
+                          </el-select>
                     </el-input>
                 </el-form-item>
             </el-form>

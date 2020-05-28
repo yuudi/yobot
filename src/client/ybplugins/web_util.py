@@ -95,7 +95,7 @@ class WebUtil:
             if name is None:
                 return jsonify(code=400, message='No name specified')
             try:
-                async with aiohttp.request('GET', url='https://api.v3.yobot.xyz/winname/?name='+name) as response:
+                async with aiohttp.request('GET', url='https://api.v3.yobot.xyz/getdomain/?name='+name) as response:
                     if response.status != 200:
                         raise ServerError(
                             f'http code {response.status} from api.v3.yobot.xyz')

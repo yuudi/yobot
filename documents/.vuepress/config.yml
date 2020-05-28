@@ -61,8 +61,6 @@ themeConfig:
           link: /project/changelog/
         - text: 项目贡献者
           link: /project/contributors/
-        - text: 待办事项
-          link: https://github.com/yuudi/yobot/projects/1
 plugins:
   vuepress-plugin-clean-urls:
     normalSuffix: /

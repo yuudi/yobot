@@ -9,9 +9,11 @@ editLink: false
 
 yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷、通知及时、数据详细的特点。
 
-## 安装
+## 获取
 
-[安装教程](./install/README.md)
+参考[安装教程](./install/README.md)
+
+或者加入[讨论群](./about.md)，与他人共享机器人。
 
 ## 功能介绍
 

@@ -463,7 +463,9 @@ class ClanBattle:
             0,
             msg,
         )
-        self._boss_status[group_id].set_result(status)
+        self._boss_status[group_id].set_result(
+            (self._boss_data_dict(group), msg)
+        )
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
 
         if defeat:
@@ -508,7 +510,9 @@ class ClanBattle:
             0,
             f'{nik}的出刀记录已被撤销',
         )
-        self._boss_status[group_id].set_result(status)
+        self._boss_status[group_id].set_result(
+            (self._boss_data_dict(group), status.info)
+        )
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
@@ -553,7 +557,9 @@ class ClanBattle:
             0,
             'boss状态已修改',
         )
-        self._boss_status[group_id].set_result(status)
+        self._boss_status[group_id].set_result(
+            (self._boss_data_dict(group), status.info)
+        )
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
@@ -889,7 +895,9 @@ class ClanBattle:
             qqid,
             info,
         )
-        self._boss_status[group_id].set_result(status)
+        self._boss_status[group_id].set_result(
+            (self._boss_data_dict(group), status.info)
+        )
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
@@ -936,7 +944,9 @@ class ClanBattle:
             0,
             'boss挑战已可申请',
         )
-        self._boss_status[group_id].set_result(status)
+        self._boss_status[group_id].set_result(
+            (self._boss_data_dict(group), status.info)
+        )
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
@@ -1555,13 +1565,13 @@ class ClanBattle:
                     )
                 elif action == 'update_boss':
                     try:
-                        status = await asyncio.wait_for(
+                        bossData, notice = await asyncio.wait_for(
                             asyncio.shield(self._boss_status[group_id]),
                             timeout=30)
                         return jsonify(
                             code=0,
-                            bossData=self._boss_data_dict(group),
-                            notice=status.info,
+                            bossData=bossData,
+                            notice=notice,
                         )
                     except asyncio.TimeoutError:
                         return jsonify(
