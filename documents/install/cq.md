@@ -36,7 +36,7 @@ yobot搭建难度约等于搭建网站的难度，请量力而行
 
 ## Linux 服务器：Docker 部署
 
-使用 Docker 一键部署（测试中）
+使用 Docker 一键部署。
 
 [详细说明](./docker.md)
 
