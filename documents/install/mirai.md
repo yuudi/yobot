@@ -2,22 +2,12 @@
 
 [mirai 项目地址](https://github.com/mamoe/mirai)
 
-## 使用 cqhttp-mirai 运行（推荐）
+yobot 原生于 cqhttp，利用[cqhttp-mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)可以直接在 mirai 内使用 yobot
 
-利用 cqhttp-mirai 可以直接在 mirai 上运行 cqhttp 项目。
+## Windows 部署
 
-编写中……
+[编写中……](./Windows-cqhttp-mirai.md)
 
-[参考链接](https://github.com/yyuueexxiinngg/cqhttp-mirai)
+## Linux 部署
 
-## 使用 yobot-mirai 运行
-
-编写中……
-
-[参考链接](https://github.com/yyuueexxiinngg/yobot-mirai)
-
-## 使用 mirai-native 运行
-
-编写中……
-
-[参考链接](https://github.com/iTXTech/mirai-native)
+[详细说明](./Linux-cqhttp-mirai.md)

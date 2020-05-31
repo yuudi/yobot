@@ -4,9 +4,9 @@
 
 由于 wine 与原生 Windows 差别较大，很多 酷Q 插件无法在 wine 中运行。
 
-Linux 用户可以使用 Docker 部署（测试中），具体请看[这里](./docker.md)。
+Linux 用户可以使用 Docker 部署，具体请看[这里](./docker.md)。
 
-Linux 用户可以使用 mirai 部署（测试中），具体请看[这里](./mirai.md)。
+Linux 用户可以使用 mirai 部署，具体请看[这里](./Linux-cqhttp-mirai.md)。
 
 **Linux运行存在问题较多，不推荐使用**，如果你坚持使用Linux来部署机器人，可以参考本文步骤。
 
