@@ -69,7 +69,8 @@ server {
 
   ## 输出文件直接访问（可选，性能）
   #location /yobot/output/ {
-  #  alias /home/yobot/src/client/output/;  # 你的输出文件目录，如果你修改了`public_basepath`，请同时修改这里的`location`
+  #  alias /home/yobot/src/client/yobot_data/output/;  # 你的输出文件目录，如果你修改了`public_basepath`，请同时修改这里的`location`
+  #  charset utf-8;  # 设置 HTTP 响应的字符集避免页面出现乱码
   #  expires 30d;
   #}
 
