@@ -61,7 +61,7 @@ class WebUtil:
 
         if not os.path.exists(os.path.join(self.resource_path, 'background.jpg')):
             try:
-                r = requests.get('http://x.jingzhidh.com/s/background.jpg')
+                r = requests.get('https://i.loli.net/2020/05/31/IirkP9TpnV7Ks6q.jpg')
                 assert r.status_code == 200
                 with open(os.path.join(self.resource_path, 'background.jpg'), 'wb') as f:
                     f.write(r.content)

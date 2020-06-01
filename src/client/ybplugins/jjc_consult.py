@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import random
@@ -7,7 +8,6 @@ from typing import Dict, List, Optional, Tuple
 from urllib.parse import urljoin
 
 import aiohttp
-import requests
 
 from .templating import render_template
 from .yobot_exceptions import ServerError
@@ -35,17 +35,33 @@ class Consult:
     Nicknames_csv = "https://gitee.com/yobot/pcr-nickname/raw/master/nicknames.csv"
     Nicknames_repo = "https://gitee.com/yobot/pcr-nickname/blob/master/nicknames.csv"
 
-    def __init__(self, glo_setting: dict, *args, refresh_nickfile=False,  **kwargs):
+    def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
         self.nickname_dict: Dict[str, Tuple[str, str]] = {}
         nickfile = os.path.join(glo_setting["dirname"], "nickname3.csv")
-        if refresh_nickfile or not os.path.exists(nickfile):
-            res = requests.get(self.Nicknames_csv)
-            if res.status_code != 200:
-                raise ServerError(
-                    "bad server response. code: "+str(res.status_code))
-            with open(nickfile, "w", encoding="utf-8-sig") as f:
-                f.write(res.text)
+        if not os.path.exists(nickfile):
+            asyncio.ensure_future(self.update_nicknames(),
+                                  loop=asyncio.get_event_loop())
+        else:
+            with open(nickfile, encoding="utf-8-sig") as f:
+                csv = f.read()
+                for line in csv.split("\n")[1:]:
+                    row = line.split(",")
+                    for col in row:
+                        self.nickname_dict[col] = (row[0], row[1])
+
+    async def update_nicknames(self):
+        nickfile = os.path.join(self.setting["dirname"], "nickname3.csv")
+        try:
+            async with aiohttp.request('GET', self.Nicknames_csv) as resp:
+                if resp.status != 200:
+                    raise ServerError(
+                        "bad server response. code: "+str(resp.status))
+                restxt = await resp.text()
+                with open(nickfile, "w", encoding="utf-8-sig") as f:
+                    f.write(restxt)
+        except aiohttp.ClientError as e:
+            raise RuntimeError('错误'+str(e))
         with open(nickfile, encoding="utf-8-sig") as f:
             csv = f.read()
             for line in csv.split("\n")[1:]:
@@ -66,6 +82,7 @@ class Consult:
                 if is_retry:
                     msg = "没有找到【{}】，目前昵称表：{}".format(
                         index, self.Nicknames_repo)
+                    asyncio.ensure_future(self.update_nicknames())
                     raise ValueError(msg)
                 else:
                     self.__init__(self.setting, refresh_nickfile=True)

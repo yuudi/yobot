@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.2]"
-    Version_id = 187
+    Version = "[v3.6.3-beta.1]"
+    Version_id = 189
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -84,20 +84,15 @@ class Yobot:
                 default_pool_filepath = os.path.join(
                     os.path.dirname(__file__), "packedfiles", "default_pool.json")
             shutil.copyfile(default_pool_filepath, pool_filepath)
-        with open(config_f_path, "r+", encoding="utf-8") as config_file:
+        with open(config_f_path, "r", encoding="utf-8-sig") as config_file:
             cfg = json.load(config_file)
             for k in self.glo_setting.keys():
                 if k in cfg:
                     self.glo_setting[k] = cfg[k]
-            config_file.seek(0)
-            config_file.truncate()
-            json.dump(self.glo_setting, config_file, indent=4)
 
         if verinfo is None:
             verinfo = updater.get_version(self.Version, self.Version_id)
             print(verinfo['ver_name'])
-
-        modified = False
 
         # initialize database
         ybdata.init(os.path.join(dirname, 'yobotdata.db'))
@@ -115,17 +110,16 @@ class Yobot:
                 ipaddr,
                 self.glo_setting["port"],
             )
-            modified = True
+
         if not self.glo_setting["public_address"].endswith("/"):
             self.glo_setting["public_address"] += "/"
-            modified = True
+
         if not self.glo_setting["public_basepath"].startswith("/"):
             self.glo_setting["public_basepath"] = "/" + \
                 self.glo_setting["public_basepath"]
-            modified = True
+
         if not self.glo_setting["public_basepath"].endswith("/"):
             self.glo_setting["public_basepath"] += "/"
-            modified = True
 
         # initialize update time
         if self.glo_setting["update-time"] == "random":
@@ -133,17 +127,14 @@ class Yobot:
                 random.randint(2, 4),
                 random.randint(0, 59)
             )
-            modified = True
 
         # initialize client salt
         if self.glo_setting["client_salt"] is None:
             self.glo_setting["client_salt"] = web_util.rand_string(16)
-            modified = True
 
         # save initialization
-        if modified:
-            with open(config_f_path, "w", encoding="utf-8") as config_file:
-                json.dump(self.glo_setting, config_file, indent=4)
+        with open(config_f_path, "w", encoding="utf-8") as config_file:
+            json.dump(self.glo_setting, config_file, indent=4)
 
         # initialize utils
         templating.Ver = self.Version[2:-1]
