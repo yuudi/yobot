@@ -1078,7 +1078,7 @@ var vm = new Vue({
         },
 
         getPlayer: function(qqid) {
-            return this.members.find(o => o.qqid === qqid) ?? {nickname:'未加入',qqid:qqid,sl:null};
+            return this.members.find(o => o.qqid === qqid) || {nickname:'未加入',qqid:qqid,sl:null};
         },
 
         playerDamage: function(playerQQid) {

@@ -169,6 +169,8 @@ class Gacha:
         if today != last_day:
             last_day = today
             day_times = 0
+        if day_limit != 0 and day_times+20 > day_limit:
+            return "{}今天剩余抽卡次数不足30次，不能抽一井".format(nickname, day_times)
         reply = ""
         result = ""
         flag_fully_30_times = True

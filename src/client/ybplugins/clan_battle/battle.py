@@ -950,7 +950,7 @@ class ClanBattle:
         self._boss_status[group_id] = asyncio.get_event_loop().create_future()
         return status
 
-    def save_slot(self, group_id: Groupid, qqid: QQid, todaystatus: Optional[bool] = True):
+    def save_slot(self, group_id: Groupid, qqid: QQid, todaystatus: bool = True, only_check: bool = False):
         """
         record today's save slot
 
@@ -966,6 +966,8 @@ class ClanBattle:
         if membership is None:
             raise UserNotInGroup
         today, _ = pcr_datetime(group.game_server)
+        if only_check:
+            return (membership.last_save_slot == today)
         if todaystatus:
             if membership.last_save_slot == today:
                 raise UserError('您今天已经存在SL记录了')
@@ -990,7 +992,7 @@ class ClanBattle:
         # refresh
         self.get_member_list(group_id, nocache=True)
 
-        return
+        return todaystatus
 
     @timed_cached_func(max_len=64, max_age_seconds=10, ignore_self=True)
     def get_report(self,
@@ -1398,15 +1400,21 @@ class ClanBattle:
             )
             return f'公会战面板：\n{url}\n建议添加到浏览器收藏夹或桌面快捷方式'
         elif match_num == 16:  # SL
-            if len(cmd) != 2:
-                return
-            try:
-                self.save_slot(group_id, user_id)
-            except ClanBattleError as e:
-                _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
-                return str(e)
-            _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-            return '已记录SL'
+            if len(cmd) == 2:
+                try:
+                    self.save_slot(group_id, user_id)
+                except ClanBattleError as e:
+                    _logger.info('群聊 失败 {} {} {}'.format(
+                        user_id, group_id, cmd))
+                    return str(e)
+                _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
+                return '已记录SL'
+            elif cmd[2:].strip() in ['?', '？']:
+                sl_ed = self.save_slot(group_id, user_id, only_check=True)
+                if sl_ed:
+                    return '今日已使用SL'
+                else:
+                    return '今日未使用SL'
         elif 20 <= match_num <= 25:
             if len(cmd) != 2:
                 return
