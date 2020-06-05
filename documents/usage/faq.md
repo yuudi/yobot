@@ -92,4 +92,4 @@ chown -R 1000:1000 .
 
 ### 这里没有我的问题
 
-可以在QQ群（{{ [770947581,1044314369,774394459][Math.floor(Math.random()*3)] }}）或[github issue](https://github.com/yuudi/yobot/issues)提问，提问前可以阅读[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)
+可以在QQ群（{{ [770947581,1044314369,1067699252,774394459][Math.floor(Math.random()*3)] }}）或[github issue](https://github.com/yuudi/yobot/issues)提问，提问前可以阅读[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)

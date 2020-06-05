@@ -13,7 +13,7 @@ yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷�
 
 自建方法请参考[安装教程](./install/README.md)
 
-或者加入交流群 {{ [770947581,1044314369,774394459][Math.floor(Math.random()*3)] }}，租用或出租机器人
+或者加入交流群 {{ [770947581,1044314369,1067699252,774394459][Math.floor(Math.random()*3)] }}，租用或出租机器人
 
 ## 功能介绍
 
@@ -32,23 +32,23 @@ yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷�
 
 新版助手提供了一个网页面板，面板上可以进行更多操作
 
-![主面板](https://assets.yobot.win/img/poYvQO.jpg)
+![主面板](https://vs.yixuedh.com/assets/img/yobot/poYvQO.jpg)
 
-![数据面板](https://assets.yobot.win/img/HOh17P.jpg)
+![数据面板](https://vs.yixuedh.com/assets/img/yobot/HOh17P.jpg)
 
 ### 新闻推送
 
 机器人主动发送游戏新闻与活动提醒
 
-![游戏活动提醒](https://assets.yobot.win/img/5bd8d1f5ac68ffde.jpg)
+![游戏活动提醒](https://vs.yixuedh.com/assets/img/yobot/5bd8d1f5ac68ffde.jpg)
 
-![数据面板](https://assets.yobot.win/img/HOh17P.jpg)
+![数据面板](https://vs.yixuedh.com/assets/img/yobot/HOh17P.jpg)
 
 ### 日程查询
 
 机器人主动发送游戏新闻与活动提醒
 
-![游戏活动提醒](https://assets.yobot.win/img/J04GEB.jpg)
+![游戏活动提醒](https://vs.yixuedh.com/assets/img/yobot/J04GEB.jpg)
 
 ### 模拟抽卡
 
@@ -57,7 +57,7 @@ yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷�
 还可以自定义修改卡池
 （怕打扰可以关闭此功能）
 
-![模拟抽卡](https://assets.yobot.win/img/u4OLHH.png)
+![模拟抽卡](https://vs.yixuedh.com/assets/img/yobot/u4OLHH.png)
 
 ### 更多功能
 

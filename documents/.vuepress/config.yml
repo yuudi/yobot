@@ -23,16 +23,30 @@ themeConfig:
       link: /
     - text: 安装方法
       items:
+        - text: 概览
+          link: /install/
         - text: 使用酷Q安装
-          items:
-            - text: 安装教程
-              link: /install/cq/
-            - text: httpapi配置说明
-              link: /install/config/
+          link: /install/cq/
         - text: 使用mirai安装
+          link: /install/mirai/
+        - text: 酷Q
           items:
-            - text: 安装教程
-              link: /install/mirai/
+            - text: Windows 便携版
+              link: /install/Windows-quick-start/
+            - text: Windows 源码部署
+              link: /install/Windows-source/
+            - text: Linux 源码部署
+              link: /install/Linux-source/
+            - text: Docker
+              link: /install/docker/
+            - text: 作为 nonebot 插件部署
+              link: /install/nonebot-plugin/
+        - text: mirai
+          items:
+            - text: Linux 部署
+              link: /install/Linux-cqhttp-mirai/
+            - text: Windows 部署
+              link: /install/Windows-cqhttp-mirai/
     - text: 使用方法
       items:
         - text: 功能表
