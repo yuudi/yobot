@@ -30,6 +30,7 @@ class User(_BaseModel):
     authority_group = IntegerField(default=100)
 
     privacy = IntegerField(default=MAX_TRY_TIMES)   # 密码错误次数
+    clan_group_id = BigIntegerField(null=True)
     last_login_time = BigIntegerField(default=0)
     last_login_ipaddr = IPField(default='0.0.0.0')
     password = FixedCharField(max_length=64, null=True)

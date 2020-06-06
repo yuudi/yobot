@@ -48,8 +48,8 @@
             </el-tooltip>
             {%- else -%}
             {% for group in clan_groups -%}
-            <a href="{{ url_for('yobot_clan', group_id=group.group_id) }}">
-                <el-button type="primary">公会：{{ group.info.group_name }}</el-button>
+            <a href="{{ url_for('yobot_clan', group_id=group['group_id']) }}">
+                <el-button type="primary">公会：{{ group['group_name'] }}</el-button>
             </a>
             {% endfor -%}
             {%- endif %}
