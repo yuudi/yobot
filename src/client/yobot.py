@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.3-beta.3]"
-    Version_id = 194
+    Version = "[v3.6.3-beta.4]"
+    Version_id = 195
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,

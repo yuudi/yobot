@@ -419,8 +419,10 @@ class Login:
             return await render_template(
                 'user.html',
                 user=User.get_by_id(session['yobot_user']),
-                clan_groups=[{'group_id': g.group_id, 'group_name': g.info.group_name}
-                             for g in clan_groups],
+                clan_groups=[{
+                    'group_id': g.group_id,
+                    'group_name': (getattr(getattr(g, 'info', None), 'group_name', None) or g.group_id)
+                } for g in clan_groups],
             )
 
         @app.route(
