@@ -1344,9 +1344,10 @@ class ClanBattle:
                 return '锁定时请留言'
             else:
                 match = re.match(r'^锁定(?:boss)? *(?:[\:：](.*))?$', cmd)
-                if match:
-                    appli_type = 2
-                    extra_msg = match.group(1)
+                if not match:
+                    return
+                appli_type = 2
+                extra_msg = match.group(1)
                 if isinstance(extra_msg, str):
                     extra_msg = extra_msg.strip()
                     if not extra_msg:

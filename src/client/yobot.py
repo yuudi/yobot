@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.3-beta.4]"
-    Version_id = 195
+    Version = "[v3.6.3-rc.1]"
+    Version_id = 196
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -173,6 +173,11 @@ class Yobot:
         self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))
         self.cct2s = OpenCC("t2s")
 
+        # filter
+        self.black_list = set(self.glo_setting["black-list"])
+        self.black_list_group = set(self.glo_setting["black-list-group"])
+        self.white_list_group = set(self.glo_setting["white-list-group"])
+
         # update runtime variables
         self.glo_setting.update({
             "dirname": dirname,
@@ -234,10 +239,15 @@ class Yobot:
                     msg["raw_message"][len(preffix):])
 
         # black-list
-        if msg["sender"]["user_id"] in self.glo_setting["black-list"]:
+        if msg["sender"]["user_id"] in self.black_list:
             return None
-        if msg["message_type"] == "group" and (msg["group_id"] in self.glo_setting["black-list-group"]):
-            return None
+        if msg["message_type"] == "group":
+            if self.glo_setting["white_list_mode"]:
+                if msg["group_id"] not in self.white_list_group:
+                    return None
+            else:
+                if msg["group_id"] in self.black_list_group:
+                    return None
 
         # zht-zhs convertion
         if self.glo_setting.get("zht_in", False):

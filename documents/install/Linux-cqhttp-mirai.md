@@ -51,34 +51,26 @@ sh yobotg.sh
 
 按下 `ctrl-a , c` 连续组合键，新建一个 screen shell
 
-启动 mirai-console
+下载 mirai-console 和 cqhttp-mirai
 
 ```shell
-mkdir -p ~/qqbot/mirai
+mkdir -p ~/qqbot/mirai/plugins/CQHTTPMirai
 cd ~/qqbot/mirai
 
 # 你可以在这里找到最新版本：https://github.com/mamoe/mirai-console-wrapper/releases
 wget https://github.com/mamoe/mirai-console-wrapper/releases/download/1.3.0/mirai-console-wrapper-1.3.0-all.jar
-java -jar mirai-console-wrapper-1.3.0-all.jar
+# 国内可改用 http://yopan.loli.show/mirai-console-wrapper-1.3.0-all.jar
+
+cd plugins
+
+# 你可以在这里找到最新版本：https://github.com/yyuueexxiinngg/cqhttp-mirai/releases
+wget https://github.com/yyuueexxiinngg/cqhttp-mirai/releases/download/0.1.4/cqhttp-mirai-0.1.4-all.jar
+# 国内可改用 http://yopan.loli.show/mirai-plugins/CQHTTPMirai/CQHTTPMirai-0.1.4.jar
 ```
-
-在 mirai-console 里登录 QQ 并下载 CQHTTPMirai 插件
-
-```shell
-# （mirai-console内）
-# 登录 QQ
-login 123456789 ppaasswwdd # 注意改成你的QQ小号的账号密码
-
-# 安装 cqhttp-mirai
-install CQHTTPMirai
-```
-
-按下 `ctrl-a , c` 连续组合键，新建一个 screen shell
 
 修改 CQHTTPMirai 配置文件
 
 ```shell
-mkdir -p ~/qqbot/mirai/plugins/CQHTTPMirai
 cd ~/qqbot/mirai/plugins/CQHTTPMirai
 vi setting.yml
 ```
@@ -99,18 +91,15 @@ vi setting.yml
 # 详细说明请参考 https://github.com/yyuueexxiinngg/cqhttp-mirai
 ```
 
-保存后按下 `ctrl-a , 1` 连续组合键，回到 1 号 shell （即 mirai-console 所在的 shell）
-
-按下 `ctrl-c` 退出 mirai 然后重新启动 mirai 并登录 QQ
-
-<!--
-重新加载插件
+启动 mirai-console 并登录 QQ
 
 ```shell
+cd ~/qqbot/mirai
+java -jar mirai-console-wrapper-1.3.0-all.jar
+
 # （mirai-console内）
-reload
+login 123456789 ppaasswwdd # 注意改成你的QQ小号的账号密码
 ```
--->
 
 部署完成，现在可以按下 `ctrl-a , d` 连续组合键挂起这两个 shell
 

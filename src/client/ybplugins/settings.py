@@ -27,9 +27,15 @@ class Setting:
         async def yobot_setting():
             if 'yobot_user' not in session:
                 return redirect(url_for('yobot_login', callback=request.path))
+            user=User.get_by_id(session['yobot_user'])
+            if user.authority_group >= 10:
+                return await render_template(
+                    'unauthorized.html',
+                    limit='主人',
+                    uath=user.authority_group,
+                )
             return await render_template(
                 'admin/setting.html',
-                user=User.get_by_id(session['yobot_user']),
             )
 
         @app.route(
