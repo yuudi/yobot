@@ -61,7 +61,7 @@ class WebUtil:
 
         if not os.path.exists(os.path.join(self.resource_path, 'background.jpg')):
             try:
-                r = requests.get('http://x.jingzhidh.com/s/background.jpg')
+                r = requests.get('https://i.loli.net/2020/05/31/IirkP9TpnV7Ks6q.jpg')
                 assert r.status_code == 200
                 with open(os.path.join(self.resource_path, 'background.jpg'), 'wb') as f:
                     f.write(r.content)
@@ -95,10 +95,10 @@ class WebUtil:
             if name is None:
                 return jsonify(code=400, message='No name specified')
             try:
-                async with aiohttp.request('GET', url='https://api.v3.yobot.xyz/winname/?name='+name) as response:
+                async with aiohttp.request('GET', url='http://api2.yobot.win/getdomain/?name='+name) as response:
                     if response.status != 200:
                         raise ServerError(
-                            f'http code {response.status} from api.v3.yobot.xyz')
+                            f'http code {response.status} from api2.yobot.win')
                     res = await response.json()
             except:
                 return jsonify(code=401, message='Fail: Connect to Server')

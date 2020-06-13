@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 8  # 目前版本
+_version = 9  # 目前版本
 
 MAX_TRY_TIMES = 3
 
@@ -74,7 +74,7 @@ class Clan_group(_BaseModel):
 
 class Clan_member(_BaseModel):
     group_id = BigIntegerField()
-    qqid = BigIntegerField()
+    qqid = BigIntegerField(index=True)
     role = IntegerField(default=100)
     last_save_slot = IntegerField(null=True)
     remaining_status = TextField(null=True)
@@ -230,6 +230,10 @@ def db_upgrade(old_version):
             migrator.add_column('clan_challenge', 'bid',
                                 IntegerField(default=0)),
             migrator.add_index('clan_challenge', ('bid', 'gid'), False)
+        )
+    if old_version < 9:
+        migrate(
+            migrator.add_index('clan_member', ('qqid',), False)
         )
 
     DB_schema.replace(key='version', value=str(_version)).execute()

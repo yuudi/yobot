@@ -4,6 +4,7 @@ var vm = new Vue({
         setting: {},
         activeNames: [],
         bossSetting: false,
+        domain: '',
         domainApply: false,
         applyName: '',
         loading: false,
@@ -40,6 +41,10 @@ var vm = new Vue({
             });
         },
         sendApply: function (api) {
+            if (this.domain === '') {
+                alert('请选择后缀');
+                return;
+            }
             if (/^[0-9a-z]{1,16}$/.test(this.applyName)) {
                 ;
             } else {
@@ -49,12 +54,12 @@ var vm = new Vue({
             var thisvue = this;
             this.loading = true;
             axios.get(
-                api + '?name=' + thisvue.applyName + '.yobot.xyz'
+                api + '?name=' + thisvue.applyName + thisvue.domain
             ).then(function (res) {
                 thisvue.domainApply = false;
                 if (res.data.code == 0) {
-                    alert('申请成功，请等待3分钟左右解析生效');
-                    thisvue.setting.public_address = thisvue.setting.public_address.replace(/\/\/([^:\/]+)/, '//' + thisvue.applyName + '.yobot.xyz');
+                    alert('申请成功，请等待1分钟左右解析生效');
+                    thisvue.setting.public_address = thisvue.setting.public_address.replace(/\/\/([^:\/]+)/, '//' + thisvue.applyName + thisvue.domain);
                     thisvue.update(null);
                 } else if (res.data.code == 1) {
                     alert('申请失败，此域已被占用');

@@ -20,12 +20,12 @@ if __package__:
     from .ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                             jjc_consult, login, marionette, push_news, settings,
                             switcher, templating, updater, web_util, ybdata,
-                            yobot_msg, custom, miner)
+                            yobot_msg, custom, miner, group_leave)
 else:
     from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
-                           yobot_msg, custom, miner)
+                           yobot_msg, custom, miner, group_leave)
 
 # 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.2_beta]"
-    Version_id = 177
+    Version = "[v3.6.3]"
+    Version_id = 197
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -84,20 +84,15 @@ class Yobot:
                 default_pool_filepath = os.path.join(
                     os.path.dirname(__file__), "packedfiles", "default_pool.json")
             shutil.copyfile(default_pool_filepath, pool_filepath)
-        with open(config_f_path, "r+", encoding="utf-8") as config_file:
+        with open(config_f_path, "r", encoding="utf-8-sig") as config_file:
             cfg = json.load(config_file)
             for k in self.glo_setting.keys():
                 if k in cfg:
                     self.glo_setting[k] = cfg[k]
-            config_file.seek(0)
-            config_file.truncate()
-            json.dump(self.glo_setting, config_file, indent=4)
 
         if verinfo is None:
             verinfo = updater.get_version(self.Version, self.Version_id)
             print(verinfo['ver_name'])
-
-        modified = False
 
         # initialize database
         ybdata.init(os.path.join(dirname, 'yobotdata.db'))
@@ -115,17 +110,16 @@ class Yobot:
                 ipaddr,
                 self.glo_setting["port"],
             )
-            modified = True
+
         if not self.glo_setting["public_address"].endswith("/"):
             self.glo_setting["public_address"] += "/"
-            modified = True
+
         if not self.glo_setting["public_basepath"].startswith("/"):
             self.glo_setting["public_basepath"] = "/" + \
                 self.glo_setting["public_basepath"]
-            modified = True
+
         if not self.glo_setting["public_basepath"].endswith("/"):
             self.glo_setting["public_basepath"] += "/"
-            modified = True
 
         # initialize update time
         if self.glo_setting["update-time"] == "random":
@@ -133,17 +127,14 @@ class Yobot:
                 random.randint(2, 4),
                 random.randint(0, 59)
             )
-            modified = True
 
         # initialize client salt
         if self.glo_setting["client_salt"] is None:
             self.glo_setting["client_salt"] = web_util.rand_string(16)
-            modified = True
 
         # save initialization
-        if modified:
-            with open(config_f_path, "w", encoding="utf-8") as config_file:
-                json.dump(self.glo_setting, config_file, indent=4)
+        with open(config_f_path, "w", encoding="utf-8") as config_file:
+            json.dump(self.glo_setting, config_file, indent=4)
 
         # initialize utils
         templating.Ver = self.Version[2:-1]
@@ -181,6 +172,11 @@ class Yobot:
         # openCC
         self.ccs2t = OpenCC(self.glo_setting.get("zht_out_style", "s2t"))
         self.cct2s = OpenCC("t2s")
+
+        # filter
+        self.black_list = set(self.glo_setting["black-list"])
+        self.black_list_group = set(self.glo_setting["black-list-group"])
+        self.white_list_group = set(self.glo_setting["white-list-group"])
 
         # update runtime variables
         self.glo_setting.update({
@@ -221,6 +217,7 @@ class Yobot:
         # load new plugins
         self.plug_new = [
             miner.Miner(**kwargs),
+            group_leave.GroupLeave(**kwargs),
             custom.Custom(**kwargs),
         ]
 
@@ -242,10 +239,15 @@ class Yobot:
                     msg["raw_message"][len(preffix):])
 
         # black-list
-        if msg["sender"]["user_id"] in self.glo_setting["black-list"]:
+        if msg["sender"]["user_id"] in self.black_list:
             return None
-        if msg["message_type"] == "group" and (msg["group_id"] in self.glo_setting["black-list-group"]):
-            return None
+        if msg["message_type"] == "group":
+            if self.glo_setting["white_list_mode"]:
+                if msg["group_id"] not in self.white_list_group:
+                    return None
+            else:
+                if msg["group_id"] in self.black_list_group:
+                    return None
 
         # zht-zhs convertion
         if self.glo_setting.get("zht_in", False):

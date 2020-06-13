@@ -16,7 +16,7 @@
 
 ### 第一步
 
-点击下载[酷Q-httpapi 整合包](http://download.yobot.xyz/tools/CoolQ_With_Httpapi.7z)
+点击下载[酷Q-httpapi 整合包](https://vs.yixuedh.com/downloads/yobot/CoolQ_With_Httpapi.7z)
 
 解压后双击“CQA.exe”，输入账号密码（注意账号风险，请勿使用重要的QQ号）
 
@@ -24,7 +24,7 @@
 
 启动 httpapi 插件后会反复出现如下的提示
 
-![httpapi启用图片](https://assets.yobot.win/img/8ba6b840bab3ac25.jpg)
+![httpapi启用图片](https://vs.yixuedh.com/assets/img/yobot/8ba6b840bab3ac25.jpg)
 
 ### 第二步
 
@@ -32,7 +32,7 @@
 
 解压后双击“yobot.exe”启动服务，双方通信成功后出现如下的提示
 
-![windows下正确yobot与httpapi成功通信](https://assets.yobot.win/img/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://vs.yixuedh.com/assets/img/yobot/8179fdd1e46690b2.jpg)
 
 ### 验证安装
 

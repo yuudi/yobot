@@ -363,7 +363,7 @@ var vm = new Vue({
                         label: {
                             formatter: params => {
                                 if (params.axisDimension === "x") {
-                                    return (new Date(params.value)).toLocaleString();
+                                    return (new Date(params.value)).toLocaleString(options = { timeZone: 'asia/shanghai' });
                                 }
                                 if (params.axisDimension === "y") {
                                     return params.value.toLocaleString();
@@ -376,7 +376,7 @@ var vm = new Vue({
                         const series = params[0];
                         const [ts, value] = series.data;
                         const matched = temp6[1].find(f => (!f.gte || f.gte  <= ts) && (!f.lt || f.lt > ts));
-                        return `${(new Date(ts)).toLocaleString()}<br />${series.marker}${(matched && matched.label) + "<br />" || ""}血量：${value.toLocaleString()}`
+                        return `${(new Date(ts)).toLocaleString(options = { timeZone: 'asia/shanghai' })}<br />${series.marker}${(matched && matched.label) + "<br />" || ""}血量：${value.toLocaleString()}`
                     }
                 },
                 toolbox: {
@@ -1078,7 +1078,7 @@ var vm = new Vue({
         },
 
         getPlayer: function(qqid) {
-            return this.members.find(o => o.qqid === qqid) ?? {nickname:'未加入',qqid:qqid,sl:null};
+            return this.members.find(o => o.qqid === qqid) || {nickname:'未加入',qqid:qqid,sl:null};
         },
 
         playerDamage: function(playerQQid) {

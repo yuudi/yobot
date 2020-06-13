@@ -6,7 +6,7 @@
 
 Linux 用户可以使用 Docker 部署，具体请看[这里](./docker.md)。
 
-Linux 用户可以使用 mirai 部署（测试中），具体请看[这里](./mirai.md)。
+Linux 用户可以使用 mirai 部署，具体请看[这里](./Linux-cqhttp-mirai.md)。
 
 **Linux运行存在问题较多，不推荐使用**，如果你坚持使用Linux来部署机器人，可以参考本文步骤。
 
@@ -46,7 +46,7 @@ Linux 用户可以使用 mirai 部署（测试中），具体请看[这里](./mi
 
 配置正确后，启动 httpapi 插件后会反复出现如下都提示
 
-![配置正确图片](https://assets.yobot.win/img/8ba6b840bab3ac25.jpg)
+![配置正确图片](https://vs.yixuedh.com/assets/img/yobot/8ba6b840bab3ac25.jpg)
 
 ## 运行 yobot 服务
 
@@ -88,9 +88,9 @@ sh yobotg.sh  # 如果python的路径不是python3，请手动修改这个脚本
 
 如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
 
-![windows下正确启动图](https://assets.yobot.win/img/aaf38d1a5cbc1c87.jpg)
+![windows下正确启动图](https://vs.yixuedh.com/assets/img/yobot/aaf38d1a5cbc1c87.jpg)
 
-![windows下正确yobot与httpapi成功通信](https://assets.yobot.win/img/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://vs.yixuedh.com/assets/img/yobot/8179fdd1e46690b2.jpg)
 
 ### 验证安装
 

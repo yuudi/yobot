@@ -33,22 +33,26 @@
             <a href="{{ url_for('yobot_user_info', qqid=user.qqid) }}">
                 <el-button type="primary">个人中心</el-button>
             </a>
-            {% if user.clan_group_id is none -%}
-            <el-tooltip effect="dark" placement="bottom">
-                <div slot="content">你还没有选择默认公会<br />请在你的公会群里发送“加入公会”来设置默认公会</div>
-                <el-button type="primary" disabled>无公会</el-button>
-            </el-tooltip>
-            {%- else -%}
-            <a href="{{ url_for('yobot_clan', group_id=user.clan_group_id) }}">
-                <el-button type="primary">我的公会</el-button>
-            </a>
-            {%- endif %}
             <a href="{{ url_for('yobot_reset_pwd') }}">
                 <el-button type="primary">修改密码</el-button>
             </a>
             <a href="{{ url_for('yobot_logout') }}">
                 <el-button type="primary">登出</el-button>
             </a>
+        </el-row>
+        <el-row>
+            {% if not clan_groups -%}
+            <el-tooltip effect="dark" placement="bottom">
+                <div slot="content">你还没有选择默认公会<br />请在你的公会群里发送“加入公会”来设置默认公会</div>
+                <el-button type="primary" disabled>无公会</el-button>
+            </el-tooltip>
+            {%- else -%}
+            {% for group in clan_groups -%}
+            <a href="{{ url_for('yobot_clan', group_id=group['group_id']) }}">
+                <el-button type="primary">公会：{{ group['group_name'] }}</el-button>
+            </a>
+            {% endfor -%}
+            {%- endif %}
         </el-row>
     </div>
     <p><a href="{{ url_for('yobot_about') }}">关于yobot</a></p>

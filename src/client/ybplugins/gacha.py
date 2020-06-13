@@ -169,12 +169,15 @@ class Gacha:
         if today != last_day:
             last_day = today
             day_times = 0
+        if day_limit != 0 and day_times+20 > day_limit:
+            return "{}今天剩余抽卡次数不足30次，不能抽一井".format(nickname, day_times)
         reply = ""
         result = ""
-        flag = False
+        flag_fully_30_times = True
         for i in range(1, 31):
             if day_limit != 0 and day_times >= day_limit:
                 reply += "{}抽到第{}发十连时已经达到今日抽卡上限，抽卡结果:".format(nickname, i)
+                flag_fully_30_times = False
                 break
             single_result = self.result()
             times += 1
@@ -184,12 +187,10 @@ class Gacha:
                     info[char] += 1
                     if self.check_ssr(char):
                         result += "\n{}({})".format(char, info[char])
-                        flag = True
                 else:
                     info[char] = 1
                     if self.check_ssr(char):
                         result += "\n{}(new)".format(char)
-                        flag = True
         sql_info = pickle.dumps(info)
         if mem_exists:
             db.execute("UPDATE Colle SET colle=?, times=?, last_day=?, day_times=? WHERE qqid=?",
@@ -198,9 +199,12 @@ class Gacha:
             db.execute("INSERT INTO Colle (qqid,colle,times,last_day,day_times) VALUES(?,?,?,?,?)",
                        (qqid, sql_info, times, last_day, day_times))
         if not result:
-            reply = "{}太非了，本次下井没有抽到ssr。".format(nickname)
+            if flag_fully_30_times:
+                reply += "\n{}太非了，本次下井没有抽到ssr。".format(nickname)
+            else:
+                reply += "\n本次没有抽到ssr。".format(nickname)
             return reply
-        if flag:
+        if flag_fully_30_times:
             reply += "{}本次下井结果：".format(nickname)
         reply += result
         db_conn.commit()
@@ -219,8 +223,8 @@ class Gacha:
         db = db_conn.cursor()
         sql_info = list(db.execute(
             "SELECT colle FROM Colle WHERE qqid=?", (qqid,)))
-        db_conn.close()
         if len(sql_info) != 1:
+            db_conn.close()
             return nickname + "的仓库为空"
         colle = pickle.loads(sql_info[0][0])
         more_colle = []
@@ -228,8 +232,10 @@ class Gacha:
             sql_info = list(db.execute(
                 "SELECT colle FROM Colle WHERE qqid=?", (other_qq,)))
             if len(sql_info) != 1:
-                return "[CQ:at,qq={}]的仓库为空".format(other_qq)
+                db_conn.close()
+                return "[CQ:at,qq={}] 的仓库为空".format(other_qq)
             more_colle.append(pickle.loads(sql_info[0][0]))
+        db_conn.close()
         if not os.path.exists(os.path.join(self.setting["dirname"], "temp")):
             os.mkdir(os.path.join(self.setting["dirname"], "temp"))
         showed_colle = set(colle)
@@ -239,7 +245,7 @@ class Gacha:
         showdata["header"] = ["角色", nickname]
         for memb in moreqq_list:
             try:
-                membinfo = await self.bot_api.get_stranger_info(memb)
+                membinfo = await self.bot_api.get_stranger_info(user_id=memb)
                 showdata["header"].append(membinfo["nickname"])
             except:
                 showdata["header"].append(str(memb))

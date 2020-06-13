@@ -38,13 +38,6 @@ mirai 尚未稳定，稳定后本站会发布教程和一键安装包。如果�
 
 ## yobot 问题
 
-### yobot 对国服的支持情况
-
-公会战：支持  
-竞技场：不支持  
-新闻推送：支持  
-活动日程：支持  
-
 ### 机器人提供的网站无法登录
 
 请参考[无法打开网页](./cannot-open-webpage.md)
@@ -104,4 +97,5 @@ chown -R 1000:1000 .
 
 ### 这里没有我的问题
 
-可以在[这里](https://github.com/yuudi/yobot/issues)提问，提问前**建议阅读**[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)和[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/master/README-zh_CN.md)
+可以在QQ群（{{ [770947581,1044314369,1067699252,774394459][Math.floor(Math.random()*4)] }}）或[这里](https://github.com/yuudi/yobot/issues)提问，提问前**建议阅读**[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)和[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/master/README-zh_CN.md)
+

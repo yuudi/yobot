@@ -1,21 +1,21 @@
 # 使用 mirai 运行
 
-:::warning
-
-- mirai 尚未稳定，API 随时可能更改，如有顾虑请[使用酷Q安装](./cq.md)
-
-:::
-
 [mirai 项目地址](https://github.com/mamoe/mirai)
 
-## 使用 yobot-mirai 运行（推荐）
+yobot 原生于 cqhttp，利用[cqhttp-mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)可以直接在 mirai 内使用 yobot
+
+## Windows 部署
+
+[编写中……](./Windows-cqhttp-mirai.md)
+
+## Linux 部署
+
+利用 [mirai-console-wrapper](https://github.com/mamoe/mirai-console) 部署命令行操作
+
+[详细说明](./Linux-cqhttp-mirai.md)
+
+## Android 部署
+
+利用 [mirai-Andriod](https://github.com/mzdluo123/MiraiAndroid) 与 [Qpython](https://play.google.com/store/apps/details?id=org.qpython.qpy3) 将 yobot 部署到安卓手机上
 
 编写中……
-
-[参考链接](https://github.com/yyuueexxiinngg/yobot-mirai)
-
-## 使用 mirai-native 运行
-
-编写中……
-
-[参考链接](https://github.com/iTXTech/mirai-native)
