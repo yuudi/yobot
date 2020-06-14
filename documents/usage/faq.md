@@ -78,18 +78,24 @@ yobot 自动添加第一个登录的用户为最高权限，如果需要手动�
 Nginx: `proxy_set_header X-Real-IP $remote_addr;`  
 Apache: `RemoteIPHeader X-Real-IP`
 
-### 使用docker-compose运行后提示 " [Errno 13] Permission denied: 'yobotg.sh' "
+### 使用docker-compose运行后提示 "[Errno 13] Permission denied: 'yobotg.sh'"
 
-请参考[Docker部署](../install/docker.md)，
-此类情况均是由 root 账户直接运行 docker 实例造成的。
-在源码根目录中执行：
-
-```shell
+请参考[Docker部署](../install/docker.md)  
+此类情况均是由root账户直接运行docker实例造成的。  
+在源码根目录中执行：  
+```shell script
 chown -R 1000:1000 .
 ```
+以解决该问题。  
 
-以解决该问题。
+### 运行时提示“存在未提交的修改”
+
+此类情况大部分来自于**直接修改Yobot源码**的行为。  
+按照教程复制更改的配置文件（.env,yobot_data）不属于源码。  
+具体有哪些文件不属于源码，请参照根目录下的 .gitignore 文件。  
+如果您主动修改了源码以执行部分额外功能，请参照[如何在本地提交Commit](https://github.com/yuudi/yobot/issues/136#issuecomment-635958636)以取消该提示。
 
 ### 这里没有我的问题
 
-可以在QQ群（{{ [770947581,1044314369,1067699252,774394459][Math.floor(Math.random()*4)] }}）或[github issue](https://github.com/yuudi/yobot/issues)提问，提问前可以阅读[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)
+可以在QQ群（{{ [770947581,1044314369,1067699252,774394459][Math.floor(Math.random()*4)] }}）或[这里](https://github.com/yuudi/yobot/issues)提问，提问前**建议阅读**[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)和[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/master/README-zh_CN.md)
+

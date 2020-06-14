@@ -54,7 +54,10 @@ Linux 用户可以使用 mirai 部署，具体请看[这里](./Linux-cqhttp-mira
 
 源码运行需要使用 git 作为版本管理和更新工具，如果没有使用过 git 可以阅读：[git官网](https://git-scm.com/)，[git教程](https://www.runoob.com/git/git-tutorial.html)
 
-确保python版本至少为3.6
+推荐使用Python版本为[Python3.7](https://www.python.org/downloads/release/python-377/)  
+您**仍然可以**继续使用Linux预装的*Python3.6*运行Yobot源码。  
+如何在Linux上安装多版本Python，请自行询问搜索引擎。  
+请注意，[Python版本过高可能导致包不兼容](https://github.com/yuudi/yobot/issues/158#issuecomment-643633908)。
 
 下载源码 `git clone https://github.com/yuudi/yobot.git`
 
