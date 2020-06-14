@@ -20,12 +20,12 @@ if __package__:
     from .ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                             jjc_consult, login, marionette, push_news, settings,
                             switcher, templating, updater, web_util, ybdata,
-                            yobot_msg, custom, miner, group_leave)
+                            yobot_msg, custom, miner, group_leave, gacha_new)
 else:
     from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
-                           yobot_msg, custom, miner, group_leave)
+                           yobot_msg, custom, miner, group_leave, gacha_new)
 
 # 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -84,6 +84,15 @@ class Yobot:
                 default_pool_filepath = os.path.join(
                     os.path.dirname(__file__), "packedfiles", "default_pool.json")
             shutil.copyfile(default_pool_filepath, pool_filepath)
+        gacha_new_filepath = os.path.join(dirname, "gacha_new_config.json")
+        if not os.path.exists(gacha_new_filepath):
+            if is_packaged:
+                default_gacha_new_filepath = os.path.join(
+                    sys._MEIPASS, "packedfiles", "default_gacha_new_config.json")
+            else:
+                default_gacha_new_filepath = os.path.join(
+                    os.path.dirname(__file__), "packedfiles", "default_gacha_new_config.json")
+            shutil.copyfile(default_gacha_new_filepath, gacha_new_filepath)
         with open(config_f_path, "r", encoding="utf-8-sig") as config_file:
             cfg = json.load(config_file)
             for k in self.glo_setting.keys():
@@ -218,6 +227,7 @@ class Yobot:
         self.plug_new = [
             miner.Miner(**kwargs),
             group_leave.GroupLeave(**kwargs),
+            gacha_new.GachaNew(**kwargs),
             custom.Custom(**kwargs),
         ]
 

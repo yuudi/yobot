@@ -17,6 +17,7 @@
     "update-time": "random",
     "clan_battle_mode": "web",
     "show_jjc_solution": "url",
+    "gacha_new_on": false,
     "gacha_on": false,
     "gacha_private_on": false,
     "jjc_search": "nomae.net",

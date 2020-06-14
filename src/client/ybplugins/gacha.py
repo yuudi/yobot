@@ -25,6 +25,9 @@ class Gacha:
 
     def __init__(self, glo_setting: dict, bot_api, *args, **kwargs):
         self.setting = glo_setting
+        if self.setting.get("gacha_new_on", False):
+           self.Active = False
+           return
         self.bot_api = bot_api
         self.pool_file_path = os.path.join(
             self.setting["dirname"], "pool3.json")

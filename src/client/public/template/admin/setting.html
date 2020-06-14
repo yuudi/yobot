@@ -140,6 +140,7 @@
       <el-form-item label="模拟抽卡">
         <el-checkbox v-model="setting.gacha_on">允许群聊抽卡</el-checkbox>
         <el-checkbox v-model="setting.gacha_private_on">允许私聊抽卡</el-checkbox>
+        <el-checkbox v-model="setting.gacha_new_on">使用新版抽卡</el-checkbox>
       </el-form-item>
       <el-form-item label="竞技场查询">
         <el-select v-model="setting.jjc_search">
@@ -222,7 +223,9 @@
       </el-collapse>
     </p>
     <p>
-      <a href="{{ url_for('yobot_pool_setting') }}">前往卡池设置</a>
+      <a href="{{ url_for('yobot_pool_setting') }}">前往旧版抽卡卡池设置</a>
+      <br>
+      <a v-show="setting.gacha_new_on" href="{{ url_for('gacha_new_config_html') }}">前往新版抽卡卡池设置</a>
     </p>
     <p>
       <el-button type="success" @click="update">确定</el-button>

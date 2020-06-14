@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>自定义奖池</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+</head>
+
+<body>
+    <p><a href="../">返回</a></p>
+    <p>所有概率都是相对值，即：抽取率 = 当前子奖池概率 ÷ 当前卡池的所有子奖池总概率 </p>
+    <hr>
+    <div id="app">
+        <div>
+            <h2>全局设置</h2>
+            <label>新用户钻石数：<input v-model.number="config.settings.new_jewels_count" /></label><br>
+            <label>每日钻石赠送数：<input v-model.number="config.settings.daily_jewels_count" /></label><br>
+            额外卡池管理员 QQ 号：（拥有修改卡池和充值的权限，机器人主人已包括在内无需额外填写）<br>
+            <input v-for="(item, ikey) in config.settings.extra_gacha_admin_qqid"
+                v-model="config.settings.extra_gacha_admin_qqid[ikey]" placeholder="请输入QQ号" />
+            <button @click="config.settings.extra_gacha_admin_qqid.push(null)">添加</button>
+            <button @click="config.settings.extra_gacha_admin_qqid.pop()">删除</button>
+        </div>
+        <br>
+        <hr>
+        <div v-for="(pool, index) in config.pools">
+            <h2>卡池：[[ pool.name ]]</h2>
+            <button
+                @click="let copy = JSON.parse(JSON.stringify(pool)); copy.name += '（复制）'; config.pools.push(copy);">复制卡池</button>
+            <button @click="$delete(config.pools, index)">删除卡池</button>
+            <br>
+            <label>名称：<input v-model="pool.name" /></label><br>
+            <label>简介：<input v-model="pool.describe" /></label><br>
+            <label>正则表达式：<input v-model="pool.regex" /></label><br>
+            <label>默认卡池：<input type="radio" name="default_pool" v-bind:value="pool.name" v-bind:checked="pool.name === config.settings.default_pool" @click="config.settings.default_pool = pool.name"></label>
+            <h4>子奖池：</h4>
+            <div style="margin-left: 2%;" v-for="(p, pindex) in pool.sub_pools">
+                <button @click="$delete(pool.sub_pools, pindex)">删除子奖池</button><br>
+                <label>子池名称：<input v-model="p.name" /></label><br>
+                <label>单抽概率：<input v-model.number="p.prob" /></label><br>
+                <label>保底抽概率：<input v-model.number="p.last_prob" /></label><br>
+                星级：<label v-for="i in [1, 2, 3]" ><input type="radio" v-bind:name="String(index) + '_' + String(pindex)" v-bind:value="i" v-model="p.star"/>[[i]]</label><br>
+                <label>UP: <input type="checkbox" v-model="p.is_up" /></label><br>
+                角色:<br><input v-for="(item, ikey) in p.charas" v-model="p.charas[ikey]" placeholder="请输入角色名" />
+                <button @click="p.charas.push(null)">添加</button>
+                <button @click="p.charas.pop()">删除</button>
+                <br><br><hr><br>
+            </div>
+            <button
+                @click="pool.sub_pools.push(JSON.parse(JSON.stringify(default_pool.sub_pools[0])))">添加子奖池</button><br>
+            <hr>
+        </div>
+        <br><br>
+        <button @click="config.pools.push(JSON.parse(JSON.stringify(default_pool)))">添加卡池</button>
+        <br><br><br>
+        <button @click="update">保存</button>
+    </div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        created() {
+            var thisvue = this;
+            axios.get(thisvue.config_path).then(function (res) {
+                thisvue.config = res.data;
+            }).catch(function (error) {
+                res = error.response;
+                if (res) {
+                    alert(`配置获取失败：${res.data} (${res.status})`)
+                }
+                else {
+                    alert(`配置获取失败：${error.message}`)
+                }
+            });
+        },
+        methods: {
+            update: function () {
+                this.config.settings.default_pool = document.querySelector('input[name="default_pool"]:checked').value;
+                var thisvue = this;
+                axios.post(thisvue.config_path, thisvue.config, {
+                    headers: {
+                        "X-CSRF-TOKEN": thisvue.csrf_token
+                    }
+                }).then(function (res) {
+                        alert('新的设置已生效');
+                }).catch(function (error) {
+                    res = error.response;
+                    if (res) {
+                        alert(`设置失败：${res.data} (${res.status})`)
+                    }
+                    else {
+                        alert(`设置失败：${error.message}`)
+                    }
+                });
+            },
+        },
+        data: {
+            default_pool: {
+                name: "请输入卡池名",
+                describe: "",
+                regex: "",
+                sub_pools: [{
+                    name: "请输入子奖池名",
+                    prob: 0,
+                    last_prob: 0,
+                    star: 1,
+                    charas: []
+                }]
+            },
+            config_path: "{{ url_for('gacha_new_config_json') }}",
+            csrf_token: "{{ session['csrf_token'] }}",
+            config: null,
+        },
+        delimiters: ['[[', ']]'],
+    })
+</script>
+
+</html>
