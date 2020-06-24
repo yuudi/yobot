@@ -3,7 +3,7 @@
 建议购买一台阿里云Ubuntu 18.04(linux) 云服务器来运行。  
 最低配置1核2GB。  
 
-::: Warning
+::: warning
 
 本文只适用于在**Linux**下部署的情况。  
 **Windows系统下部署**，建议参考[Windows源码部署](./Windows-source.md)。  

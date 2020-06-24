@@ -10,4 +10,4 @@
 
 进入httpapi的`<应用目录/config/<general|qq号>.json`（如下图），将其中 `access_token` 修改为刚才一样的字符串
 
-![httpapi配置文件](https://vs.yixuedh.com/assets/img/yobot/f6772ec9.png)
+![httpapi配置文件](https://img.yobot.win/yobot/f6772ec9.png)

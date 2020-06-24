@@ -9,14 +9,14 @@
 [阿里云学生服务器](https://promotion.aliyun.com/ntms/act/campus2018.html)（24岁以下自动获得学生身份）  
 [腾讯云学生服务器](https://cloud.tencent.com/act/campus)（25岁以下自动获得学生身份）
 
-## 国外免费服务器
+## 境外免费服务器
 
 稳定性好，可以访问外网资源，需要外币信用卡验证
 
 [甲骨文永久免费](https://www.oracle.com/cloud/free/)  
 [谷歌云永久免费](https://console.cloud.google.com/freetrial)
 
-## 国外便宜服务器
+## 境外便宜服务器
 
 一些口碑比较好的：
 
@@ -42,5 +42,5 @@
 ## 域名购买
 
 国内域名商：[腾讯dnspod](https://dnspod.cloud.tencent.com/)、[阿里万网](https://wanwang.aliyun.com/domain/)  
-国外域名商：[namesilo](https://namesilo.com/)、[porkbun](https://porkbun.com/)  
+境外域名商：[namesilo](https://namesilo.com/)、[porkbun](https://porkbun.com/)  
 免费域名：[freenom](https://www.freenom.com)（条款严格）

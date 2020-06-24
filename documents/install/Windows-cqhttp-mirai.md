@@ -10,19 +10,19 @@
 
 解压后双击“yobot.exe”启动服务
 
-![windows下正确启动图](https://vs.yixuedh.com/assets/img/yobot/aaf38d1a5cbc1c87.jpg)
+![windows下正确启动图](https://img.yobot.win/yobot/aaf38d1a5cbc1c87.jpg)
 
 ### 部署 mirai
 
-下载[mirai-installer](https://yobot.lanzous.com/id6owid)，并安装
+下载 miraiOK  
+[miraiOK 64位](http://t.imlxy.net:64724/mirai/MiraiOK/miraiOK_windows_amd64.exe)
+[miraiOK 32位](http://t.imlxy.net:64724/mirai/MiraiOK/miraiOK_windows_386.exe)
 
-启动 mirai
+双击启动 miraiOK
 
-在 mirai 控制台里登录 QQ `login 123456789 ppaasswwdd`
+下载 [CQHTTPMirai.jar](http://yopan.loli.show/mirai-plugins/CQHTTPMirai/CQHTTPMirai-0.1.4.jar) 并放在 `.\plugins` 目录里
 
-在 mirai 控制台里安装 cqhttp-mirai `install CQHTTPMirai`
-
-CQHTTPMirai 配置文件在 `mirai\plugins\CQHTTPMirai\setting.yml`，修改配置文件如下（注意修改 QQ 号）
+新建 CQHTTPMirai 配置文件在 `.\plugins\CQHTTPMirai\setting.yml`，修改配置文件如下（注意修改 QQ 号）
 
 ```yaml
 # 要进行配置的QQ号 (Mirai支持多帐号登录, 故需要对每个帐号进行单独设置)
@@ -38,11 +38,9 @@ CQHTTPMirai 配置文件在 `mirai\plugins\CQHTTPMirai\setting.yml`，修改配�
 # 详细说明请参考 https://github.com/yyuueexxiinngg/cqhttp-mirai
 ```
 
-重新启动 mirai 并登录
+重新启动 miraiOK 并登录
 
-<!--
-在 mirai 控制台里重新加载插件 `reload`
--->
+在 mirai 控制台里登录 QQ `login 1234567890 ppaasswwdd`
 
 部署完成
 

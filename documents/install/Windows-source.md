@@ -20,11 +20,11 @@
 #### Windows 使用
 
 yobot 三代基于酷Q机器人和 httpapi 插件实现
-如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](http://vs.yixuedh.com/downloads/yobot/CoolQ_With_Httpapi.7z)
+如果你第一次使用酷Q机器人，可以直接下载[酷Q-httpapi 整合包](https://yobot.lanzous.com/iXsLmdsixkh)
 
-如果你已经使用过酷Q机器人，可以下载[httpapi 插件](http://vs.yixuedh.com/downloads/yobot/Packed_httpapi.7z)
+如果你已经使用过酷Q机器人，可以下载[httpapi 插件](https://yobot.lanzous.com/iQentdsixif)
 
-如果你已经使用过 httpapi 插件，或者想额外开启一个 httpapi 插件，可以下载[httpapi 插件分身版](http://vs.yixuedh.com/downloads/yobot/mirror_of_httpapi.7z)
+如果你已经使用过 httpapi 插件，或者想额外开启一个 httpapi 插件，可以下载[httpapi 插件分身版](https://yobot.lanzous.com/iS5JSdsixli)
 
 ### 环境搭建
 
@@ -42,7 +42,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 配置正确后，启动 httpapi 插件后会反复出现如下都提示
 
-![配置正确图片](https://vs.yixuedh.com/assets/img/yobot/8ba6b840bab3ac25.jpg)
+![配置正确图片](https://img.yobot.win/yobot/8ba6b840bab3ac25.jpg)
 
 ## 运行yobot服务
 
@@ -50,9 +50,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 源码运行需要使用git作为版本管理和更新工具，如果没有使用过git可以阅读：[git官网](https://git-scm.com/)，[git教程](https://www.runoob.com/git/git-tutorial.html)
 
-推荐使用Python版本为[Python3.7](https://www.python.org/downloads/release/python-377/)  
-**极其不推荐**使用Windows商店自带Python，建议从官网下载可执行文件进行安装。  
-请注意，[Python版本过高可能导致包不兼容](https://github.com/yuudi/yobot/issues/158#issuecomment-643633908)。
+确保 python 版本至少为 3.6
 
 下载源码 `git clone https://github.com/yuudi/yobot.git`
 
@@ -69,9 +67,9 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
 
-![windows下正确启动图](https://vs.yixuedh.com/assets/img/yobot/aaf38d1a5cbc1c87.jpg)
+![windows下正确启动图](https://img.yobot.win/yobot/aaf38d1a5cbc1c87.jpg)
 
-![windows下正确yobot与httpapi成功通信](https://vs.yixuedh.com/assets/img/yobot/8179fdd1e46690b2.jpg)
+![windows下正确yobot与httpapi成功通信](https://img.yobot.win/yobot/8179fdd1e46690b2.jpg)
 
 ### 验证安装
 
