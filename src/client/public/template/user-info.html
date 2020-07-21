@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
-{% if user.qqid != visitor and visitor.authority_group >= 100 %}{# 不是本人且不是管理员 -#}
+{% if user.qqid != visitor.qqid and visitor.authority_group >= 100 %}{# 不是本人且不是管理员 -#}
 <body>
     <h1>yobot用户信息</h1>
     <p>你无权查看这个页面</p>
