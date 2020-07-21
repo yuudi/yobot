@@ -1,5 +1,15 @@
 # Linux 源码运行
 
+::: tip
+
+阅读此章节前，您需要了解：
+
+- Linux 基本用法
+- docker
+- git
+
+:::
+
 由于 酷Q 机器人原生于 Windows 系统，所以 Linux 上运行只能使用 wine（类似于虚拟机）来运行 酷Q，使用 Docker 可以直接部署。  
 
 由于 wine 与原生 Windows 差别较大，很多 酷Q 插件无法在 wine 中运行。
@@ -56,7 +66,7 @@ Linux 用户可以使用 mirai 部署，具体请看[这里](./Linux-cqhttp-mira
 
 确保 python 版本至少为 3.6
 
-下载源码 `git clone https://github.com/yuudi/yobot.git`
+下载源码 `git clone https://github.com/pcrbot/yobot.git`
 
 或者使用国内源 `git clone https://gitee.com/yobot/yobot.git`
 

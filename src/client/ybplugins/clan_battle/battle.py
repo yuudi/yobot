@@ -172,7 +172,7 @@ class ClanBattle:
         except Exception as e:
             _logger.exception('获取群成员列表错误'+str(type(e))+str(e))
             asyncio.ensure_future(self.api.send_group_msg(
-                group_id=group_id, message='获取群成员错误，这可能是缓存问题，请稍后再试'))
+                group_id=group_id, message='获取群成员错误，这可能是缓存问题，请重启酷Q后再试'))
             return []
         return group_member_list
 

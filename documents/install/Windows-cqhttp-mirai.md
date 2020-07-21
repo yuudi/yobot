@@ -1,4 +1,4 @@
-# Windows 使用 cqhttp-mirai 部署（测试）
+# Windows 使用 cqhttp-mirai 部署
 
 ## 部署过程
 
@@ -20,7 +20,7 @@
 
 双击启动 miraiOK
 
-下载 [CQHTTPMirai.jar](http://yopan.loli.show/mirai-plugins/CQHTTPMirai/CQHTTPMirai-0.1.4.jar) 并放在 `.\plugins` 目录里
+下载 [CQHTTPMirai.jar](https://github.com/yyuueexxiinngg/cqhttp-mirai/releases/download/0.1.4/cqhttp-mirai-0.1.4-all.jar) 并放在 `.\plugins` 目录里
 
 新建 CQHTTPMirai 配置文件在 `.\plugins\CQHTTPMirai\setting.yml`，修改配置文件如下（注意修改 QQ 号）
 

@@ -14,7 +14,7 @@ themeConfig:
   search: true
   searchMaxSuggestions: 10
   smoothScroll: true
-  repo: https://github.com/yuudi/yobot
+  repo: https://github.com/pcrbot/yobot
   docsDir: documents
   editLinks: true
   editLinkText: 编辑此页面
@@ -46,7 +46,7 @@ themeConfig:
             - text: Linux 部署
               link: /install/Linux-cqhttp-mirai/
             - text: Windows 部署
-              link: /install/Windows-cqhttp-mirai/
+              link: /install/Windows-mirai-auto/
     - text: 使用方法
       items:
         - text: 功能表

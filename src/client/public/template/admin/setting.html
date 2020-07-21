@@ -131,9 +131,9 @@
         <el-input v-model="setting['update-time']" placeholder="03:30"></el-input>
       </el-form-item>
       <el-form-item label="公会战记录">
-        <el-radio v-model="setting.clan_battle_mode" label="chat" @change="comfirm_change_clan_mode">使用旧版（仅聊天）
+        <el-radio v-model="setting.clan_battle_mode" label="chat" @change="comfirm_change_clan_mode" hidden>使用旧版（仅聊天）
         </el-radio>
-        <el-radio v-model="setting.clan_battle_mode" label="web" @change="comfirm_change_clan_mode">使用新版（聊天+网站）
+        <el-radio v-model="setting.clan_battle_mode" label="web" @change="comfirm_change_clan_mode">使用（聊天+网站）
         </el-radio>
         <el-radio v-model="setting.clan_battle_mode" label="none">关闭</el-radio>
       </el-form-item>

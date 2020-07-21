@@ -6,7 +6,7 @@ yobot 原生于 cqhttp，利用[cqhttp-mirai](https://github.com/yyuueexxiinngg/
 
 ## Windows 部署
 
-[编写中……](./Windows-cqhttp-mirai.md)
+[自动部署脚本](./Windows-mirai-auto.md)
 
 ## Linux 部署
 

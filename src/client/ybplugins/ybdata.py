@@ -92,7 +92,7 @@ class Clan_challenge(_BaseModel):
     challenge_pcrtime = IntegerField()
     boss_cycle = SmallIntegerField()
     boss_num = SmallIntegerField()
-    boss_health_ramain = BigIntegerField()
+    boss_health_ramain = BigIntegerField()  # MMP拼错了，没法改了
     challenge_damage = BigIntegerField()
     is_continue = BooleanField()  # 此刀是结余刀
     message = TextField(null=True)

@@ -1,4 +1,15 @@
 # 使用Docker启动yobot
+
+::: tip
+
+阅读此章节前，您需要了解：
+
+- Linux 基本用法
+- docker
+- git
+
+:::
+
 使用Docker的方式应该是最省心的方式。  
 建议购买一台阿里云Ubuntu 18.04(linux) 云服务器来运行。  
 最低配置1核2GB。  
@@ -19,7 +30,7 @@ sudo apt install -y git
 ```
 之后运行
 ```shell script
-git clone https://github.com/yuudi/yobot.git
+git clone https://github.com/pcrbot/yobot.git
 ```
 或者使用国内镜像源 https://gitee.com/yobot/yobot.git
 
@@ -66,7 +77,7 @@ su - yobot
 ```
 克隆一份yobot的源码：  
 ```shell script
-git clone https://github.com/yuudi/yobot.git
+git clone https://github.com/pcrbot/yobot.git
 ```
 或者使用国内镜像源 https://gitee.com/yobot/yobot.git
 如果您按照上述步骤执行了，后续的源码均指刚刚从git仓库克隆下来的这份源码。  

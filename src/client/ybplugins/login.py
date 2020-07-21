@@ -192,7 +192,7 @@ class Login:
         if user.privacy >= MAX_TRY_TIMES:
             raise ExceptionWithAdvice(
                 '您的密码错误次数过多，账号已锁定',
-                f'如果忘记密码，请私聊机器人“{self._get_prefix()}解除锁定”后，重新登录'
+                f'请私聊机器人“{self._get_prefix()}重置密码”后，重新登录'
             )
         if not user.password == _add_salt_and_hash(pwd, user.salt):
             user.privacy += 1  # 密码错误次数+1

@@ -6,6 +6,8 @@ python最低要求为 `python3.6`
 
 ## 打包
 
+（一般不建议对 python 项目打包）
+
 安装 `pyinstaller`
 
 ```sh

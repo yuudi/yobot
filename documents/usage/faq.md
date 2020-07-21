@@ -4,10 +4,6 @@
 
 ## 酷Q 问题
 
-### 酷Q 社区无法注册账号
-
-现在酷Q只能在周末白天注册。
-
 ### 需要购买 酷Q Pro 吗
 
 yobot 不需要。（其他插件可能需要）
@@ -95,8 +91,8 @@ chown -R 1000:1000 .
 此类情况大部分来自于**直接修改Yobot源码**的行为。  
 按照教程复制更改的配置文件（.env,yobot_data）不属于源码。  
 具体有哪些文件不属于源码，请参照根目录下的 .gitignore 文件。  
-如果您主动修改了源码以执行部分额外功能，请参照[如何在本地提交Commit](https://github.com/yuudi/yobot/issues/136#issuecomment-635958636)以取消该提示。
+如果您主动修改了源码以执行部分额外功能，请参照[如何在本地提交Commit](https://github.com/pcrbot/yobot/issues/136#issuecomment-635958636)以取消该提示。
 
 ### 这里没有我的问题
 
-可以在QQ群（{{ [770947581,1044314369,1067699252,774394459][Math.floor(Math.random()*4)] }}）或[github issue](https://github.com/yuudi/yobot/issues)提问，提问前可以阅读[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)
+可以在QQ群（{{ [770947581,1044314369,1067699252,774394459][Math.floor(Math.random()*4)] }}）或[github issue](https://github.com/pcrbot/yobot/issues)提问，提问前可以阅读[正确的提问姿势](https://github.com/tangx/Stop-Ask-Questions-The-Stupid-Ways/blob/master/README.md)
