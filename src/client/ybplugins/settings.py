@@ -29,10 +29,14 @@ class Setting:
                 return redirect(url_for('yobot_login', callback=request.path))
             user=User.get_by_id(session['yobot_user'])
             if user.authority_group >= 10:
+                if not user.authority_group >= 100:
+                    uathname = '公会战管理员'
+                else:
+                    uathname = '成员'
                 return await render_template(
                     'unauthorized.html',
                     limit='主人',
-                    uath=user.authority_group,
+                    uath=uathname,
                 )
             return await render_template(
                 'admin/setting.html',
@@ -99,10 +103,14 @@ class Setting:
                 return redirect(url_for('yobot_login', callback=request.path))
             user = User.get_by_id(session['yobot_user'])
             if user.authority_group >= 10:
+                if not user.authority_group >= 100:
+                    uathname = '公会战管理员'
+                else:
+                    uathname = '成员'
                 return await render_template(
                     'unauthorized.html',
                     limit='主人',
-                    uath=user.authority_group,
+                    uath=uathname,
                 )
             return await render_template('admin/pool-setting.html')
 
@@ -160,10 +168,14 @@ class Setting:
                 return redirect(url_for('yobot_login', callback=request.path))
             user = User.get_by_id(session['yobot_user'])
             if user.authority_group >= 10:
+                if not user.authority_group >= 100:
+                    uathname = '公会战管理员'
+                else:
+                    uathname = '成员'
                 return await render_template(
                     'unauthorized.html',
                     limit='主人',
-                    uath=user.authority_group,
+                    uath=uathname,
                 )
             return await render_template('admin/users.html')
 
@@ -253,10 +265,14 @@ class Setting:
                 return redirect(url_for('yobot_login', callback=request.path))
             user = User.get_by_id(session['yobot_user'])
             if user.authority_group >= 10:
+                if not user.authority_group >= 100:
+                    uathname = '公会战管理员'
+                else:
+                    uathname = '成员'
                 return await render_template(
                     'unauthorized.html',
                     limit='主人',
-                    uath=user.authority_group,
+                    uath=uathname,
                 )
             return await render_template('admin/groups.html')
 
