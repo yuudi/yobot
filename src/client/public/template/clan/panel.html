@@ -64,12 +64,12 @@
           <el-dialog title="上报伤害" :visible.sync="recordFormVisible">
             <el-form>
               <el-form-item label="伤害值" label-width="120">
-                <el-input v-model.number="damage"{# @keyup.enter.native="recordselfdamage" #}>
+                <el-input v-model.number="damage" @keyup.enter.native="recordselfdamage">
                   <template slot="prepend">[[ damageHint ]]</template>
                 </el-input>
               </el-form-item>
               <el-form-item label="留言" label-width="120">
-                <el-input v-model="message" placeholder="（选填）"></el-input>
+                <el-input v-model="message" placeholder="（选填）" @keyup.enter.native="recordselfdamage"></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -81,7 +81,7 @@
           <el-dialog title="上报伤害" :visible.sync="recordDefeatVisible">
             <el-form>
               <el-form-item label="留言" label-width="120">
-                <el-input v-model="message" placeholder="（选填）"></el-input>
+                <el-input v-model="message" placeholder="（选填）" @keyup.enter.native="recordselfdefeat"></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -104,12 +104,12 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="伤害值" label-width="120">
-                <el-input v-model.number="damage" :disabled="defeat"{#  @keyup.enter.native="recorddamage" #}>
+                <el-input v-model.number="damage" :disabled="defeat" @keyup.enter.native="recorddamage">
                   <template slot="prepend">[[ damageHint ]]</template>
                 </el-input>
               </el-form-item>
               <el-form-item label="留言" label-width="120">
-                <el-input v-model="message" placeholder="（选填）"></el-input>
+                <el-input v-model="message" placeholder="（选填）" @keyup.enter.native="recorddamage"></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -126,7 +126,7 @@
           <el-dialog title="锁定boss" :visible.sync="lockBossVisible">
             <el-form>
               <el-form-item label="留言" label-width="120">
-                <el-input v-model="message" placeholder="（必填）"></el-input>
+                <el-input v-model="message" placeholder="（必填）" @keyup.enter.native="challengeapply(2)"></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -141,7 +141,7 @@
           <el-dialog title="挂树" :visible.sync="suspendVisible">
             <el-form>
               <el-form-item label="留言" label-width="120">
-                <el-input v-model="message" placeholder="（选填）"></el-input>
+                <el-input v-model="message" placeholder="（选填）" @keyup.enter.native="addsuspend"></el-input>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -159,7 +159,7 @@
               <el-radio-button label="4"></el-radio-button>
               <el-radio-button label="5"></el-radio-button>
             </el-radio-group>
-            <el-input v-model="message" placeholder="留言（选填）"></el-input>
+            <el-input v-model="message" placeholder="留言（选填）" @keyup.enter.native="addsubscribe"></el-input>
             <div slot="footer" class="dialog-footer">
               <el-button @click="subscribeFormVisible = false">取消</el-button>
               <el-button type="primary" @click="addsubscribe">预约</el-button>
