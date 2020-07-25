@@ -8,7 +8,7 @@
 
 如果坚持在本地计算机运行，也可以使用内网穿透（不建议新手使用）
 
-### 方法 1：直接连接
+### 方法 1：直接连接（最简单）
 
 在 yobot [配置文件](./configuration.md)中，将`host`字段恢复为`0.0.0.0`（即默认值，如果没有手动修改过就不用管）
 
@@ -30,8 +30,6 @@ e.g. `http://10.10.10.10:9222/yobot/`
 
 ### 方法 2：使用 Nginx 代理（功能最强）
 
-Windows 用户可以使用配置好的[Nginx 预配置包](./windows-nginx-package.md)。
-
 如果需要为网页添加日志记录、HTTPS支持、安全限制等，或者需要同时部署其他站点，可以使用 Nginx、Apache 之类的服务器软件
 
 请根据服务器实际情况设定 Nginx 代理，这里给出一个示例，**不要直接复制**，如果不懂请用工具生成或请熟悉的人代劳
@@ -42,11 +40,12 @@ Nginx 代理配置后，在机器人配置文件中`public_address`项替换为�
 server {
   listen 80;
   listen [::]:80;
-  listen 443 ssl http2;
-  listen [::]:443 ssl http2;
 
-  ssl_certificate /home/www/ssl/ssl_certificate.crt;  # 你的证书路径
-  ssl_certificate_key /home/www/ssl/ssl_certificate.key;  # 你的私钥路径
+  ## 使用 https 加密通信，增加安全性（可选）
+  # listen 443 ssl http2;
+  # listen [::]:443 ssl http2;
+  # ssl_certificate /home/www/ssl/ssl_certificate.crt;  # 你的证书路径
+  # ssl_certificate_key /home/www/ssl/ssl_certificate.key;  # 你的私钥路径
 
   server_name io.yobot.xyz;  # 你的域名
 
@@ -55,11 +54,6 @@ server {
     proxy_pass http://localhost:9222;  # 反向代理
     proxy_set_header X-Real-IP $remote_addr;  # 传递用户IP
   }
-
-  ## 强制使用https加密通信（可选，安全）
-  #if ($server_port != 443){
-  #  return 301 https://$host$request_uri;
-  #}
 
   ## 静态文件直接访问（可选，性能）
   #location /yobot/assets/ {

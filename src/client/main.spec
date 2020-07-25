@@ -1,14 +1,22 @@
 # -*- mode: python ; coding: utf-8 -*-
+"""
+打包文件说明（一般不建议对 python 项目打包）
+
+pip 安装 `pyinstaller` 后，使用 `pyinstaller main.spec`，对项目打包。
+"""
 
 import os
 import site
 
 sitepackages = site.getsitepackages()
+
+
 def sitepackages_location(package_name):
     for sp in sitepackages:
-        if os.path.exists(os.path.join(sp,package_name)):
+        if os.path.exists(os.path.join(sp, package_name)):
             return sp
     raise RuntimeError(f"{package_name} not found")
+
 
 block_cipher = None
 
