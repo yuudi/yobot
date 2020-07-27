@@ -17,6 +17,26 @@
 <body>
     <div id="app">
         <el-page-header @back="location='..'" content="yobot用户管理"></el-page-header>
+        <br>
+        <el-form :inline="true" :model="query_input">
+            <el-form-item label="QQ号">
+                <el-input v-model="query_input.qqid" placeholder="QQ号"></el-input>
+            </el-form-item>
+            <el-form-item label="公会战群号">
+                <el-input v-model="query_input.clan_group_id" placeholder="公会战群号"></el-input>
+            </el-form-item>
+            <el-form-item label="用户组">
+                <el-select v-model="query_input.authority_group" placeholder="用户组">
+                    <el-option label="不限" value=""></el-option>
+                    <el-option label="主人" value="1"></el-option>
+                    <el-option label="公会战管理员" value="10"></el-option>
+                    <el-option label="成员" value="100"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="search" icon="el-icon-search">搜索</el-button>
+            </el-form-item>
+        </el-form>
         <el-table :data="userData" style="width: 100%" v-loading="isLoading" stripe>
             <el-table-column label="详情页" width="30">
                 <template slot-scope="scope">
@@ -45,6 +65,9 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-button v-if="has_more" icon="el-icon-arrow-down" :loading="moreLoading" @click="load_more">加载更多</el-button>
+        <el-button v-else icon="el-icon-arrow-down" disabled>已加载全部</el-button>
+        <el-backtop></el-backtop>
     </div>
 </body>
 <script>

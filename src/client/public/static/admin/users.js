@@ -2,7 +2,21 @@ var vm = new Vue({
     el: '#app',
     data: {
         isLoading: true,
+        moreLoading: false,
         userData: [],
+        querys: {
+            page: 1,
+            page_size: 50,
+            qqid: null,
+            clan_group_id: null,
+            authority_group: null,
+        },
+        query_input: {
+            qqid: null,
+            clan_group_id: null,
+            authority_group: null,
+        },
+        has_more: true,
         authtype: [{
             value: 100,
             label: '成员',
@@ -15,7 +29,7 @@ var vm = new Vue({
         }],
     },
     mounted() {
-        this.refresh();
+        this.load_more();
     },
     methods: {
         datestr: function (ts) {
@@ -26,15 +40,30 @@ var vm = new Vue({
             nd.setTime(ts * 1000);
             return nd.toLocaleString('chinese', { hour12: false, timeZone: 'asia/shanghai' });
         },
-        refresh: function (event) {
+        search: function (event) {
+            Object.assign(this.querys, this.query_input);
+            this.querys.page = 1;
+            this.isLoading = true;
+            this.userData = [];
+            this.load_more();
+        },
+        load_more: function (event) {
+            this.moreLoading = true;
             var thisvue = this;
             axios.post(api_path, {
                 action: 'get_data',
+                querys: thisvue.querys,
                 csrf_token: csrf_token,
             }).then(function (res) {
                 if (res.data.code == 0) {
-                    thisvue.userData = res.data.data;
+                    thisvue.userData.push(...res.data.data);
                     thisvue.isLoading = false;
+                    thisvue.moreLoading = false;
+                    if (res.data.data.length < thisvue.querys.page_size) {
+                        thisvue.has_more = false;
+                    } else {
+                        thisvue.querys.page += 1;
+                    }
                 } else {
                     thisvue.$alert(res.data.message, '加载数据错误');
                 }

@@ -60,22 +60,28 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 源码运行需要使用git作为版本管理和更新工具，如果没有使用过git可以阅读：[git官网](https://git-scm.com/)，[git教程](https://www.runoob.com/git/git-tutorial.html)
 
+::: warning
+
+以下命令均在*命令提示符（Command Prompt）*中使用，不要使用 git bash！！
+
+:::
+
 确保 python 版本至少为 3.6
 
 下载源码 `git clone https://github.com/pcrbot/yobot.git`
 
 或者使用国内源 `git clone https://gitee.com/yobot/yobot.git`
 
-请尽量使用git clone而不是download zip，否则无法自动更新版本
+请尽量使用 git clone 而不是 download zip，否则无法自动更新版本
 
-进入目录 `cd yobot`
+进入目录 `cd yobot\src\client`
 
-安装依赖 `pip install -r src\client\requirements.txt`
+安装依赖 `pip install -r requirements.txt`
 （如果在国内建议加上参数 `-i https://pypi.tuna.tsinghua.edu.cn/simple`）
 
-启动：`cd src\client & python main.py`
+启动：`python main.py`
 
-如果需要更换主机地址、端口等信息请修改src\client\yobot_config.json配置文件。
+如果需要更换主机地址、端口等信息请修改 `yobot_data\yobot_config.json` 配置文件。
 
 ![windows下正确启动图](https://img.yobot.win/yobot/aaf38d1a5cbc1c87.jpg)
 
@@ -87,36 +93,7 @@ yobot 三代基于酷Q机器人和 httpapi 插件实现
 
 ## 常见问题
 
-### 如何修改运行的端口号
-
-需要修改服务程序的端口号和httpapi的配置文件
-
-服务程序的配置文件在yobot\yobot_config.json，port字段就是端口号，默认值为9222，可以修改为8000至65535之间的数。
-
-httpapi的配置文件如[配置小节](#配置)所示，请将文件中默认端口9222(三处)改为与服务程序相同的端口号。
-
-### 其他问题
-
-见[FAQ](../usage/faq.md)
-
-## 注意事项
-
-- **请不要使用重要的QQ号作为机器人**
-- 系统至少要windows 7或者windows server 2008
-- 机器人的数据都是分群存储的，一个机器人可以服务多个群
-- 本机器人不包含“签到”、“宠物”等通用功能，如果需要可以在[酷Q插件社区](https://cqp.cc/b/app)搜索下载。
-- 发送图片，发送语音等功能必须购买高级版才能使用，yobot三代所有功能均可用文字实现，不需要高级版
-
-容易引起封号的行为：
-
-- 异地登录后立刻修改昵称头像（可以先修改再异地登录）
-- 新注册的号在机房ip登录（ip真人鉴别有很多，比如[这个](https://ip.rtbasia.com/)）
-- 机器人大量地发长消息（尤其是抽卡，条件允许可以改用图片抽卡）
-- 机器人24小时不停发消息（如果真的有需求可以让两个账号轮班）
-- 账号在短时间内加了大量的群（可以慢慢加，最好不超过10个群）
-- 大量高危账号在同一个ip登录（可以慢慢加，一台服务器最好不超过5个账号）
-
-如果文中下载链接失效，可以使用[备用网盘](https://www.lanzous.com/b00n6dnqh)
+见 [FAQ](../usage/faq.md)
 
 ## 开始 web 模式
 

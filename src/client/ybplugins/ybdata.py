@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 9  # 目前版本
+_version = 10  # 目前版本
 
 MAX_TRY_TIMES = 3
 
@@ -73,7 +73,7 @@ class Clan_group(_BaseModel):
 
 
 class Clan_member(_BaseModel):
-    group_id = BigIntegerField()
+    group_id = BigIntegerField(index=True)
     qqid = BigIntegerField(index=True)
     role = IntegerField(default=100)
     last_save_slot = IntegerField(null=True)
@@ -87,7 +87,7 @@ class Clan_challenge(_BaseModel):
     cid = AutoField(primary_key=True)
     bid = IntegerField(default=0)
     gid = BigIntegerField()
-    qqid = BigIntegerField()
+    qqid = BigIntegerField(index=True)
     challenge_pcrdate = IntegerField()
     challenge_pcrtime = IntegerField()
     boss_cycle = SmallIntegerField()
@@ -99,12 +99,16 @@ class Clan_challenge(_BaseModel):
     behalf = IntegerField(null=True)
 
     class Meta:
-        indexes = ((('bid', 'gid'), False),)
+        indexes = (
+            (('bid', 'gid'), False),
+            (('qqid', 'challenge_pcrdate'), False),
+            (('bid', 'gid', 'challenge_pcrdate'), False),
+        )
 
 
 class Clan_subscribe(_BaseModel):
     sid = AutoField(primary_key=True)
-    gid = BigIntegerField()
+    gid = BigIntegerField(index=True)
     qqid = IntegerField()
     subscribe_item = SmallIntegerField()
     message = TextField(null=True)
@@ -207,9 +211,6 @@ def db_upgrade(old_version):
             migrator.add_column('user', 'must_change_password',
                                 BooleanField(default=True)),
         )
-    if old_version < 6:
-        User.update({User.authority_group: 1}).where(
-            User.authority_group == 2).execute()
     if old_version < 7:
         migrate(
             migrator.drop_column('clan_challenge', 'comment'),
@@ -234,6 +235,14 @@ def db_upgrade(old_version):
     if old_version < 9:
         migrate(
             migrator.add_index('clan_member', ('qqid',), False)
+        )
+    if old_version < 10:
+        migrate(
+            migrator.add_index('clan_member', ('group_id',), False),
+            migrator.add_index('clan_subscribe', ('gid',), False),
+            migrator.add_index('clan_challenge', ('qqid',), False),
+            migrator.add_index('clan_challenge', ('qqid', 'challenge_pcrdate'), False),
+            migrator.add_index('clan_challenge', ('bid', 'gid', 'challenge_pcrdate'), False),
         )
 
     DB_schema.replace(key='version', value=str(_version)).execute()

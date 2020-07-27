@@ -90,9 +90,9 @@ class Consult:
                     self.__init__(self.setting, refresh_nickfile=True)
                     return self.user_input(cmd, True)
             def_set.add(item)
-            def_lst = list(def_set)
-        if len(def_lst) < 3:
-            raise ValueError("防守人数过少")
+        def_lst = list(def_set)
+        if len(def_lst) < 5:
+            raise ValueError("需要完整的5人防守队伍")
         return def_lst
 
     async def jjcsearch_async(self, def_lst, region):
