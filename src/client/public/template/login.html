@@ -1,72 +1,60 @@
 <!DOCTYPE html>
-
+<html>
 <head>
-    <meta name='viewport' content='width=device-width, initial-scale=1' charset="utf-8"/>
-    <title>yobot登录</title>
-    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
-    <script src="{{ url_for('yobot_static', filename='password.js') }}"></script>
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
-    <style>
-        #app {
-            margin: auto;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-flow: column;
-            max-width: 400px;
-        }
-
-        .comment {
-            color: #aaa;
-            line-height: 20px;
-            font-size: 0.8em;
-            margin: 20px 0;
-        }
-    </style>
+<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
+<title>yobot登录</title>
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script> 
+<script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script> 
+<script src="{{ url_for('yobot_static', filename='password.js') }}"></script>
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+<style>
+#app {
+  margin: auto;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column;
+  max-width: 400px;
+}
+.comment {
+  color: #aaa;
+  line-height: 20px;
+  font-size: 0.8em;
+  margin: 20px 0;
+}
+</style>
 </head>
 
 <body>
 <div id="app" class="container">
-    <div class="container">
-        <h1>登录</h1>
-
-        {% if reason -%}
-        <el-alert
-                title="{{ reason }}"
-                type="error">
-        </el-alert>
-        {% endif -%}
-        {% if advice -%}
-        <el-alert
-                title="{{ advice }}"
-                type="info">
-        </el-alert>
-        {% endif -%}
-
-        <div style="margin: 20px;"></div>
-
-        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-            <el-form-item label="QQ号" prop="qq">
-                <el-input v-model="form.qq" name="user" placeholder="请输入登录QQ号" @keyup.enter.native="onSubmit"></el-input>
-            </el-form-item>
-            <el-form-item label="密码" prop="pwd">
-                <el-input v-model="form.pwd" name="password" placeholder="这个密码不是QQ密码" type="password" @keyup.enter.native="onSubmit"></el-input>
-                <p class="comment">* 如果不知道密码，您可以私聊机器人“{{ prefix }}登录”或“{{ prefix }}重置密码”</p>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="onSubmit">登录</el-button>
-            </el-form-item>
-        </el-form>
-    </div>
-    <footer style="text-align: center">
-        powered by <a href="https://github.com/pcrbot/yobot">yobot</a>
-    </footer>
+  <div class="container">
+    <h1>登录</h1>
+    {% if reason -%}
+    <el-alert title="{{ reason }}"
+                      type="error"> </el-alert>
+    {% endif -%}
+    {% if advice -%}
+    <el-alert title="{{ advice }}"
+                      type="info"> </el-alert>
+    {% endif -%}
+    <div style="margin: 20px;"></div>
+    <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form-item label="QQ号" prop="qq">
+        <el-input v-model="form.qq" name="user" placeholder="请输入登录QQ号" @keyup.enter.native="onSubmit"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="pwd">
+        <el-input v-model="form.pwd" name="password" placeholder="这个密码不是QQ密码" type="password" @keyup.enter.native="onSubmit"></el-input>
+      </el-form-item>
+      <p class="comment">* 如果不知道密码，您可以私聊机器人“{{ prefix }}登录”或“{{ prefix }}重置密码”</p>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">登录</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+  <footer style="text-align: center"> powered by <a href="https://github.com/pcrbot/yobot">yobot</a> </footer>
 </div>
-
 <script>
     new Vue({
         el: '#app',
