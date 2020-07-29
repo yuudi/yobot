@@ -1,26 +1,56 @@
 <!DOCTYPE html>
-
+<html>
 <head>
-    <title>公会战 - 数据分析</title>
+<meta charset="utf-8" name="viewport" content="width=device-width,initial-scale=1">
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<style>a{color:#3eaf7c;text-decoration:none}body{font-size:1.2em;margin:0 auto;max-width:85%;text-align:center}button{background-color:rgba(255,255,255,.7);border:1px solid #ccc;border-radius:20em;font-size:1em;margin:.4em;outline:0;padding:.4em 1.4em;transition-duration:.06s;width:8em}button:active{box-shadow:0 0;transform:translateY(2px)}button:hover{background-color:rgba(62,175,124,.7);color:#FFF}footer{font-size:.8em;margin-top:3em;text-align:center}input{border:1px solid #aaa;text-align:center;width:44%}input:focus,input:hover{border:1px solid #3eaf7c;outline:0}.main{margin:0 auto}</style>
+<title>数据分析</title>
 </head>
-
-<body>
-    <p><a href="../">返回</a></p>
-    <h1>数据分析</h1>
-    <p><a href="./1/">统计：出刀顺序表</a> by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></p>
-    <p><a href="./2/">统计：数据图表</a> by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></p>
-    <p><a href="#" target="_blank" id="pcrd-yobot-fe">统计：多维度分析</a>（需要开启api访问） by <a href="https://github.com/Tan90Qian">@Tan90Qian</a></p>
+<body oncontextmenu="return false" ondragstart="return false">
+<h1>数据分析</h1>
+<div class="main">
+  <div>
+    <button onClick="window.location.href='./1/'">出刀顺序表</button>
+    <div><a class="github-button" href="https://github.com/Ai-Himmel" data-size="large">@Ai-Himmel</a></div>
+    <p></p>
+  </div>
+  <div>
+    <button onClick="window.location.href='./2/'">数据图表</button>
+    <div><a class="github-button" href="https://github.com/Diving-Fish" data-size="large">@Diving-Fish</a></div>
+    <div><a class="github-button" href="https://github.com/winrey" data-size="large">@winrey</a></div>
+    <p></p>
+  </div>
+  <div><a href="#" target="_blank" id="pcrd-yobot-fe">
+    <button>多维度分析</button>
+    </a>
+    <div><a class="github-button" href="https://github.com/Tan90Qian" data-size="large">@Tan90Qian</a><br/>
+      （需要开启 API 访问）</div>
+    <p></p>
+  </div>
+</div>
+<p>&nbsp;</p>
+<div>
+  <p>原始数据（JSON）</p>
+  <p><a href="./api/" style="margin-right:1em">查看本轮</a><a href="./api/" download>下载本轮</a></p>
+  <p><a href="./api/?battle_id=all" style="margin-right:1em">查看全部</a><a href="./api/?battle_id=all" download>下载全部</a></p>
+  {% if allow_api -%}
+  <div>
+    <p>API 地址：</p>
     <p>
-        原始数据（json格式）<br>
-        <a href="./api/">查看本轮</a> <a href="./api/" download>下载本轮</a><br>
-        <a href="./api/?battle_id=all">查看全部</a> <a href="./api/?battle_id=all" download>下载全部</a><br>
-        {% if allow_api -%}
-        api地址：<input id="apiurl"><input type="button" value="复制" id="copy">
-        {% else -%}
-        api访问已禁用，如需开启请前往<a href="../setting/">公会设置</a>
-        {% endif -%}
+      <input id="apiurl" readonly>
     </p>
-    <!--
+    <p>
+      <button id="copy">复制</button>
+    </p>
+    <p></p>
+  </div>
+  {% else -%}
+  <div>
+    <p>API 访问已禁用</p>
+    <p>如需开启请前往 <a href="../setting/">公会设置</a></p>
+  </div>
+  {% endif -%} </div>
+<!--
         api说明：
         公会战管理员在设置中开启“允许外部api调用”后，可在外部直接调用，
         也可以直接下载json文件
@@ -39,7 +69,10 @@
         members：成员列表
         challenges：出刀记录表
     -->
-
+<button onClick="window.location.href='../'">返回</button>
+<footer>
+  <p>Powered by <a href="https://yobot.win" target="_blank">yobot</a> Presented by <a href="https://github.com/Lancercmd/">Lancercmd</a></p>
+</footer>
 <script>
     var apikey = "{{ apikey }}";
     var apiurl = window.location.href + "api/?apikey=" + apikey
@@ -51,7 +84,5 @@
         alert("已复制。");
     })
 </script>
-
 </body>
-
 </html>
