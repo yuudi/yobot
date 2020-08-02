@@ -26,20 +26,6 @@ yobot搭建难度约等于搭建网站的难度，请量力而行
 
 [详细说明](./Windows-source.md)
 
-## Linux 服务器：源码运行
-
-在 Linux 或 MacOS 上用 python 运行源码，
-同时在 docker 下使用 wine 运行酷Q。
-由于不是原生环境，所以其他插件可能不兼容。
-
-[详细说明](./Linux-source.md)
-
-## Linux 服务器：Docker 部署
-
-使用 Docker 一键部署。
-
-[详细说明](./docker.md)
-
 ## 作为 nonebot 插件运行
 
 如果想搭建一个高度自定义的机器人，可以使用 [nonebot](https://nonebot.cqp.moe/) 框架。（Python语言）
@@ -47,3 +33,7 @@ yobot搭建难度约等于搭建网站的难度，请量力而行
 你可以在 Windows 或 Linux 或 MacOS 上运行 nonebot，将 yobot 作为 nonebot 的一个插件运行。
 
 [详细说明](./nonebot-plugin.md)
+
+## Linux 服务器
+
+酷Q 已放弃对 Linux 的支持

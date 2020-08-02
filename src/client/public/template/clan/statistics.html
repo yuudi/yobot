@@ -2,14 +2,22 @@
 
 <head>
     <title>公会战 - 数据分析</title>
+    <style>
+        .statisticpage{font-size: 32px;}
+        .authorinfo{font-size: 12px;}
+    </style>
 </head>
 
 <body>
     <p><a href="../">返回</a></p>
-    <h1>数据分析</h1>
-    <p><a href="./1/">统计：出刀顺序表</a> by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></p>
-    <p><a href="./2/">统计：数据图表</a> by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></p>
-    <p><a href="#" target="_blank" id="pcrd-yobot-fe">统计：多维度分析</a>（需要开启api访问） by <a href="https://github.com/Tan90Qian">@Tan90Qian</a></p>
+    <h1>图表</h1>
+    <p><br/><br/>
+        <span class="statisticpage"><a href="./2/"><img style="width:140px;height:140px" src="{{ url_for('yobot_static', filename='clan/statistics/pie.png') }}"><br/>数据图表</a></span> <span class="authorinfo">by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></span>
+    <br/><br/><br/><br/><br/></p>
+    <h2>更多分析</h2>
+    <p><span class="more-statisticpage"><a href="./1/">>出刀顺序表</a></span> <span class="authorinfo">by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></span></p>
+    <p><span class="more-statisticpage"><a href="#" target="_blank" id="pcrd-yobot-fe">>多维度分析</a></span>（需要开启api访问） <span class="authorinfo">by <a href="https://github.com/Tan90Qian">@Tan90Qian</a></span></p>
+    <!-- 更多统计方式欢迎提交 pull request，建议采用 api 调用的方式 -->
     <p>
         原始数据（json格式）<br>
         <a href="./api/">查看本轮</a> <a href="./api/" download>下载本轮</a><br>

@@ -35,10 +35,6 @@ themeConfig:
               link: /install/Windows-quick-start/
             - text: Windows 源码部署
               link: /install/Windows-source/
-            - text: Linux 源码部署
-              link: /install/Linux-source/
-            - text: Docker
-              link: /install/docker/
             - text: 作为 nonebot 插件部署
               link: /install/nonebot-plugin/
         - text: mirai
