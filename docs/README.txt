@@ -1,0 +1,1 @@
+文档移动至 https://github.com/pcrbot/yobot-docs
