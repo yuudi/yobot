@@ -1,5 +1,6 @@
 {
     "stable": {
-        "version": 0
+        "version": 210,
+        "url": "http://download.yobot.win/scyb/yobot210.zip"
     }
 }

@@ -446,9 +446,9 @@ class Login:
 
         @app.route(
             urljoin(self.setting['public_basepath'],
-                    'user/<int:qqid>/nickname/'),
-            methods=['PUT'])
-        async def yobot_user_info_nickname(qqid):
+                    'user/<int:qqid>/api/'),
+            methods=['GET', 'PUT'])
+        async def yobot_user_info_api(qqid):
             if 'yobot_user' not in session:
                 return jsonify(code=10, message='未登录')
             user = User.get_by_id(session['yobot_user'])
@@ -457,6 +457,15 @@ class Login:
             user_data = User.get_or_none(User.qqid == qqid)
             if user_data is None:
                 return jsonify(code=20, message='用户不存在')
+            if request.method == 'GET':
+                return jsonify(
+                    code=0,
+                    nickname=user_data.nickname,
+                    authority_group=user_data.authority_group,
+                    clan_group_id=user_data.clan_group_id,
+                    last_login_ipaddr=user_data.last_login_ipaddr,
+                    last_login_time=user_data.last_login_time,
+                )
             new_setting = await request.get_json()
             if new_setting is None:
                 return jsonify(code=30, message='消息体格式错误')

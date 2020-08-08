@@ -292,6 +292,7 @@ class Updater:
                 reply = await self.linux_update_async()
         except Exception as e:
             print(e)
+            return []
         finally:
             self.working = False
         print(reply)
@@ -330,9 +331,9 @@ def get_version(base_version: str, base_commit:  int) -> dict:
         return {
             "run-as": "exe" if platform.system() == "Windows" else "linux-exe",
             "ver_name": "yobot{}便携版".format(base_version),
-            "ver_id": 3300 + base_commit,
+            "ver_id": base_commit,
             "check_url": [
-                "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
+                "https://toolscdn.yobot.win/verinfo/yobot3.json",
             ]
         }
     try:
@@ -345,7 +346,12 @@ def get_version(base_version: str, base_commit:  int) -> dict:
                 "ver_name": "yobot{}源码版\n存在未提交的修改".format(base_version)
             }
     except Exception as e:
-        print(e)
+        if os.path.exists('/.dockerenv'):
+            return {
+                "run-as": "python",
+                "commited": False,
+                "ver_name": f"yobot{base_version} on Docker"
+            }
         return {
             "run-as": "python",
             "commited": False,
@@ -367,9 +373,9 @@ def get_version(base_version: str, base_commit:  int) -> dict:
             "commited": True,
             "extra_commit": extra_commit,
             "ver_name": vername,
-            "ver_id": 3300 + base_commit,
+            "ver_id": base_commit,
             "check_url": [
-                "https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json",
+                "https://toolscdn.yobot.win/verinfo/yobot3.json",
             ],
         }
     except Exception as e:

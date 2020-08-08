@@ -9,30 +9,40 @@
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
 </head>
 
-{% if user.qqid != visitor.qqid and visitor.authority_group >= 100 %}{# 不是本人且不是管理员 -#}
-<body>
-    <h1>yobot用户信息</h1>
-    <p>你无权查看这个页面</p>
-    <p><a href="#" onClick="javascript:history.go(-1);">返回</a></p>
-</body>
-{%- else %}{# 本人或管理员 -#}
 <body>
     <div id="app">
         <el-page-header @back="location='..'" content="yobot用户信息"></el-page-header>
-    <p :hidden="edit">用户名：[[ nickname ]]<el-button type="primary" size="mini" icon="el-icon-edit" @click="edit=true" circle></el-button></p>
-    <p :hidden="!edit">用户名：<el-input v-model="nickname" placeholder="昵称"></el-input><el-button type="success" size="mini" icon="el-icon-check" @click="edit_nickname" circle></el-button></p>
-    <p>用户权限：[[ authtype[{{ user.authority_group }}] ]]</p>
-    <p>公会战所在群：{{ user.clan_group_id }}</p>
-    <p>上次登录时间：[[ from_ts({{ session.get('last_login_time') }}) ]]</p>
-    <p>上次登录ip地址：{{ user.last_login_ipaddr }}（[[ addr.join('') ]]）</p>
-</div>
+        <template v-if="display">
+            <p :hidden="edit">用户名：[[ nickname ]]
+                <el-button type="primary" size="mini" icon="el-icon-edit" @click="edit=true" circle></el-button>
+            </p>
+            <p :hidden="!edit">用户名：<el-input v-model="nickname" placeholder="昵称"></el-input>
+                <el-button type="success" size="mini" icon="el-icon-check" @click="edit_nickname" circle></el-button>
+            </p>
+            <p>用户权限：[[ authority_group ]]</p>
+            <p>公会战主群：[[ clan_group_id ]]</p>
+            <p>上次登录时间：[[ last_login_time ]]</p>
+            <p>上次登录ip地址：[[ last_login_ipaddr ]]（[[ addr.join('') ]]）</p>
+        </template>
+        <template v-else>
+            <h1>yobot用户信息</h1>
+            <p>你无法查看这个页面，[[ failure_reason ]]</p>
+            <p><a href="#" onClick="javascript:history.go(-1);">返回</a></p>
+        </template>
+    </div>
 </body>
 <script>
     var vm = new Vue({
         el: '#app',
         data: {
+            display: true,
+            failure_reason: '',
             addr: [],
-            nickname: '{{ user.nickname }}',
+            nickname: '',
+            clan_group_id: '',
+            authority_group: '',
+            last_login_ipaddr: '',
+            last_login_time: '',
             edit: false,
             authtype: {
                 1: '主人',
@@ -43,24 +53,36 @@
         },
         mounted() {
             var thisvue = this;
-            axios.get('{{ url_for("yobot_api_iplocation", ip=user.last_login_ipaddr) }}').then(function (res) {                
-                thisvue.addr = res.data;
+            axios.get('./api/').then(function (res) {
+                if (res.data.code != 0) {
+                    thisvue.display = false;
+                    failure_reason = res.data = message;
+                } else {
+                    thisvue.nickname = res.data.nickname;
+                    thisvue.clan_group_id = res.data.clan_group_id;
+                    thisvue.authority_group = thisvue.authtype[res.data.authority_group];
+                    thisvue.last_login_ipaddr = res.data.last_login_ipaddr;
+                    thisvue.last_login_time = thisvue.from_ts(res.data.last_login_time);
+                    axios.get('{{ url_for("yobot_api_iplocation") }}?ip=' + thisvue.last_login_ipaddr).then(function (res) {
+                        thisvue.addr = res.data;
+                    })
+                }
             }).catch(function (error) {
                 console.log(error);
                 thisvue.addr = ['未知'];
             });
         },
         methods: {
-            edit_nickname: function(event){
+            edit_nickname: function (event) {
                 var thisvue = this;
-                axios.put('{{ url_for("yobot_user_info_nickname", qqid=user.qqid) }}',{nickname: thisvue.nickname}).then(function (res) {
+                axios.put('./api/', { nickname: thisvue.nickname }).then(function (res) {
                     thisvue.edit = false;
                 }).catch(function (error) {
                     alert('改名失败');
                     console.log(error);
                 })
             },
-            from_ts: function(ts) {
+            from_ts: function (ts) {
                 if (ts == 0) {
                     return '-';
                 }
@@ -72,6 +94,5 @@
         delimiters: ['[[', ']]'],
     })
 </script>
-{%- endif %}
 
 </html>
