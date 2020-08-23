@@ -15,6 +15,7 @@ _calender_url = {
     "cn": "https://tools.yobot.win/calender/#cn",
 }
 
+_region_name = {"cn": "国服", "jp": "日服", "tw": "台服"}
 
 class Event_timeline:
     def __init__(self):
@@ -50,34 +51,25 @@ class Event:
 
         self.timeline = None
 
+        self.timeline_cn = None
+        self.timeline_jp = None
+        self.timeline_tw = None
+
     def load_timeline(self, rg):
         raise RuntimeError("no more sync calling")
 
     async def load_timeline_async(self, rg=None):
         if rg is None:
             rg = self.setting.get("calender_region", "default")
-        if rg == "jp":
-            timeline = await self.load_timeline_jp_async()
-            if timeline is None:
-                return
-            self.timeline = timeline
-            print("刷新日服日程表成功")
-        elif rg == "tw":
-            timeline = await self.load_timeline_tw_async()
-            if timeline is None:
-                return
-            self.timeline = timeline
-            print("刷新台服日程表成功")
-        elif rg == "cn":
-            timeline = await self.load_timeline_cn_async()
-            if timeline is None:
-                return
-            self.timeline = timeline
+        if self.setting.get("calender_cn", False) or rg == "cn":
+            self.timeline_cn = await self.load_timeline_cn_async()
             print("刷新国服日程表成功")
-        else:
-            self.timeline = None
-            if rg != "default":
-                print(f"{rg}区域无日程表")
+        if self.setting.get("calender_jp", False) or rg == "jp":
+            self.timeline_jp = await self.load_timeline_jp_async()
+            print("刷新日服日程表成功")
+        if self.setting.get("calender_tw", False) or rg == "tw":
+            self.timeline_tw = await self.load_timeline_tw_async()
+            print("刷新台服日程表成功")
 
     # def load_time_jp(self, timestamp) -> Arrow:
     #     tz = datetime.timezone(datetime.timedelta(hours=8))
@@ -181,7 +173,7 @@ class Event:
             )
         return timeline
 
-    def get_day_events(self, match_num) -> tuple:
+    def get_day_events(self, match_num, region) -> tuple:
         if match_num == 2:
             daystr = "今天"
             date = Arrow.now(tzinfo=self.timezone)
@@ -197,14 +189,33 @@ class Event:
                 date = Arrow(2000+year, month, day)
             except ValueError as v:
                 raise InputError("日期错误：{}".format(v))
-        events = self.timeline.at(date)
+
+        timeline = self.timeline_cn
+        if region == "jp":
+            timeline = self.timeline_jp
+        elif region == "tw":
+            timeline = self.timeline_tw
+        if not timeline:
+            events = None
+        else:
+            events = timeline.at(date)
+
         return (daystr, events)
 
     def get_week_events(self) -> str:
+        tl = self.timeline_cn
+        rg = self.setting.get("calender_region", "default")
+        if rg == "jp":
+            tl = self.timeline_jp
+        elif rg == "tw":
+            tl = self.timeline_tw
+        if tl is None:
+            reply = "日程表未初始化\n\n更多日程：{}".format(_calender_url.get(self.setting["calender_region"]))
+            return reply
         reply = "一周日程："
         date = Arrow.now(tzinfo=self.timezone)
         for i in range(7):
-            events = self.timeline.at(date)
+            events = tl.at(date)
             events_str = "\n⨠".join(events)
             if events_str == "":
                 events_str = "没有记录"
@@ -237,32 +248,38 @@ class Event:
             day = int(match.group(3))
             return (0x100000 + 0x1000*year + 0x100*month + day)
         return 1
+    
+    def get_day_events_reply(self, match_num: int) -> str:
+        reply = ""
+        for k in ("cn", "jp", "tw"):
+            rg =  self.setting.get("calender_" + k, False)
+            if not rg:
+                continue
+            try:
+                daystr, events = self.get_day_events(match_num, k)
+            except InputError as e:
+                continue
+            if events == None:
+                events_str = "未初始化"
+            else:
+                events_str = "\n".join(events)
+                if events_str == "":
+                    events_str = "没有记录"
+            reply += "{}{}活动：\n{}".format(daystr, _region_name[k], events_str)
+            reply += "\n\n"
+        reply = reply.rstrip()
+        return reply
 
     def execute(self, match_num: int, msg: dict) -> dict:
-        if self.timeline is None:
-            if self.setting.get("calender_region", "default") == "default":
-                reply = "未设置区服，请发送“{}设置”".format(
-                    self.setting.get("preffix_string", ""))
-            else:
-                reply = "日程表未初始化\n\n更多日程：{}".format(
-                    _calender_url.get(self.setting["calender_region"]))
-            return {"reply": reply, "block": True}
         if match_num == 1:
             return {"reply": "", "block": True}
         # self.check_and_update()
-        if match_num == 4:
+        elif match_num == 4:
             reply = self.get_week_events()
             return {"reply": reply, "block": True}
-        try:
-            daystr, events = self.get_day_events(match_num)
-        except InputError as e:
-            return {"reply": str(e), "block": True}
-
-        events_str = "\n".join(events)
-        if events_str == "":
-            events_str = "没有记录"
-        reply = "{}活动：\n{}".format(daystr, events_str)
-        return {"reply": reply, "block": True}
+        else:
+            reply = self.get_day_events_reply(match_num)
+            return {"reply": reply, "block": True}
 
     async def send_daily_async(self):
         print("正在刷新日程表")
@@ -276,11 +293,9 @@ class Event:
         sub_users = self.setting.get("notify_privates", [])
         if not (sub_groups or sub_users):
             return
-        _, events = self.get_day_events(2)
-        events_str = "\n".join(events)
-        if events_str is None:
-            return
-        msg = "今日活动：\n{}".format(events_str)
+
+        msg = self.get_day_events_reply(2)
+
         sends = []
         for group in sub_groups:
             sends.append({

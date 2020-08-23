@@ -191,7 +191,12 @@
           <el-option label="国服日程表" value="cn"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="每日推送日程">
+      <el-form-item label="日程区域">
+        <el-checkbox v-model="setting.calender_cn">国服</el-checkbox>
+        <el-checkbox v-model="setting.calender_jp">日服</el-checkbox>
+        <el-checkbox v-model="setting.calender_tw">台服</el-checkbox>
+      </el-form-item>
+      <el-form-item label="推送时间">
         <el-checkbox v-model="setting.calender_on"></el-checkbox>
         <el-input :disabled="!setting.calender_on" v-model="setting.calender_time" placeholder="08:00">
         </el-input>
