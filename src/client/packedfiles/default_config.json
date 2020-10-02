@@ -4,7 +4,7 @@
     "access_token": "",
     "client_salt": null,
     "public_address": null,
-    "public_basepath": "/yobot/",
+    "public_basepath": "/",
     "web_mode_hint": true,
     "super-admin": [],
     "black-list": [],

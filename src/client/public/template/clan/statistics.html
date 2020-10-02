@@ -13,6 +13,8 @@
     <h1>图表</h1>
     <p><br/><br/>
         <span class="statisticpage"><a href="./2/"><img style="width:140px;height:140px" src="{{ url_for('yobot_static', filename='clan/statistics/pie.png') }}"><br/>数据图表</a></span> <span class="authorinfo">by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></span>
+        <br/><br/>
+        <span class="statisticpage"><a href="#" target="_blank" id="clan-battle-analyzer"><img style="width:140px;height:140px" src="{{ url_for('yobot_static', filename='clan/statistics/deviation.png') }}"><br/>均值偏差</a></span> <span class="authorinfo">by <a href="https://github.com/Alive24">@Alive24</a></span>
     <br/><br/><br/><br/><br/></p>
     <h2>更多分析</h2>
     <p><span class="more-statisticpage"><a href="./1/">>出刀顺序表</a></span> <span class="authorinfo">by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></span></p>
@@ -53,6 +55,7 @@
     var apiurl = window.location.href + "api/?apikey=" + apikey
     document.getElementById("apiurl").value = apiurl;
     document.getElementById("pcrd-yobot-fe").href = "http://tools.yobot.win/pcrd-yobot-fe/#" + encodeURIComponent(apiurl);
+    document.getElementById("clan-battle-analyzer").href = "http://clan-battle-analyzer.pcrbot.com/?apiURL=" + encodeURIComponent(apiurl);
     document.getElementById("copy").addEventListener("click", e => {
         document.getElementById("apiurl").select();
         document.execCommand("Copy");

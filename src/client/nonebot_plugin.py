@@ -30,6 +30,12 @@ if __name__ == "__main__":
 from .yobot import Yobot
 import asyncio
 
+# print(
+#     "|===========================================|"
+#     "| yobot 插件版即将停止支持，请尽快更换为独立版 |"
+#     "|===========================================|"
+# )
+
 if "nonebot" in sys.modules:
     from nonebot import get_bot, scheduler
 else:

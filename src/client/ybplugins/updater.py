@@ -336,6 +336,12 @@ def get_version(base_version: str, base_commit:  int) -> dict:
                 "https://toolscdn.yobot.win/verinfo/yobot3.json",
             ]
         }
+    if os.path.exists('/.dockerenv'):
+        return {
+            "run-as": "python",
+            "commited": False,
+            "ver_name": f"yobot{base_version} on Docker"
+        }
     try:
         with os.popen("git diff HEAD --stat") as r:
             text = r.read()
@@ -346,12 +352,6 @@ def get_version(base_version: str, base_commit:  int) -> dict:
                 "ver_name": "yobot{}源码版\n存在未提交的修改".format(base_version)
             }
     except Exception as e:
-        if os.path.exists('/.dockerenv'):
-            return {
-                "run-as": "python",
-                "commited": False,
-                "ver_name": f"yobot{base_version} on Docker"
-            }
         return {
             "run-as": "python",
             "commited": False,
