@@ -49,15 +49,15 @@ New-Item -ItemType Directory -Path .\yobot, .\yobot\yobot_data, .\mirai, .\mirai
 
 # 下载程序
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest https://pan.yobot.win/yobot/wget.exe -OutFile .\wget.exe
+Invoke-WebRequest https://down.yobot.club/tools/wget.exe -OutFile .\wget.exe
 .\wget.exe https://download.fastgit.org/Mrs4s/go-cqhttp/releases/download/v0.9.25-fix3/go-cqhttp-v0.9.25-fix3-windows-amd64.zip -O .\go-cqhttp.zip
 Expand-Archive go-cqhttp.zip -DestinationPath .\mirai\
 Remove-Item go-cqhttp.zip
 if ($yocool) {
-    .\wget.exe https://pan.yobot.win/yobot/yocool.zip -O .\yobot.zip
+    .\wget.exe https://down.yobot.club/yobot/yocool.zip -O .\yobot.zip
 }
 else {
-    .\wget.exe https://pan.yobot.win/yobot/yobot.zip -O .\yobot.zip
+    .\wget.exe https://down.yobot.club/yobot/yobot.zip -O .\yobot.zip
 }
 Expand-Archive yobot.zip -DestinationPath .\yobot\
 if ($yocool) { Move-Item .\yobot\yobot--with-yocool.exe  .\yobot\yobot.exe }
