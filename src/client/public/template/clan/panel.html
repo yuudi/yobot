@@ -28,7 +28,7 @@
 
 <body>
   <div id="app">
-    <el-page-header @back="location='../../user'" :content="groupData.group_name + ' - 公会战'" style="margin-bottom: 25px"></el-page-header>
+    <el-page-header @back="location='../../user'" :content="groupData.group_name + ' - 公会战'"></el-page-header>
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1">面板</el-menu-item>
       <el-menu-item index="2">预约</el-menu-item>
@@ -36,7 +36,7 @@
       <el-menu-item index="4">统计</el-menu-item>
       <el-menu-item index="5">我的</el-menu-item>
     </el-menu>
-    <el-container style="margin-top: 50px">
+    <el-container style="margin-top: 50px"></el-container>
       <el-header class="big">Boss状态</el-header>
       <el-main>
         <el-row>
@@ -209,9 +209,10 @@
       </el-main>
     </el-container>
   </div>
-  <footer style="text-align: center">
-    powered by <a href="https://github.com/pcrbot/yobot">yobot</a>
-  </footer>
+  <el-footer style="position: fixed;bottom: -10px;left: 50%;transform: translate(-50%, -50%);background-color: #66b1ff;color: #ffffff;
+width: 100%;font-size:15px;">
+    powered by <a href="https://github.com/pcrbot/yobot" style="text-decoration:none;color: #ffffff;">yobot</a>
+  </el-footer>
 </body>
 <script>var csrf_token = "{{ session['csrf_token'] }}";</script>
 <script src="{{ url_for('yobot_static', filename='clan/panel.js') }}"></script>

@@ -82,9 +82,10 @@
       </el-form-item>
     </el-form>
   </div>
-  <footer style="text-align: center">
-    powered by <a href="https://github.com/pcrbot/yobot">yobot</a>
-  </footer>
+  <el-footer style="text-align: center;position: fixed;bottom: -10px;left: 50%;transform: translate(-50%, -50%);background-color: #66b1ff;color: #ffffff;
+width: 100%;font-size:15px;">
+    powered by <a href="https://github.com/pcrbot/yobot" style="text-decoration:none;color: #ffffff;">yobot</a>
+  </el-footer>
 </body>
 <script>var csrf_token = "{{ session['csrf_token'] }}";</script>
 <script src="{{ url_for('yobot_static', filename='clan/setting.js') }}"></script>

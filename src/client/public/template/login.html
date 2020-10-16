@@ -1,119 +1,246 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
-<title>yobot登录</title>
-<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script> 
-<script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script> 
-<script src="{{ url_for('yobot_static', filename='password.js') }}"></script>
-<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
-<style>
-#app {
-  margin: auto;
-}
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-flow: column;
-  max-width: 400px;
-}
-.comment {
-  color: #aaa;
-  line-height: 20px;
-  font-size: 0.8em;
-  margin: 20px 0;
-}
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" />
+  <title>Yobot登录</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+  <script src="{{ url_for('yobot_static', filename='password.js') }}"></script>
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+  <style>
+    #app {
+      margin: auto;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-flow: column;
+      max-width: 400px;
+    }
+
+    .comment {
+      color: #aaa;
+      line-height: 20px;
+      font-size: 0.8em;
+      margin: 20px 0;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    h1 {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      letter-spacing: 2px;
+      font-size: 48px;
+    }
+
+    p {
+      font-family: 'Lato', sans-serif;
+      letter-spacing: 1px;
+      font-size: 14px;
+      color: #333333;
+    }
+
+    .header {
+      position: relative;
+      text-align: center;
+      background: linear-gradient(60deg, rgba(43, 122, 205, 1) 0%, rgba(0, 90, 180, 1) 100%);
+      color: white;
+    }
+
+    .inner-header {
+      height: 200px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .flex {
+      /*Flexbox for containers*/
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .waves {
+      position: relative;
+      width: 100%;
+      height: 40px;
+      margin-bottom: -7px;
+      /*Fix for safari gap*/
+      min-height: 60px;
+      max-height: 120px;
+    }
+
+    .content {
+      position: relative;
+      height: 20vh;
+      text-align: center;
+      background-color: white;
+    }
+
+    /* Animation */
+
+    .parallax>use {
+      animation: move-forever 25s cubic-bezier(.55, .5, .45, .5) infinite;
+    }
+
+    .parallax>use:nth-child(1) {
+      animation-delay: -2s;
+      animation-duration: 7s;
+    }
+
+    .parallax>use:nth-child(2) {
+      animation-delay: -3s;
+      animation-duration: 10s;
+    }
+
+    .parallax>use:nth-child(3) {
+      animation-delay: -4s;
+      animation-duration: 13s;
+    }
+
+    .parallax>use:nth-child(4) {
+      animation-delay: -5s;
+      animation-duration: 20s;
+    }
+
+    @keyframes move-forever {
+      0% {
+        transform: translate3d(-90px, 0, 0);
+      }
+
+      100% {
+        transform: translate3d(85px, 0, 0);
+      }
+    }
+
+    /*Shrinking for mobile*/
+    @media (max-width: 768px) {
+      .waves {
+        height: 40px;
+        min-height: 40px;
+      }
+
+      .content {
+        height: 30vh;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<div id="app" class="container">
-  <div class="container">
-    <h1>登录</h1>
-    {% if reason -%}
-    <el-alert title="{{ reason }}"
-                      type="error"> </el-alert>
-    {% endif -%}
-    {% if advice -%}
-    <el-alert title="{{ advice }}"
-                      type="info"> </el-alert>
-    {% endif -%}
-    <div style="margin: 20px;"></div>
-    <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-      <el-form-item label="QQ号" prop="qq">
-        <el-input v-model="form.qq" name="user" placeholder="请输入登录QQ号" @keyup.enter.native="onSubmit"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="pwd">
-        <el-input v-model="form.pwd" name="password" placeholder="这个密码不是QQ密码" type="password" @keyup.enter.native="onSubmit"></el-input>
-      </el-form-item>
-      <p class="comment">* 如果不知道密码，您可以私聊机器人“{{ prefix }}登录”或“{{ prefix }}重置密码”</p>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">登录</el-button>
-      </el-form-item>
-    </el-form>
+  <div class="header">
+    <div class="inner-header flex">
+      <h1>Yobot登录</h1>
+    </div>
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+      viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+      <defs>
+        <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+      </defs>
+      <g class="parallax">
+        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
+        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
+        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
+        <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+      </g>
+    </svg>
   </div>
-  <footer style="text-align: center"> powered by <a href="https://github.com/pcrbot/yobot">yobot</a> </footer>
-</div>
-<script>
+  <div id="app" class="container">
+    <div class="container">
+      {% if reason -%}
+      <el-alert title="{{ reason }}" type="error"> </el-alert>
+      {% endif -%}
+      <div style="margin: 20px;"></div>
+      <el-form ref="form" :model="form" :rules="rules" label-width="0px" style="width: 300px;">
+				<el-form-item prop="qq">
+					<el-input v-model="form.qq" name="user" placeholder="请输入登录QQ号" @keyup.enter.native="onSubmit"></el-input>
+				</el-form-item>
+				<el-form-item prop="pwd">
+					<el-input v-model="form.pwd" name="password" placeholder="这个密码不是QQ密码" type="password" @keyup.enter.native="onSubmit"></el-input>
+				</el-form-item>
+        <p class="comment">* 如果不知道密码，您可以私聊机器人“{{ prefix }}登录”或“{{ prefix }}重置密码”</p>
+        <el-form-item>
+					<el-button type="primary" @click="onSubmit" style="width: 100%;">登录</el-button>
+				</el-form-item>
+			</el-form>
+    </div>
+  </div>
+  <el-footer style="text-align: center;position: fixed;bottom: -11px;left: 50%;transform: translate(-50%, -50%);background-color: #66b1ff;color: #ffffff;
+width: 100%;font-size:15px;">
+        powered by <a href="https://github.com/pcrbot/yobot" style="text-decoration:none;color: #ffffff;">yobot</a>
+  </el-footer>
+  <script>
     new Vue({
-        el: '#app',
-        data: {
-            form: {
-                qq: "",
-                pwd: ""
-            },
-            rules: {
-                qq: [
-                    {required: true, message: '必须输入您的QQ号', trigger: 'blur'}
-                ],
-                pwd: [
-                    {required: true, message: '必须输入您的密码', trigger: 'blur'},
-                ],
-            }
+      el: '#app',
+      data: {
+        form: {
+          qq: "",
+          pwd: ""
         },
-        methods() {
-            if (localStorage.login_qqid) {
-                this.form.qq = String(localStorage.login_qqid);
-            }
-        },
-        methods: {
-            post: function (url, params) {
-                //创建form表单
-                const temp_form = document.createElement("form");
-                temp_form.action = url;
-                //如需打开新窗口，form的target属性要设置为'_blank'
-                // temp_form.target = "_blank";
-                temp_form.method = "post";
-                temp_form.style.display = "none";
-                //添加参数
-                for (const key in params) {
-                    const opt = document.createElement("textarea");
-                    opt.name = key;
-                    opt.value = params[key];
-                    temp_form.appendChild(opt);
-                }
-                document.body.appendChild(temp_form);
-                //提交数据
-                temp_form.submit();
-            },
-            onSubmit: function () {
-                localStorage.login_qqid = this.form.qq;
-                this.$refs['form'].validate((valid) => {
-                    if (valid) {
-                        const url = "{{ url_for('yobot_login') }}";
-                        this.post(url, {
-                            qqid: this.form.qq,
-                            pwd: getHashWithSalt(this.form.pwd + this.form.qq)
-                        });
-                    } else {
-                        console.log('请检查输入！');
-                        return false;
-                    }
-                });
-            }
+        rules: {
+          qq: [
+            { required: true, message: '必须输入您的QQ号', trigger: 'blur' }
+          ],
+          pwd: [
+            { required: true, message: '必须输入您的密码', trigger: 'blur' },
+          ],
         }
+      },
+      methods() {
+        if (localStorage.login_qqid) {
+          this.form.qq = String(localStorage.login_qqid);
+        }
+      },
+      methods: {
+        post: function (url, params) {
+          //创建form表单
+          const temp_form = document.createElement("form");
+          temp_form.action = url;
+          //如需打开新窗口，form的target属性要设置为'_blank'
+          // temp_form.target = "_blank";
+          temp_form.method = "post";
+          temp_form.style.display = "none";
+          //添加参数
+          for (const key in params) {
+            const opt = document.createElement("textarea");
+            opt.name = key;
+            opt.value = params[key];
+            temp_form.appendChild(opt);
+          }
+          document.body.appendChild(temp_form);
+          //提交数据
+          temp_form.submit();
+        },
+        onSubmit: function () {
+          localStorage.login_qqid = this.form.qq;
+          this.$refs['form'].validate((valid) => {
+            if (valid) {
+              const url = "{{ url_for('yobot_login') }}";
+              this.post(url, {
+                qqid: this.form.qq,
+                pwd: getHashWithSalt(this.form.pwd + this.form.qq)
+              });
+            } else {
+              console.log('请检查输入！');
+              return false;
+            }
+          });
+        }
+      }
     })
-</script>
+  </script>
 </body>
+
 </html>
