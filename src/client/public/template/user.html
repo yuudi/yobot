@@ -185,11 +185,11 @@
             {% endfor -%}
             {%- endif %}
         </el-row>
+        <a href="{{ url_for('yobot_about') }}">
+            <el-button size="mini" style="margin-top: 10px;">关于yobot</el-button>
+        </a>
     </div>
     <br />
-    <a href="{{ url_for('yobot_about') }}">
-        <button class="el-button el-button--info el-button--small">关于yobot</button>
-    </a>
     <el-footer style="position: fixed;bottom: -10px;left: 50%;transform: translate(-50%, -50%);background-color: #66b1ff;color: #ffffff;
 width: 100%;font-size:15px;">
         powered by <a href="https://github.com/pcrbot/yobot" style="text-decoration:none;color: #ffffff;">yobot</a>
