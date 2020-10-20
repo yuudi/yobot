@@ -1,36 +1,113 @@
 <!DOCTYPE html>
 
 <head>
-    <title>公会战 - 数据分析</title>
-    <style>
-        .statisticpage{font-size: 32px;}
-        .authorinfo{font-size: 12px;}
-    </style>
+	<title>公会战 - 数据分析</title>
+	<meta name='viewport' content='width=480' charset="utf-8" />
+	<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js"></script>
+	<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+	<style>
+		body {
+			text-align: center;
+		}
+
+		.el-row {
+			margin-bottom: 15px;
+		}
+
+		.lib {
+			display: inline-block;
+			text-align: center;
+			margin: 10px;
+		}
+
+		.lib2 {
+			display: inline-block;
+			width: 80px;
+			margin: 5px;
+		}
+	</style>
 </head>
 
 <body>
-    <p><a href="../">返回</a></p>
-    <h1>图表</h1>
-    <p><br/><br/>
-        <span class="statisticpage"><a href="./2/"><img style="width:140px;height:140px" src="{{ url_for('yobot_static', filename='clan/statistics/pie.png') }}"><br/>数据图表</a></span> <span class="authorinfo">by <a href="https://github.com/Diving-Fish">@Diving-Fish</a> & <a href="https://github.com/winrey">@Winrey</a></span>
-        <br/><br/>
-        <span class="statisticpage"><a href="#" target="_blank" id="clan-battle-analyzer"><img style="width:140px;height:140px" src="{{ url_for('yobot_static', filename='clan/statistics/deviation.png') }}"><br/>均值偏差</a></span> <span class="authorinfo">by <a href="https://github.com/Alive24">@Alive24</a></span>
-    <br/><br/><br/><br/><br/></p>
-    <h2>更多分析</h2>
-    <p><span class="more-statisticpage"><a href="./1/">>出刀顺序表</a></span> <span class="authorinfo">by <a href="https://github.com/Ai-Himmel">@Ai-Himmel</a></span></p>
-    <p><span class="more-statisticpage"><a href="#" target="_blank" id="pcrd-yobot-fe">>多维度分析</a></span>（需要开启api访问） <span class="authorinfo">by <a href="https://github.com/Tan90Qian">@Tan90Qian</a></span></p>
-    <!-- 更多统计方式欢迎提交 pull request，建议采用 api 调用的方式 -->
-    <p>
-        原始数据（json格式）<br>
-        <a href="./api/">查看本轮</a> <a href="./api/" download>下载本轮</a><br>
-        <a href="./api/?battle_id=all">查看全部</a> <a href="./api/?battle_id=all" download>下载全部</a><br>
-        {% if allow_api -%}
-        api地址：<input id="apiurl"><input type="button" value="复制" id="copy">
-        {% else -%}
-        api访问已禁用，如需开启请前往<a href="../setting/">公会设置</a>
-        {% endif -%}
-    </p>
-    <!--
+	<div id="app">
+		<el-page-header @back="location='..'" content="数据统计"></el-page-header>
+		<el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleTitleSelect">
+			<el-menu-item index="1">面板</el-menu-item>
+			<el-menu-item index="2">预约</el-menu-item>
+			<el-menu-item index="3">查刀</el-menu-item>
+			<el-menu-item index="4">统计</el-menu-item>
+			<el-menu-item index="5">我的</el-menu-item>
+		</el-menu>
+		<h1 style="text-align:center">选择查看方式</h1><br>
+		<el-row>
+			<el-button class="lib" type="primary" @click="location.href='./1/'"><img style="width:100px;height:100px"
+					src="{{ url_for('yobot_static', filename='clan/statistics/order.png') }}"><br><br>出刀顺序</el-button>
+			<el-button class="lib" type="warning" @click="location.href='./2/'"><img style="width:100px;height:100px"
+				src="{{ url_for('yobot_static', filename='clan/statistics/pie.png') }}"><br><br>数据图表</el-button>
+			<a href="#" target="_blank" id="clan-battle-analyzer">
+				<el-button class="lib" type="danger"><img style="width:100px;height:100px" src="{{ url_for('yobot_static', filename='clan/statistics/deviation.png') }}"><br><br>均值偏差</el-button>
+			</a>
+			<a href="#" target="_blank" id="pcrd-yobot-fe">
+				<el-button class="lib" type="success"><img style="width:100px;height:100px"
+					src="{{ url_for('yobot_static', filename='clan/statistics/many.png') }}"><br><br>多维分析</el-button>
+			</a>
+		</el-row>
+		<h2>原始数据</h2>
+		<div class="lib2"><a href="./api/"><button class="el-button el-button--info el-button--small">查看本轮</button></a>
+		</div>
+		<div class="lib2"><a href="./api/" download><button
+					class="el-button el-button--info el-button--small">下载本轮</button></a><br></div>
+		<div class="lib2"><a href="./api/?battle_id=all"><button
+					class="el-button el-button--info el-button--small">查看全部</button></a></div>
+		<div class="lib2"><a href="./api/?battle_id=all" download><button
+					class="el-button el-button--info el-button--small">下载全部</button></a><br></div>
+		<br><br><br>
+		<div>
+			{% if allow_api -%}
+			<input id="apiurl" style=" position: fixed;width: 5px;top: -30px;height: 6px;" readonly />
+			<input type="button" value="获取api" id="copy" class="el-button el-button--mini">
+			{% else -%}
+			api访问已禁用，如需开启请前往<a href="../setting/">
+				<el-button size="mini">公会设置</el-button>
+			</a>
+			{% endif -%}
+		</div>
+	</div>
+	<!-- 
+	出刀顺序 by @Ai-Himmel https://github.com/Ai-Himmel
+	数据图表 by @Diving-Fish & @Winrey https://github.com/Diving-Fish
+	均值偏差 by @Alive24 https://github.com/Alive24
+	多维分析 by @Tan90Qian https://github.com/Tan90Qian
+
+	更多统计方式欢迎提交 pull request，建议采用 api 调用的方式 
+-->
+	<p>
+
+	</p>
+	<el-footer style="text-align: center;position: fixed;bottom: -10px;left: 50%;transform: translate(-50%, -50%);background-color: #66b1ff;color: #ffffff;
+width: 100%;font-size:15px;">
+		powered by <a href="https://github.com/pcrbot/yobot" style="text-decoration:none;color: #ffffff;">yobot</a>
+	</el-footer>
+</body>
+
+<script src="{{ url_for('yobot_static', filename='clan/statistics.js') }}"></script>
+<script>
+	var apikey = "{{ apikey }}";
+	var apiurl = window.location.href + "api/?apikey=" + apikey
+	document.getElementById("apiurl").value = apiurl;
+	document.getElementById("pcrd-yobot-fe").href = "http://tools.yobot.win/pcrd-yobot-fe/#" + encodeURIComponent(apiurl);
+	document.getElementById("clan-battle-analyzer").href = "http://clan-battle-analyzer.pcrbot.com/?apiURL=" + encodeURIComponent(apiurl);
+	document.getElementById("copy").addEventListener("click", e => {
+		document.getElementById("apiurl").select();
+		document.execCommand("Copy");
+		alert("API已复制到剪贴板");
+	})
+</script>
+
+</html>
+<!--
         api说明：
         公会战管理员在设置中开启“允许外部api调用”后，可在外部直接调用，
         也可以直接下载json文件
@@ -48,21 +125,4 @@
         groupinfo：群组信息
         members：成员列表
         challenges：出刀记录表
-    -->
-
-<script>
-    var apikey = "{{ apikey }}";
-    var apiurl = window.location.href + "api/?apikey=" + apikey
-    document.getElementById("apiurl").value = apiurl;
-    document.getElementById("pcrd-yobot-fe").href = "http://tools.yobot.win/pcrd-yobot-fe/#" + encodeURIComponent(apiurl);
-    document.getElementById("clan-battle-analyzer").href = "http://clan-battle-analyzer.pcrbot.com/?apiURL=" + encodeURIComponent(apiurl);
-    document.getElementById("copy").addEventListener("click", e => {
-        document.getElementById("apiurl").select();
-        document.execCommand("Copy");
-        alert("已复制。");
-    })
-</script>
-
-</body>
-
-</html>
+	-->
