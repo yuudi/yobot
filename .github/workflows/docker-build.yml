@@ -1,6 +1,8 @@
 name: docker-build
 
-on: [release]
+on:
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -17,4 +19,4 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESSTOKEN }}
           repository: yobot/yobot
-          tags: latest,slim
+          tags: latest,3

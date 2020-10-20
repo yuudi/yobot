@@ -1,8 +1,19 @@
 ﻿# this file should be saved as "UTF-8 with BOM"
 $ErrorActionPreference = "Stop"
 
+function Expand-ZIPFile($file, $destination) {
+  $file = (Resolve-Path -Path $file).Path
+  $destination = (Resolve-Path -Path $destination).Path
+	$shell = new-object -com shell.application
+	$zip = $shell.NameSpace($file)
+	foreach($item in $zip.items())
+		{
+			$shell.Namespace($destination).copyhere($item)
+		}
+}
+
 # 检查运行环境
-if ($Host.Version.Major -lt 5) {
+if ($Host.Version.Major -lt 3) {
     Write-Output 'powershell 版本过低，无法一键安装'
     exit
 }
@@ -11,8 +22,10 @@ if ((Get-ChildItem -Path Env:OS).Value -ine 'Windows_NT') {
     exit
 }
 if (![Environment]::Is64BitProcess) {
-    Write-Output '暂时不支持32位系统'
-    exit
+    $OStype = 'windows-amd64'
+}
+else {
+    $OStype = 'windows-386'
 }
 if (Test-Path .\qqbot) {
     Write-Output '发现重复，是否删除旧文件并重新安装？'
@@ -27,13 +40,7 @@ if (Test-Path .\qqbot) {
 # 用户输入
 $qqid = Read-Host '请输入作为机器人的QQ号：'
 $qqpassword = Read-Host -AsSecureString '请输入作为机器人的QQ密码：'
-Write-Output '是否使用YoCool皮肤（测试版）：'
-$yocool = Read-Host '请输入 y 或 n (y/n)'
-Switch ($yocool) {
-    Y { $yocool = $true }
-    N { $yocool = $false }
-    Default { $yocool = $false }
-}
+
 Write-Output '是否监听80端口（如果此服务器没有其他网站，建议选 y）：'
 $listen_80 = Read-Host '请输入 y 或 n (y/n)'
 Switch ($listen_80) {
@@ -49,18 +56,22 @@ New-Item -ItemType Directory -Path .\yobot, .\yobot\yobot_data, .\mirai, .\mirai
 
 # 下载程序
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest https://down.yobot.club/tools/wget.exe -OutFile .\wget.exe
-.\wget.exe https://download.fastgit.org/Mrs4s/go-cqhttp/releases/download/v0.9.25-fix3/go-cqhttp-v0.9.25-fix3-windows-amd64.zip -O .\go-cqhttp.zip
-Expand-Archive go-cqhttp.zip -DestinationPath .\mirai\
-Remove-Item go-cqhttp.zip
-if ($yocool) {
-    .\wget.exe https://down.yobot.club/yobot/yocool.zip -O .\yobot.zip
+$releases = ConvertFrom-Json(Invoke-WebRequest https://api.github.com/repos/Mrs4s/go-cqhttp/releases)
+$exeDownloadUrl = ''
+foreach ($assetsFile in $releases[0].assets) {
+    if ($assetsFile.name.EndsWith("${OStype}.zip")) {
+        $exeDownloadUrl = $assetsFile.browser_download_url
+        break
+    }
 }
-else {
-    .\wget.exe https://down.yobot.club/yobot/yobot.zip -O .\yobot.zip
-}
-Expand-Archive yobot.zip -DestinationPath .\yobot\
-if ($yocool) { Move-Item .\yobot\yobot--with-yocool.exe  .\yobot\yobot.exe }
+$exeDownloadUrl = $exeDownloadUrl -replace "https://github.com", "https://download.fastgit.org"
+Invoke-WebRequest $exeDownloadUrl -O .\go-cqhttp-latest-windows-amd64.zip
+Expand-ZIPFile go-cqhttp-latest-windows-amd64.zip -Destination .\mirai\
+Remove-Item go-cqhttp-latest-windows-amd64.zip
+
+Invoke-WebRequest https://down.yu.al/others/qqbot/yobot/yobot-latest.zip -O .\yobot.zip
+
+Expand-ZIPFile yobot.zip -Destination .\yobot\
 Remove-Item yobot.zip
 
 # 生成随机 access_token

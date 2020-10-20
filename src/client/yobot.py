@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.5]"
-    Version_id = 213
+    Version = "[v3.6.6]"
+    Version_id = 215
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -311,4 +311,4 @@ class Yobot:
     def execute(self, cmd: str, *args, **kwargs):
         if cmd == "update":
             res = self.plug_passive[0].execute(0x30)
-        return res["reply"]
+            return res["reply"]

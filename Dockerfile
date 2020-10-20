@@ -8,7 +8,6 @@ ADD src/client/ /yobot
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo 'Asia/Shanghai' >/etc/timezone \
     && cd /yobot \
-    && useradd yobot \
     && pip3 install aiocqhttp==0.6.8 Quart==0.6.15 --no-cache-dir \
     && pip3 install -r requirements.txt --no-cache-dir \
     && python3 main.py \
