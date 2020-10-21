@@ -1,0 +1,33 @@
+name: windows-exe-build
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-2019
+    name: auto build windows binary
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build exe binary and archive
+        shell: cmd
+        run: |
+          cd .\src\client
+          pip install pyinstaller
+          pip install -r requirements.txt
+          pyinstaller main.spec
+          7z a yobot-windows64.zip .\dist\yobot.exe
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./src/client/dist/yobot-windows64.zip
+          asset_name: yobot-windows64.zip
+          asset_content_type: application/zip

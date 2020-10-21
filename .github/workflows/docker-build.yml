@@ -6,15 +6,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: auto build
+    runs-on: ubuntu-18.04
+    name: auto build docker
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Build image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESSTOKEN }}
