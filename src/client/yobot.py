@@ -20,12 +20,12 @@ if __package__:
     from .ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                             jjc_consult, login, marionette, push_news, settings,
                             switcher, templating, updater, web_util, ybdata,
-                            yobot_msg, custom, miner, group_leave)
+                            yobot_msg, custom, miner, group_leave, hedao)
 else:
     from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
-                           yobot_msg, custom, miner, group_leave)
+                           yobot_msg, custom, miner, group_leave, hedao)
 
 # 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -206,6 +206,7 @@ class Yobot:
             settings.Setting(**kwargs),
             web_util.WebUtil(**kwargs),
             clan_battle.ClanBattle(**kwargs),
+            hedao.Event(**kwargs),
         ]
         self.plug_passive = [p for p in plug_all if p.Passive]
         self.plug_active = [p for p in plug_all if p.Active]
