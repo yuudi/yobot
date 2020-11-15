@@ -11,7 +11,7 @@ from .yobot_exceptions import InputError, ServerError
 
 _calender_url = {
     "jp": "https://tools.yobot.win/calender/#jp",
-    "tw": "https://pcredivewiki.tw/",
+    "tw": "https://tools.yobot.win/calender/#tw",
     "cn": "https://tools.yobot.win/calender/#cn",
 }
 

@@ -17,12 +17,12 @@ from opencc import OpenCC
 from quart import Quart, send_file
 
 if __package__:
-    from .ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
+    from .ybplugins import (calender, clan_battle, gacha, homepage,
                             jjc_consult, login, marionette, push_news, settings,
                             switcher, templating, updater, web_util, ybdata,
                             yobot_msg, custom, miner, group_leave)
 else:
-    from ybplugins import (boss_dmg, calender, clan_battle, gacha, homepage,
+    from ybplugins import (calender, clan_battle, gacha, homepage,
                            jjc_consult, login, marionette, push_news, settings,
                            switcher, templating, updater, web_util, ybdata,
                            yobot_msg, custom, miner, group_leave)
@@ -34,7 +34,7 @@ else:
 
 class Yobot:
     Version = "[v3.6.7]"
-    Version_id = 217
+    Version_id = 218
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -202,7 +202,6 @@ class Yobot:
             yobot_msg.Message(**kwargs),
             gacha.Gacha(**kwargs),
             jjc_consult.Consult(**kwargs),
-            boss_dmg.Boss_dmg(**kwargs),
             push_news.News(**kwargs),
             calender.Event(**kwargs),
             homepage.Index(**kwargs),

@@ -9,14 +9,11 @@ class Message:
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.version = glo_setting["verinfo"]["ver_name"]
         self.setting = glo_setting
-        if glo_setting["clan_battle_mode"] != "chat":
-            self.help_page = urljoin(
-                glo_setting["public_address"],
-                '{}help/'.format(glo_setting['public_basepath']))
-            if glo_setting['web_mode_hint']:
-                self.help_page += '\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
-        else:
-            self.help_page = "https://gitee.com/yobot/yobot/blob/master/documents/features/old.md"
+        self.help_page = urljoin(
+            glo_setting["public_address"],
+            '{}help/'.format(glo_setting['public_basepath']))
+        if glo_setting['web_mode_hint']:
+            self.help_page += '\n\n如果无法打开，请仔细阅读教程中《链接无法打开》的说明'
 
     @staticmethod
     def match(cmd: str) -> int:
