@@ -258,6 +258,8 @@ class Updater:
                 await self.send_reply(msg, '开始自动拉取git更新')
                 reply = await self.windows_update_git_async(force, ver)
         else:
+            if self.evn == "docker":
+                return "此版本无法自动更新"
             await self.send_reply(msg, '开始自动拉取git更新')
             reply = await self.linux_update_async(force, ver)
         return {
@@ -338,7 +340,7 @@ def get_version(base_version: str, base_commit:  int) -> dict:
         }
     if os.path.exists('/.dockerenv'):
         return {
-            "run-as": "python",
+            "run-as": "docker",
             "commited": False,
             "ver_name": f"yobot{base_version} on Docker"
         }

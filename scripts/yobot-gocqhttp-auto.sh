@@ -2,7 +2,7 @@
 set -e
 
 # ensure amd64
-if [ $(dpkg --print-architecture) != "amd64" ]; then
+if [ $(uname -m) != "x86_64" ]; then
     echo "Sorry, the architecture of your device is not supported yet."
     exit
 fi
@@ -21,7 +21,8 @@ What will it do:
 2. run yobot in docker
 3. run go-cqhttp in docker
 
-After script finished, you need to press 'ctrl-p, ctrl-q' to detach the container.
+After script finished, you need to press 'ctrl-P, ctrl-Q' to detach the container.
+此脚本执行结束并登录后，你需要按下【ctrl-P，ctrl-Q】连续组合键以挂起容器
 
 "
 
@@ -46,7 +47,7 @@ docker pull alpine
 docker pull yobot/yobot
 
 echo "downloading latest gocqhttp"
-docker run --rm -v ${PWD}:/work -w /work python:3.7-slim-buster python3 -c "
+docker run --rm -v ${PWD}:/work -w /work yobot/yobot python3 -c "
 import json
 import urllib.request
 url = 'https://api.github.com/repos/Mrs4s/go-cqhttp/releases'
@@ -67,20 +68,20 @@ rm go-cqhttp.tar.gz -f
 echo "building gocqhttp container"
 echo "
 FROM alpine:latest
-ADD go-cqhttp /bin/go-cqhttp
-WORKDIR /bot
-ENTRYPOINT /bin/go-cqhttp
+ADD go-cqhttp /usr/bin/cqhttp
+WORKDIR /data
+ENTRYPOINT /usr/bin/cqhttp
 ">Dockerfile
 docker build . -t gocqhttp
-rm Dockerfile -f
+rm Dockerfile go-cqhttp -f
 
 echo "initializing gocqhttp configure file"
 docker run --rm \
-           -v ${PWD}/gocqhttp_data:/bot \
+           -v ${PWD}/gocqhttp_data:/data \
            gocqhttp >/dev/null 2>&1
 
 echo "writing configure files"
-docker run --rm -v ${PWD}:/work -w /work -e qqid -e qqpassword python:3.7-slim-buster python3 -c "
+docker run --rm -v ${PWD}:/work -w /work -e qqid -e qqpassword yobot/yobot python3 -c "
 import json, os, random, string
 access_token = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16))
 with open('yobot_data/yobot_config.json', 'w') as f:
@@ -118,5 +119,5 @@ echo "starting gocqhttp"
 docker run -it \
            --name gocqhttp \
            --network qqbot \
-           -v ${PWD}/gocqhttp_data:/bot \
+           -v ${PWD}/gocqhttp_data:/data \
            gocqhttp

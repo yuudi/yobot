@@ -33,8 +33,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.6]"
-    Version_id = 215
+    Version = "[v3.6.7]"
+    Version_id = 217
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -64,7 +64,8 @@ class Yobot:
         with open(default_config_f_path, "r", encoding="utf-8") as config_file:
             self.glo_setting = json.load(config_file)
         if not os.path.exists(config_f_path):
-            shutil.copyfile(default_config_f_path, config_f_path)
+            with open(config_f_path, "w") as f:
+                f.write("{}")
             print("设置已初始化，发送help获取帮助")
         boss_filepath = os.path.join(dirname, "boss3.json")
         if not os.path.exists(boss_filepath):
@@ -84,6 +85,10 @@ class Yobot:
                 default_pool_filepath = os.path.join(
                     os.path.dirname(__file__), "packedfiles", "default_pool.json")
             shutil.copyfile(default_pool_filepath, pool_filepath)
+        for e in os.environ:
+            if e.startswith("YOBOT_"):
+                k = e[6:].lower()
+                self.glo_setting[k] = os.environ[e]
         with open(config_f_path, "r", encoding="utf-8-sig") as config_file:
             cfg = json.load(config_file)
             for k in self.glo_setting.keys():

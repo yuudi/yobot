@@ -1,13 +1,14 @@
 name: windows-exe-build
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*"
 
 jobs:
   build:
     runs-on: windows-2019
-    name: auto build windows binary
+    name: build windows binary
 
     steps:
       - name: Checkout code
@@ -17,17 +18,29 @@ jobs:
         shell: cmd
         run: |
           cd .\src\client
-          pip install pyinstaller
           pip install -r requirements.txt
+          pip install pyinstaller
           pyinstaller main.spec
-          7z a yobot-windows64.zip .\dist\yobot.exe
+          cd .\dist
+          7z a yobot-windows64.zip .\yobot.exe
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./src/client/dist/yobot-windows64.zip
           asset_name: yobot-windows64.zip
           asset_content_type: application/zip

@@ -1,8 +1,9 @@
 name: docker-build
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -19,4 +20,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESSTOKEN }}
           repository: yobot/yobot
-          tags: latest,3
+          dockerfile: scripts/slim.Dockerfile
+          tags: latest,slim
+
+      - name: Build image on pypy
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESSTOKEN }}
+          repository: yobot/yobot
+          dockerfile: scripts/pypy.Dockerfile
+          tags: pypy
