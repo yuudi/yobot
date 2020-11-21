@@ -1107,8 +1107,8 @@ class ClanBattle:
             expressions.append(Clan_challenge.bid == battle_id)
         member_list = []
         for u in Clan_challenge.select(
-            Clan_challenge.qqid,
-            User.nickname,
+            Clan_challenge,
+            User,
         ).join(
             User,
             on=(Clan_challenge.qqid == User.qqid),
