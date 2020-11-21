@@ -28,8 +28,6 @@ After script finished, you need to press 'ctrl-P, ctrl-Q' to detach the containe
 
 read -p "请输入作为机器人的QQ号：" qqid
 read -p "请输入作为机器人的QQ密码：" qqpassword
-export qqid
-export qqpassword
 
 echo "开始安装，请等待"
 
@@ -72,40 +70,52 @@ ADD go-cqhttp /usr/bin/cqhttp
 WORKDIR /data
 ENTRYPOINT /usr/bin/cqhttp
 ">Dockerfile
-docker build . -t gocqhttp
+docker build -t gocqhttp .
 rm Dockerfile go-cqhttp -f
 
-echo "initializing gocqhttp configure file"
-docker run --rm \
-           -v ${PWD}/gocqhttp_data:/data \
-           gocqhttp >/dev/null 2>&1
+access_token="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
 
-echo "writing configure files"
-docker run --rm -v ${PWD}:/work -w /work -e qqid -e qqpassword yobot/yobot python3 -c "
-import json, os, random, string
-access_token = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16))
-with open('yobot_data/yobot_config.json', 'w') as f:
-    json.dump({'access_token': access_token}, f, indent=4)
-with open('gocqhttp_data/config.json', 'r+') as f:
-    config = json.load(f)
-    config['uin'] = int(os.environ['qqid'])
-    config['password'] = os.environ['qqpassword']
-    config['access_token'] = access_token
-    config['enable_db'] = False
-    config['web_ui']['enabled'] = False
-    config['http_config']['enabled'] = False
-    config['ws_config']['enabled'] = False
-    config['ws_reverse_servers'] = [{
-        'enabled': True,
-        'reverse_url': 'ws://yobot:9222/ws/',
-        'reverse_api_url': '',
-        'reverse_event_url': '',
-        'reverse_reconnect_interval': 3000
-    }]
-    f.seek(0)
-    f.truncate()
-    json.dump(config, f, indent=4)
-"
+echo "
+{
+  \"uin\": ${qqid},
+  \"password\": \"${qqpassword}\",
+  \"encrypt_password\": false,
+  \"password_encrypted\": \"\",
+  \"enable_db\": false,
+  \"access_token\": \"${access_token}\",
+  \"relogin\": {
+    \"enabled\": true,
+    \"relogin_delay\": 3,
+    \"max_relogin_times\": 0
+  },
+  \"_rate_limit\": {
+    \"enabled\": false,
+    \"frequency\": 1,
+    \"bucket_size\": 1
+  },
+  \"post_message_format\": \"string\",
+  \"ignore_invalid_cqcode\": false,
+  \"force_fragmented\": true,
+  \"heartbeat_interval\": 5,
+  \"use_sso_address\": false,
+  \"http_config\": {
+    \"enabled\": false
+  },
+  \"ws_config\": {
+    \"enabled\": false
+  },
+  \"ws_reverse_servers\": [
+    {
+      \"enabled\": true,
+      \"reverse_url\": \"ws://yobot:9222/ws/\",
+      \"reverse_reconnect_interval\": 3000
+    }
+  ],
+  \"web_ui\": {
+    \"enabled\": false
+  }
+}
+">gocqhttp_data/config.json
 
 echo "starting yobot"
 docker run -d \
@@ -113,6 +123,7 @@ docker run -d \
            -p 9222:9222 \
            --network qqbot \
            -v ${PWD}/yobot_data:/yobot/yobot_data \
+           -e YOBOT_ACCESS_TOKEN="$access_token" \
            yobot/yobot
 
 echo "starting gocqhttp"

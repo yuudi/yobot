@@ -8,7 +8,7 @@ function Expand-ZIPFile($file, $destination) {
   $zip = $shell.NameSpace($file)
   foreach ($item in $zip.items()) {
     $shell.Namespace($destination).copyhere($item)
-		}
+  }
 }
 
 # 检查运行环境
@@ -40,9 +40,9 @@ if (Test-Path .\qqbot) {
 $qqid = Read-Host '请输入作为机器人的QQ号：'
 $qqpassword = Read-Host -AsSecureString '请输入作为机器人的QQ密码：'
 
-$port = Read-Host '请输入端口（范围8000到65535，直接回车则随机）：'
+$port = Read-Host '请输入端口（范围8000到49151，直接回车则随机）：'
 if (!$port) {
-  $port = Get-Random -Minimum 8000 -Maximum 65535
+  $port = Get-Random -Minimum 8000 -Maximum 49151
 }
 
 Write-Output '是否部署 caddy 网络服务器（如果你打算部署其他网络服务器如 nginx 等，建议选否）：'
@@ -104,7 +104,7 @@ if ($domain) {
 }
 else {
   $ip = (Invoke-WebRequest api.ipify.org).content
-  if (use_caddy) {
+  if ($use_caddy) {
     $public_address = "http://${ip}"
   }
   else {
@@ -139,6 +139,7 @@ New-Item -Path .\mirai\config.json -ItemType File -Value @"
   "ignore_invalid_cqcode": false,
   "force_fragmented": true,
   "heartbeat_interval": 5,
+  "use_sso_address": false,
   "http_config": {
     "enabled": false
   },
