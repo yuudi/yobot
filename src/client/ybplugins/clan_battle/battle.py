@@ -182,7 +182,7 @@ class ClanBattle:
             user = User.get_or_create(qqid=member['user_id'])[0]
             membership = Clan_member.get_or_create(
                 group_id=group_id, qqid=member['user_id'])[0]
-            user.nickname = member.get('card') or member['nickname']
+            user.nickname = member.get('card') or member.get('nickname') or member['user_id']
             user.clan_group_id = group_id
             if user.authority_group >= 10:
                 user.authority_group = (
@@ -1107,18 +1107,24 @@ class ClanBattle:
             expressions.append(Clan_challenge.bid == battle_id)
         member_list = []
         for u in Clan_challenge.select(
-            Clan_challenge,
-            User,
+            Clan_challenge.qqid,
+            User.nickname,
         ).join(
             User,
+            peewee.JOIN.LEFT_OUTER,
             on=(Clan_challenge.qqid == User.qqid),
             attr='user',
         ).where(
             *expressions
         ).distinct():
+            user = getattr(u, 'user', None)  # 用户数据可能不存在
+            if user is None:
+                nickname = str(u.qqid)  # 不存在则用 id 代替 nickname
+            else:
+                nickname = u.user.nickname
             member_list.append({
                 'qqid': u.qqid,
-                'nickname': u.user.nickname,
+                'nickname': nickname,
             })
         return member_list
 
