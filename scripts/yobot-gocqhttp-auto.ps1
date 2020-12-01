@@ -21,10 +21,8 @@ if ((Get-ChildItem -Path Env:OS).Value -ine 'Windows_NT') {
   exit
 }
 if (![Environment]::Is64BitProcess) {
-  $OStype = 'windows-amd64'
-}
-else {
-  $OStype = 'windows-386'
+  Write-Output '对不起，此脚本只支持64位系统'
+  exit
 }
 if (Test-Path .\qqbot) {
   Write-Output '发现重复，是否删除旧文件并重新安装？'
@@ -65,26 +63,17 @@ New-Item -ItemType Directory -Path .\yobot, .\yobot\yobot_data, .\mirai
 
 # 下载程序
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$releases = ConvertFrom-Json(Invoke-WebRequest https://api.github.com/repos/Mrs4s/go-cqhttp/releases)
-$exeDownloadUrl = ''
-foreach ($assetsFile in $releases[0].assets) {
-  if ($assetsFile.name.EndsWith("${OStype}.zip")) {
-    $exeDownloadUrl = $assetsFile.browser_download_url
-    break
-  }
-}
-$exeDownloadUrl = $exeDownloadUrl -replace "https://github.com", "https://download.fastgit.org"
-Invoke-WebRequest $exeDownloadUrl -O .\go-cqhttp-latest-windows-amd64.zip
-Expand-ZIPFile go-cqhttp-latest-windows-amd64.zip -Destination .\mirai\
-Remove-Item go-cqhttp-latest-windows-amd64.zip
+Invoke-WebRequest https://down.yobot.club/yobot/go-cqhttp-v0.9.29-fix2-windows-amd64.zip -OutFile .\go-cqhttp-v0.9.29-fix2-windows-amd64.zip
+Expand-ZIPFile go-cqhttp-v0.9.29-fix2-windows-amd64.zip -Destination .\mirai\
+Remove-Item go-cqhttp-v0.9.29-fix2-windows-amd64.zip
 
-Invoke-WebRequest https://down.yu.al/others/qqbot/yobot/yobot-latest.zip -O .\yobot.zip
+Invoke-WebRequest https://down.yobot.club/yobot/yobot-3.6.7-windows64.zip -OutFile .\yobot.zip
 
 Expand-ZIPFile yobot.zip -Destination .\yobot\
 Remove-Item yobot.zip
 
 if ($use_caddy) {  
-  Invoke-WebRequest https://download.fastgit.org/caddyserver/caddy/releases/download/v2.2.1/caddy_2.2.1_windows_amd64.zip -O .\caddy_2.2.1_windows_amd64.zip
+  Invoke-WebRequest https://down.yobot.club/yobot/caddy_2.2.1_windows_amd64.zip -OutFile .\caddy_2.2.1_windows_amd64.zip
   New-Item -ItemType Directory -Path caddy
   Expand-ZIPFile caddy_2.2.1_windows_amd64.zip -Destination .\caddy\
   Remove-Item caddy_2.2.1_windows_amd64.zip
@@ -138,7 +127,7 @@ New-Item -Path .\mirai\config.json -ItemType File -Value @"
   "post_message_format": "string",
   "ignore_invalid_cqcode": false,
   "force_fragmented": true,
-  "heartbeat_interval": 5,
+  "heartbeat_interval": 0,
   "use_sso_address": false,
   "http_config": {
     "enabled": false
@@ -181,7 +170,7 @@ respond /ws/* "Forbidden" 403 {
   close
 }
 reverse_proxy / http://127.0.0.1:${port} {
-  header_up X-Real-IP {remote}
+  header_up X-Real-IP {remote_host}
 }
 "@
 }

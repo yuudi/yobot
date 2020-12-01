@@ -41,37 +41,8 @@ else
 fi
 
 docker network create qqbot
-docker pull alpine
-docker pull yobot/yobot
-
-echo "downloading latest gocqhttp"
-docker run --rm -v ${PWD}:/work -w /work yobot/yobot python3 -c "
-import json
-import urllib.request
-url = 'https://api.github.com/repos/Mrs4s/go-cqhttp/releases'
-resp = urllib.request.urlopen(url).read().decode('utf-8')
-assets = json.loads(resp)[0]['assets']
-for item in assets:
-    if item['name'].endswith('linux-amd64.tar.gz'):
-        download = item['browser_download_url']
-        break
-resp = urllib.request.urlopen(download).read()
-f = open('go-cqhttp.tar.gz', 'wb')
-f.write(resp)
-f.close()
-"
-tar zxf go-cqhttp.tar.gz
-rm go-cqhttp.tar.gz -f
-
-echo "building gocqhttp container"
-echo "
-FROM alpine:latest
-ADD go-cqhttp /usr/bin/cqhttp
-WORKDIR /data
-ENTRYPOINT /usr/bin/cqhttp
-">Dockerfile
-docker build -t gocqhttp .
-rm Dockerfile go-cqhttp -f
+docker pull pcrbot/gocqhttp:0.9.29-fix2
+docker pull yobot/yobot:slim
 
 access_token="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
 
@@ -124,11 +95,11 @@ docker run -d \
            --network qqbot \
            -v ${PWD}/yobot_data:/yobot/yobot_data \
            -e YOBOT_ACCESS_TOKEN="$access_token" \
-           yobot/yobot
+           yobot/yobot:slim
 
 echo "starting gocqhttp"
 docker run -it \
            --name gocqhttp \
            --network qqbot \
            -v ${PWD}/gocqhttp_data:/data \
-           gocqhttp
+           pcrbot/gocqhttp:0.9.29-fix2
