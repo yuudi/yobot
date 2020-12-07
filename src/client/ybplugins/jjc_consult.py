@@ -32,8 +32,8 @@ class Consult:
     Passive = True
     Active = False
     Request = False
-    Nicknames_csv = "https://gitee.com/yobot/pcr-nickname/raw/master/nicknames.csv"
-    Nicknames_repo = "https://gitee.com/yobot/pcr-nickname/blob/master/nicknames.csv"
+    Nicknames_csv = "https://cdn.jsdelivr.net/gh/pcrbot/pcr-nickname@master/nicknames_zh-cn.csv"
+    Nicknames_repo = "https://github.com/pcrbot/pcr-nickname/blob/master/nicknames_zh-cn.csv"
 
     def __init__(self, glo_setting: dict, *args, **kwargs):
         self.setting = glo_setting
@@ -46,7 +46,7 @@ class Consult:
             with open(nickfile, encoding="utf-8-sig") as f:
                 csv = f.read()
                 for line in csv.split("\n")[1:]:
-                    row = line.split(",")
+                    row = line.replace('"','').split(",")
                     for col in row:
                         self.nickname_dict[col] = (row[0], row[1])
         self.output_foler = os.path.join(self.setting['dirname'], 'output')
@@ -67,7 +67,7 @@ class Consult:
         with open(nickfile, encoding="utf-8-sig") as f:
             csv = f.read()
             for line in csv.split("\n")[1:]:
-                row = line.split(",")
+                row = line.replace('"','').split(",")
                 for col in row:
                     self.nickname_dict[col] = (row[0], row[1])
 

@@ -42,5 +42,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./src/client/dist/yobot-windows64.zip
-          asset_name: yobot-windows64.zip
+          asset_name: yobot-${{ github.ref }}-windows64.zip
           asset_content_type: application/zip

@@ -84,7 +84,7 @@ else {
 }
 
 if ($domain) {
-  if (use_caddy) {
+  if ($use_caddy) {
     $public_address = "https://${domain}"
   }
   else {
