@@ -23,7 +23,7 @@ var vm = new Vue({
             axios.post('../api/', {
                 action: 'get_challenge',
                 csrf_token: csrf_token,
-                ts: (thisvue.get_today() / 1000) + 43200,
+                ts: (thisvue.get_now() / 1000),
             }),
             axios.post('../api/', {
                 action: 'get_member_list',
@@ -44,18 +44,15 @@ var vm = new Vue({
                 m.detail = [];
             }
             thisvue.today = res.data.today;
-            thisvue.reportDate = thisvue.get_today();
             thisvue.refresh(res.data.challenges);
         })).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');
         });
     },
     methods: {
-        get_today: function () {
+        get_now: function () {
             let d = new Date();
-            d -= 18000000;
-            d = new Date(d).setHours(0, 0, 0, 0);
-            return d;
+            return Date.parse(d);
         },
         csummary: function (cha) {
             if (cha == undefined) {
@@ -69,9 +66,10 @@ var vm = new Vue({
             }
             var nd = new Date();
             nd.setTime(cha.challenge_time * 1000);
-            var detailstr = nd.toLocaleString('chinese', { hour12: false, timeZone: 'asia/shanghai' }) + '\n';
+            var tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+            var detailstr = nd.toLocaleString('chinese', { hour12: false, timeZone: tz }) + '\n';
             detailstr += cha.cycle + '周目' + cha.boss_num + '号boss\n';
-            detailstr += (cha.health_ramain + cha.damage).toLocaleString(options = { timeZone: 'asia/shanghai' }) + '→' + cha.health_ramain.toLocaleString(options = { timeZone: 'asia/shanghai' });
+            detailstr += (cha.health_ramain + cha.damage).toLocaleString(options = { timeZone: tz }) + '→' + cha.health_ramain.toLocaleString(options = { timeZone: tz });
             if (cha.message) {
                 detailstr += '\n留言：' + cha.message;
             }
@@ -97,7 +95,7 @@ var vm = new Vue({
             axios.post('../api/', {
                 action: 'get_challenge',
                 csrf_token: csrf_token,
-                ts: (thisvue.reportDate ? (thisvue.reportDate.getTime() / 1000) + 43200 : null),
+                ts: (thisvue.reportDate ? (thisvue.reportDate.getTime() - thisvue.reportDate.getTimezoneOffset() * 60000) / 1000  : null),
             }).then(function (res) {
                 if (res.data.code != 0) {
                     thisvue.$alert(res.data.message, '获取记录失败');
