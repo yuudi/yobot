@@ -16,6 +16,7 @@ var vm = new Vue({
         send_via_private: false,
         dropMemberVisible: false,
         today: 0,
+        isToday: false,
     },
     mounted() {
         var thisvue = this;
@@ -44,6 +45,7 @@ var vm = new Vue({
                 m.detail = [];
             }
             thisvue.today = res.data.today;
+            thisvue.isToday = true;
             thisvue.refresh(res.data.challenges);
         })).catch(function (error) {
             thisvue.$alert(error, '获取数据失败');
@@ -92,20 +94,21 @@ var vm = new Vue({
         },
         report_day: function (event) {
             var thisvue = this;
+            var reportDatetime = (thisvue.reportDate ? (thisvue.reportDate.getTime() - thisvue.reportDate.getTimezoneOffset() * 60000) / 1000  : null);
             axios.post('../api/', {
                 action: 'get_challenge',
                 csrf_token: csrf_token,
-                ts: (thisvue.reportDate ? (thisvue.reportDate.getTime() - thisvue.reportDate.getTimezoneOffset() * 60000) / 1000  : null),
+                ts: reportDatetime,
             }).then(function (res) {
                 if (res.data.code != 0) {
                     thisvue.$alert(res.data.message, '获取记录失败');
                 } else {
                     thisvue.refresh(res.data.challenges);
+                    thisvue.isToday = (thisvue.reportDate ? thisvue.today == Math.floor(reportDatetime / 86400) : true);
                 }
             }).catch(function (error) {
                 thisvue.$alert(error, '获取记录失败');
             })
-            this.today = -1;
         },
         refresh: function (challenges) {
             challenges.sort((a, b) => a.qqid - b.qqid);
