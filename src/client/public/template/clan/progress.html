@@ -136,7 +136,7 @@
         </el-table-column>
         <el-table-column prop="sl" label="SL" width="55" sortable>
           <template slot-scope="scope">
-            <template v-if="today==-1">-</template>
+            <template v-if="!isToday">-</template>
             <template v-else>
               <i class="el-icon-smoking" :style="{color:(scope.row.sl==today?'#F56C6C':'#67C23A')}"></i>
             </template>
