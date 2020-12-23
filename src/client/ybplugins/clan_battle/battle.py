@@ -112,17 +112,17 @@ class ClanBattle:
             User.qqid.in_(self.setting['super-admin'])
         ).execute()
 
-    def _level_by_cycle(self, cycle, *, level_4=None, game_server=None):
+    def _level_by_cycle(self, cycle, *, game_server=None):
         if cycle <= 3:
-            return 0
-        elif cycle <= 10:
-            return 1
-        else:
-            if level_4 is None:
-                level_4 = (len(self.setting['boss'][game_server]) == 4)
-            if level_4 and cycle >= 35:
-                return 3
-            return 2
+            return 0  # 1~3 周目：一阶段
+        if cycle <= 10:
+            return 1  # 4~10 周目：二阶段
+        server_total = len(self.setting['boss'][game_server])
+        if cycle <= 34 or server_total <= 3:
+            return 2  # 11~34 周目：三阶段
+        if cycle <= 44 or server_total <= 4:
+            return 3  # 35~44 周目：四阶段
+        return 4  # 45~ 周目：五阶段
 
     @timed_cached_func(128, 3600, ignore_self=True)
     def _get_nickname_by_qqid(self, qqid) -> Union[str, None]:

@@ -40,7 +40,7 @@ else
     curl -fsSL "https://get.docker.com" | sh
 fi
 
-docker network create qqbot
+docker network create qqbot || true
 docker pull pcrbot/gocqhttp:0.9.29-fix2
 docker pull yobot/yobot:slim
 

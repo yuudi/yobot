@@ -73,10 +73,10 @@ var vm = new Vue({
             });
         },
         switch_levels: function (area) {
-            if (this.setting.boss[area].length <= 3) {
+            if (this.setting.boss[area].length < 5) {
                 this.setting.boss[area].push([0, 0, 0, 0, 0]);
             } else {
-                this.setting.boss[area].pop();
+                this.setting.boss[area] = this.setting.boss[area].slice(0, -2);
             }
         },
         comfirm_change_clan_mode: function (event) {
