@@ -60,6 +60,7 @@ class ClanBattle:
         '查3': 23,
         '查4': 24,
         '查5': 25,
+        '强制': 26,
     }
 
     Server = {
@@ -1401,6 +1402,26 @@ class ClanBattle:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
             _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return '已取消'+event
+        elif match_num == 26:  # 强制取消
+            match = re.match(r'^强制取消(?:预约)?([1-5])? *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
+            if match:
+                if ctx['sender']['role'] == 'member':
+                    return '只有管理员才可以强制取消'
+                elif not match.group(1):
+                    return '请输入需要取消的boss'
+                elif not match.group(2):
+                    return '请加上at需要取消的用户'
+                else:
+                    boss_num = match.group(1) and int(match.group(1))
+                    user_id = match.group(2) and int(match.group(2))
+                    nickname = None
+                    event = f'预约{boss_num}号boss'
+                    counts = self.cancel_subscribe(group_id, user_id, boss_num)
+                    if counts == 0:
+                        return '{}没有'.format(atqq(user_id)) + event
+                        _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
+                    _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
+                    return '已为{}取消'.format(atqq(user_id)) + event 
         elif match_num == 14:  # 解锁
             if cmd != '解锁':
                 return
@@ -1445,7 +1466,7 @@ class ClanBattle:
                     return str(e)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '已记录SL'
-        elif 20 <= match_num <= 25:
+        elif 20 <= match_num <= 26:
             if len(cmd) != 2:
                 return
             beh = '挂树' if match_num == 20 else '预约{}号boss'.format(match_num-20)
