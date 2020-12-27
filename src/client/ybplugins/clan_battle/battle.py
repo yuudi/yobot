@@ -857,7 +857,7 @@ class ClanBattle:
             if subscribe.message:
                 msg += subscribe.message
             notice.append(msg)
-            subscribe.delete_instance()
+            # subscribe.delete_instance()
         if notice:
             asyncio.ensure_future(self.api.send_group_msg(
                 group_id=group_id,
