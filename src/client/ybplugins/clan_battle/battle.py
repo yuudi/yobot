@@ -114,17 +114,14 @@ class ClanBattle:
             User.qqid.in_(self.setting['super-admin'])
         ).execute()
 
-    def _level_by_cycle(self, cycle, *, game_server=None):
-        if cycle <= 3:
-            return 0  # 1~3 周目：一阶段
-        if cycle <= 10:
-            return 1  # 4~10 周目：二阶段
-        server_total = len(self.setting['boss'][game_server])
-        if cycle <= 34 or server_total <= 3:
-            return 2  # 11~34 周目：三阶段
-        if cycle <= 44 or server_total <= 4:
-            return 3  # 35~44 周目：四阶段
-        return 4  # 45~ 周目：五阶段
+    def _stage_by_cycle(self, cycle, *, game_server=None):
+        stage = 0
+        for item in self.setting['stage_cycle'][game_server]:
+            if cycle >= item:
+                stage += 1
+            else:
+                break
+        return stage
 
     @timed_cached_func(128, 3600, ignore_self=True)
     def _get_nickname_by_qqid(self, qqid) -> Union[str, None]:
@@ -224,7 +221,7 @@ class ClanBattle:
             'challenging_comment': group.challenging_comment,
             'full_health': (
                 self.bossinfo[group.game_server]
-                [self._level_by_cycle(
+                [self._stage_by_cycle(
                     group.boss_cycle, game_server=group.game_server)]
                 [group.boss_num-1]
             ),
@@ -446,7 +443,7 @@ class ClanBattle:
             health_before = group.boss_health
             group.boss_health = (
                 self.bossinfo[group.game_server]
-                [self._level_by_cycle(
+                [self._stage_by_cycle(
                     group.boss_cycle, game_server=group.game_server)]
                 [group.boss_num-1])
         else:
@@ -562,7 +559,7 @@ class ClanBattle:
         if boss_health is None:
             boss_health = (
                 self.bossinfo[group.game_server]
-                [self._level_by_cycle(
+                [self._stage_by_cycle(
                     group.boss_cycle, game_server=group.game_server)]
                 [group.boss_num-1])
         group.boss_health = boss_health
@@ -709,7 +706,7 @@ class ClanBattle:
                     group.boss_num += 1
                 group.boss_health = (
                     self.bossinfo[group.game_server]
-                    [self._level_by_cycle(
+                    [self._stage_by_cycle(
                         group.boss_cycle, game_server=group.game_server)]
                     [group.boss_num-1])
         group.challenging_member_qq_id = None
