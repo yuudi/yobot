@@ -1260,8 +1260,16 @@ class ClanBattle:
             except ClanBattleError as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            if behalf:
+                user_id = match.group(3) and int(match.group(3))
+            group = Clan_group.get_or_none(group_id=group_id)
+            boss_num = group.boss_num
+            counts = self.cancel_subscribe(group_id, user_id, boss_num)
             _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-            return str(boss_status)
+            if counts != 0:
+                return str(boss_status) + '\n※已取消该boss的预约'   
+            else:
+                return str(boss_status)
         elif match_num == 5:  # 尾刀
             match = re.match(
                 r'^尾刀 ?(?:\[CQ:at,qq=(\d+)\])? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
