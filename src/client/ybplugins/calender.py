@@ -120,7 +120,7 @@ class Event:
         return a_time
 
     async def load_timeline_jp_async(self):
-        event_source = "http://toolscdn.yobot.win/calender/jp.json"
+        event_source = "https://cdn.jsdelivr.net/gh/pcrbot/calendar-updater-action@gh-pages/jp.json"
         async with aiohttp.request("GET", url=event_source) as response:
             if response.status != 200:
                 raise ServerError(f"服务器状态错误：{response.status}")
@@ -166,7 +166,7 @@ class Event:
         return a_time
 
     async def load_timeline_cn_async(self):
-        event_source = "http://toolscdn.yobot.win/calender/cn.json"
+        event_source = "https://cdn.jsdelivr.net/gh/pcrbot/calendar-updater-action@gh-pages/cn.json"
         async with aiohttp.request("GET", url=event_source) as response:
             if response.status != 200:
                 raise ServerError(f"服务器状态错误：{response.status}")
