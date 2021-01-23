@@ -138,7 +138,7 @@ New-Item -Path .\mirai\config.json -ItemType File -Value @"
   "ws_reverse_servers": [
     {
       "enabled": true,
-      "reverse_url": "ws://localhost:${port}/ws/",
+      "reverse_url": "ws://127.0.0.1:${port}/ws/",
       "reverse_reconnect_interval": 3000
     }
   ],
