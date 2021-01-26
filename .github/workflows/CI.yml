@@ -12,18 +12,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - uses: actions/cache@v2
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
       - name: Build exe binary and archive
         shell: cmd
         run: |
           cd .\src\client
+          sed -e "s/\"\[v.*semver$/\"test version\"/" -i.bak yobot.py
           pip install -r requirements.txt
           pip install pyinstaller
           PYTHONOPTIMIZE=0
           pyinstaller main.spec
-          cd .\dist
-          7z a yobot-windows64.zip .\yobot.exe
 
       - uses: actions/upload-artifact@v2
         with:
           name: windows-executable
-          path: ./src/client/dist/yobot-windows64.zip
+          path: ./src/client/dist/yobot.exe

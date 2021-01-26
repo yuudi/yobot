@@ -21,8 +21,8 @@
             </p>
             <p>预约提醒偏好：
 			<el-select v-model="notify_preference" placeholder="请选择" @change="edit_notify_preference">
-				<el-option key="1" label="仅提醒一次" value="1"></el-option>
-				<el-option key="2" label="提醒直至出刀" value="2"></el-option>
+				<el-option key="1" label="仅提醒一次" value="once"></el-option>
+				<el-option key="2" label="提醒直至出刀" value="util_challenge"></el-option>
 			</el-select>
             </p>
             <p>用户权限：[[ authority_group ]]</p>
@@ -45,7 +45,7 @@
             failure_reason: '',
             addr: [],
             nickname: '',
-			notify_preference: 1,
+			notify_preference: "once",
             clan_group_id: '',
             authority_group: '',
             last_login_ipaddr: '',
@@ -66,7 +66,7 @@
                     failure_reason = res.data = message;
                 } else {
                     thisvue.nickname = res.data.nickname;
-                    thisvue.notify_preference = res.data.notify_preference;
+                    thisvue.notify_preference = res.data.notify_preference == 1 ? "once" : "util_challenge";
                     thisvue.clan_group_id = res.data.clan_group_id;
                     thisvue.authority_group = thisvue.authtype[res.data.authority_group];
                     thisvue.last_login_ipaddr = res.data.last_login_ipaddr;
@@ -92,7 +92,9 @@
             },
 			edit_notify_preference: function (event) {
                 var thisvue = this;
-                axios.patch('./api/', { notify_preference: thisvue.notify_preference }).then(function (res) {
+                axios.patch('./api/', {
+				    notify_preference: thisvue.notify_preference == "once" ? 1 : 2
+				}).then(function (res) {
                     thisvue.$message({
                         message: '修改成功',
                         type: 'success',
