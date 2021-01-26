@@ -20,6 +20,7 @@ jobs:
           cd .\src\client
           pip install -r requirements.txt
           pip install pyinstaller
+          PYTHONOPTIMIZE=1
           pyinstaller main.spec
           cd .\dist
           7z a yobot-windows64.zip .\yobot.exe

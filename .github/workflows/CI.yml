@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push
+
+jobs:
+  build-windows:
+    runs-on: windows-2019
+    name: build windows binary
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build exe binary and archive
+        shell: cmd
+        run: |
+          cd .\src\client
+          pip install -r requirements.txt
+          pip install pyinstaller
+          PYTHONOPTIMIZE=0
+          pyinstaller main.spec
+          cd .\dist
+          7z a yobot-windows64.zip .\yobot.exe
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: windows-executable
+          path: ./src/client/dist/yobot-windows64.zip

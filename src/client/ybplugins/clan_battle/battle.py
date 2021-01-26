@@ -859,8 +859,19 @@ class ClanBattle:
             if subscribe.message:
                 msg += subscribe.message
             notice.append(msg)
-            if subscribe.subscribe_item == 0:  # 如果是挂树，则删除
+            # 如果是挂树，则删除
+            if subscribe.subscribe_item == 0:
                 subscribe.delete_instance()
+                continue
+            # 如果预约者选择了“仅提醒一次”，则删除
+            try:
+                notify_user = User.get_by_id(subscribe.qqid)
+            except peewee.DoesNotExist:
+                _logger.warning('预约者用户不存在')
+                continue
+            if notify_user.notify_preference == 1:
+                subscribe.delete_instance()
+                continue
         if notice:
             asyncio.ensure_future(self.api.send_group_msg(
                 group_id=group_id,
