@@ -21,7 +21,7 @@ jobs:
         shell: cmd
         run: |
           cd .\src\client
-          sed -e "s/\"\[v.*semver$/\"test version\"/" -i.bak yobot.py
+          sed -e "s/\"\[v.*semver$/\"[test-${{ github.ref }}]\"/" -i.bak yobot.py
           pip install -r requirements.txt
           pip install pyinstaller
           PYTHONOPTIMIZE=0
