@@ -1,7 +1,9 @@
 name: ci
 
 on:
-  push
+  push:
+    paths:
+      - 'src/client/**'
 
 jobs:
   build-windows:
@@ -27,7 +29,37 @@ jobs:
           PYTHONOPTIMIZE=0
           pyinstaller main.spec
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
           name: windows-executable
           path: ./src/client/dist/yobot.exe
+
+  upload:
+    runs-on: ubuntu-20.04
+    needs: build-windows
+    name: upload binary
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-executable
+
+      - name: Cache Uploader
+        id: cache-uploader
+        uses: actions/cache@v2
+        with:
+          path: ./uploader
+          key: ${{ runner.os }}-uploader-735d37236b86a5343370a5f2991f55e5062f35b5
+
+      - name: Setup Uploader
+        if: ${{ ! steps.cache-uploader.outputs.cache-hit }}
+        run: |
+          mkdir -p uploader
+          echo '${{ secrets.UPLOADER_AUTH }}' > uploader/auth.json
+          wget -q https://github.com/MoeClub/OneList/raw/735d37236b86a5343370a5f2991f55e5062f35b5/OneDriveUploader/amd64/linux/OneDriveUploader -O uploader/OneDriveUploader
+          chmod +x uploader/OneDriveUploader
+
+      - name: Upload to Onedrive
+        run: ./uploader/OneDriveUploader -c "uploader/auth.json" -s "yobot.exe" -r "pan/yobot/test/${GITHUB_RUN_ID}" -n "yobot.exe"

@@ -139,6 +139,7 @@
 		</svg>
 	</div><br>
     <div id="app">
+        <el-alert v-if="localStorage.yobot_free_statement!=='true'" title="yobot 软件始终免费" description="yobot 软件始终免费，任何人都可以部署在自己的服务器上。yobot 不禁止商业使用，鼓励有能力的用户自行搭建。" center effect="dark" type="info" close-text="不再提醒" @close="localStorage.yobot_free_statement='true'"></el-alert>
         <div><strong>欢迎，{{ user.nickname }}</strong></div>
         <p>上次登录：[[ from_ts({{ session.get('last_login_time') }}) ]] 在 [[ addr.join('') ]]
         </p>

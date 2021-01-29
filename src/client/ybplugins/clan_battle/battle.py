@@ -795,7 +795,7 @@ class ClanBattle:
             message=message,
         )
 
-    def get_subscribe_list(self, group_id: Groupid, boss_num=None) -> List[Tuple[int, QQid, dict]]:
+    def get_subscribe_list(self, group_id: Groupid, boss_num=None, order_by="sid") -> List[Dict[str, Any]]:
         """
         get the subscribe lists.
 
@@ -812,7 +812,8 @@ class ClanBattle:
         for subscribe in Clan_subscribe.select().where(
             *query
         ).order_by(
-            Clan_subscribe.sid
+            # Clan_subscribe.sid
+            getattr(Clan_subscribe, order_by)
         ):
             subscribe_list.append({
                 'boss': subscribe.subscribe_item,
@@ -1354,6 +1355,28 @@ class ClanBattle:
             )
             return '请在面板中查看：'+url
         elif match_num == 10:  # 预约
+            if cmd == '预约表':
+                # 查询预约表
+                subscribers = self.get_subscribe_list(group_id, order_by='subscribe_item')
+                if not subscribers:
+                    return '没有预约记录'
+                reply = "预约表：\n"
+                current_boss = '-1'  # 尚未开始输出结果
+                for sub in subscribers:
+                    if sub['boss'] != current_boss:  # boss 号变化前，显示小标题
+                        if sub['boss'] == 0:
+                            reply += '====挂树====\n'
+                        else:
+                            reply += f"==={sub['boss']}号boss===\n"
+                        current_boss = sub['boss']
+                    reply += self._get_nickname_by_qqid(sub['qqid'])  # 显示昵称
+                    message = sub['message']  # 如果有留言则显示留言
+                    if message:
+                        reply += '：' + message
+                    reply += '\n'
+                reply += '============'  # 结束
+                return reply
+            # 预约 boss
             match = re.match(r'^预约([1-5]) *(?:[\:：](.*))?$', cmd)
             if not match:
                 return
