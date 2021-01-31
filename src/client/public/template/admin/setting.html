@@ -24,7 +24,9 @@
       </el-form-item>
       <el-form-item>
         <el-button type="info" @click="setting.public_address = window.location.origin+'/'">填入当前地址</el-button>
+        <!--
         <el-button type="info" @click="domainApply = true">获取 yobot 域名</el-button>
+        -->
       </el-form-item>
       <el-dialog title="申请yobot域名" :visible.sync="domainApply">
         <el-form>

@@ -37,12 +37,12 @@ def async_cached_func(maxsize=64):
 
 
 @async_cached_func(128)
-async def _ip_location(ip):
+async def _ip_location(ip) -> str:
     async with aiohttp.request("GET", url=f'http://freeapi.ipip.net/{ip}') as response:
         if response.status != 200:
             raise ServerError(f'http code {response.status} from ipip.net')
         res = await response.json()
-    return res
+    return ''.join(res)
 
 
 class WebUtil:
@@ -82,8 +82,8 @@ class WebUtil:
             try:
                 location = await _ip_location(ip)
             except:
-                location = ['unknown']
-            return jsonify(location)
+                location = 'unknown'
+            return jsonify([location])
 
         @app.route(
             urljoin(self.setting['public_basepath'], 'api/get-domain/'),
