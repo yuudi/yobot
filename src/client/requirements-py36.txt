@@ -1,7 +1,7 @@
 APScheduler~=3.6
 requests~=2.22
 aiohttp>=3.6.1
-opencc-python-reimplemented~=0.1.5
+opencc-python-reimplemented~=0.1.6
 feedparser~=6.0
 beautifulsoup4~=4.8
 arrow~=0.14
