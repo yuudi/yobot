@@ -11,6 +11,10 @@ jobs:
     name: build windows binary
 
     steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -48,5 +52,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./src/client/dist/yobot-windows64.zip
-          asset_name: yobot-${{ github.ref }}-windows64.zip
+          asset_name: yobot-${GITHUB_REF##*/}-windows64.zip
           asset_content_type: application/zip
