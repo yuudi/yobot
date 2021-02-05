@@ -1,5 +1,5 @@
 APScheduler~=3.6
-requests~=2.22
+requests~=2.25
 aiohttp>=3.6.1
 opencc-python-reimplemented~=0.1.5
 feedparser~=6.0
