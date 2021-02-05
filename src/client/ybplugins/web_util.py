@@ -4,6 +4,7 @@ import string
 from urllib.parse import urljoin
 
 import aiohttp
+import peewee as pw
 import requests
 from quart import Quart, jsonify, request, send_file, session
 
@@ -36,13 +37,32 @@ def async_cached_func(maxsize=64):
     return decorator
 
 
+ip_cache = pw.SqliteDatabase(None)
+
+
+class IP_Location(pw.Model):
+    ip = pw.IPField(primary_key=True)
+    location = pw.TextField()
+
+    class Meta:
+        database = ip_cache
+
+
 @async_cached_func(128)
-async def _ip_location(ip) -> str:
+async def _ip_location(ip: str) -> str:
+    cache = IP_Location.get_or_none(ip=ip)
+    if cache is not None:
+        return cache.location
     async with aiohttp.request("GET", url=f'http://freeapi.ipip.net/{ip}') as response:
         if response.status != 200:
             raise ServerError(f'http code {response.status} from ipip.net')
         res = await response.json()
-    return ''.join(res)
+    location = ''.join(res)
+    IP_Location.create(
+        ip=ip,
+        location=location,
+    )
+    return location
 
 
 class WebUtil:
@@ -59,9 +79,21 @@ class WebUtil:
         if not os.path.exists(self.resource_path):
             os.makedirs(self.resource_path)
 
+        ip_cache.init(
+            database=os.path.join(
+                glo_setting['dirname'], 'ip_location_cache.db'),
+            pragmas={
+                'journal_mode': 'wal',
+                'cache_size': -1024,
+            },
+        )
+        if not IP_Location.table_exists():
+            IP_Location.create_table()
+
         if not os.path.exists(os.path.join(self.resource_path, 'background.jpg')):
             try:
-                r = requests.get('https://i.loli.net/2020/05/31/IirkP9TpnV7Ks6q.jpg')
+                r = requests.get(
+                    'https://i.loli.net/2020/05/31/IirkP9TpnV7Ks6q.jpg')
                 assert r.status_code == 200
                 with open(os.path.join(self.resource_path, 'background.jpg'), 'wb') as f:
                     f.write(r.content)
@@ -81,7 +113,8 @@ class WebUtil:
                 return jsonify(['unknown'])
             try:
                 location = await _ip_location(ip)
-            except:
+            except Exception as e:
+                print(e)
                 location = 'unknown'
             return jsonify([location])
 

@@ -50,7 +50,8 @@ jobs:
         shell: cmd
         run: |
           cd .\src\client
-          sed -e "s/\"\[v.*semver$/\"[test-${{ github.sha }}]\"/" -i.bak yobot.py
+          for /F %n IN ('git rev-list --count HEAD') DO SET COMMIT_COUNT=%n
+          sed -e "s/\"\[v.*semver$/\"[test-%COMMIT_COUNT%-${{ github.sha }}]\"/" -i.bak yobot.py
           SET PYTHONOPTIMIZE=0
           pyinstaller main.spec
 
@@ -74,7 +75,7 @@ jobs:
           name: windows-executable
 
       - name: Initial rclone configuration
-        run: echo '$RCLONE_CONF'>rclone.conf
+        run: echo "$RCLONE_CONF">rclone.conf
         env:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
 
