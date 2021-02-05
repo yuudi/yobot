@@ -28,9 +28,7 @@ jobs:
       - name: Cache Dependencies
         uses: actions/cache@v2
         with:
-          path: |
-            ~\AppData\Local\pip\Cache
-            C:\hostedtoolcache\windows\python\3.7.9\x64\lib\site-packages
+          path: ~\AppData\Local\pip\Cache
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
       - name: Install Dependencies

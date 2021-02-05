@@ -48,7 +48,12 @@ class Event:
         # 。。。屁东8区，Arrow这个库解析的时候把时区略了，加东8区会有bug，导致每天早上8点前获取的calendar会延后一天
         self.timezone = datetime.timezone(datetime.timedelta(hours=0))
 
-        self.timeline = None
+        self.timeline_default_region = "unknown"
+        self.timelines = {
+            "jp": None,
+            "tw": None,
+            "cn": None,
+        }
 
     def load_timeline(self, rg):
         raise RuntimeError("no more sync calling")
@@ -56,61 +61,22 @@ class Event:
     async def load_timeline_async(self, rg=None):
         if rg is None:
             rg = self.setting.get("calender_region", "default")
-        if rg == "jp":
-            timeline = await self.load_timeline_jp_async()
-            if timeline is None:
-                return
-            self.timeline = timeline
+        self.timeline_default_region = rg
+        try:
+            self.timelines["jp"] = await self.load_timeline_jp_async()
             print("刷新日服日程表成功")
-        elif rg == "tw":
-            timeline = await self.load_timeline_tw_async()
-            if timeline is None:
-                return
-            self.timeline = timeline
+        except Exception as e:
+            print("刷新日服日程表失败"+e)
+        try:
+            self.timelines["tw"] = await self.load_timeline_tw_async()
             print("刷新台服日程表成功")
-        elif rg == "cn":
-            timeline = await self.load_timeline_cn_async()
-            if timeline is None:
-                return
-            self.timeline = timeline
+        except Exception as e:
+            print("刷新台服日程表失败"+e)
+        try:
+            self.timelines["cn"] = await self.load_timeline_cn_async()
             print("刷新国服日程表成功")
-        else:
-            self.timeline = None
-            if rg != "default":
-                print(f"{rg}区域无日程表")
-
-    # def load_time_jp(self, timestamp) -> Arrow:
-    #     tz = datetime.timezone(datetime.timedelta(hours=8))
-    #     d_time = datetime.datetime.fromtimestamp(timestamp, tz)
-    #     a_time = Arrow.fromdatetime(d_time)
-    #     if a_time.hour < 4:
-    #         a_time -= datetime.timedelta(hours=4)
-    #     return a_time
-
-    # async def load_timeline_jp_async(self):
-    #     event_source = "https://gamewith.jp/pricone-re/article/show/93857"
-    #     try:
-    #         async with aiohttp.request("GET", url=event_source) as response:
-    #             if response.status != 200:
-    #                 raise ServerError(f"服务器状态错误：{response.status}")
-    #             res = await response.text()
-    #     except aiohttp.client_exceptions.ClientError:
-    #         print("日程表加载失败")
-    #         return
-    #     soup = BeautifulSoup(res, features="html.parser")
-    #     events_ids = set()
-    #     timeline = Event_timeline()
-    #     for event in soup.select("[data-calendar]"):
-    #         e = json.loads(event["data-calendar"])
-    #         if e["id"] in events_ids:
-    #             continue
-    #         events_ids.add(e["id"])
-    #         timeline.add_event(
-    #             self.load_time_jp(e["start_time"]),
-    #             self.load_time_jp(e["end_time"]),
-    #             e["event_name"],
-    #         )
-    #     return timeline
+        except Exception as e:
+            print("刷新国服日程表失败"+e)
 
     def load_time_jp(self, timestr) -> Arrow:
         d_time = datetime.datetime.strptime(timestr, r"%Y/%m/%d %H:%M:%S")
@@ -181,80 +147,89 @@ class Event:
             )
         return timeline
 
-    def get_day_events(self, match_num) -> tuple:
-        if match_num == 2:
+    def get_day_events(self, date_num, rg) -> tuple:
+        if date_num == 2:
             daystr = "今天"
             date = Arrow.now(tzinfo=self.timezone)
-        elif match_num == 3:
+        elif date_num == 3:
             daystr = "明天"
             date = Arrow.now(tzinfo=self.timezone) + datetime.timedelta(days=1)
-        elif match_num & 0xf00000 == 0x100000:
-            year = (match_num & 0xff000) >> 12
-            month = (match_num & 0xf00) >> 8
-            day = match_num & 0xff
+        elif date_num & 0xf00000 == 0x100000:
+            year = (date_num & 0xff000) >> 12
+            month = (date_num & 0xf00) >> 8
+            day = date_num & 0xff
             daystr = "{}年{}月{}日".format(2000+year, month, day)
             try:
                 date = Arrow(2000+year, month, day)
             except ValueError as v:
                 raise InputError("日期错误：{}".format(v))
-        events = self.timeline.at(date)
+        else:
+            raise ValueError(f'unespected date_num: {date_num}')
+        events = self.timelines[rg].at(date)
         return (daystr, events)
 
-    def get_week_events(self) -> str:
+    def get_week_events(self, rg) -> str:
         reply = "一周日程："
         date = Arrow.now(tzinfo=self.timezone)
         for i in range(7):
-            events = self.timeline.at(date)
+            events = self.timelines[rg].at(date)
             events_str = "\n⨠".join(events)
             if events_str == "":
                 events_str = "没有记录"
             daystr = date.format("MM月DD日")
             reply += "\n======{}======\n⨠{}".format(daystr, events_str)
             date += datetime.timedelta(days=1)
-        reply += "\n\n更多日程：{}".format(
-            _calender_url.get(self.setting["calender_region"]))
+        reply += "\n\n更多日程：{}".format(_calender_url.get(rg))
         return reply
 
-    @staticmethod
-    def match(cmd: str) -> int:
+    def execute(self, _: int, msg: dict) -> dict:
+        cmd = msg["raw_message"]
+        if cmd.startswith("日服"):
+            rg = "jp"
+            cmd = cmd[2:]
+        elif cmd.startswith("台服"):
+            rg = "tw"
+            cmd = cmd[2:]
+        elif cmd.startswith("国服"):
+            rg = "cn"
+            cmd = cmd[2:]
+        else:
+            rg = self.timeline_default_region
         if not cmd.startswith("日程"):
-            return 0
-        if cmd == "日程" or cmd == "日程今日" or cmd == "日程今天":
-            return 2
-        if cmd == "日程明日" or cmd == "日程明天":
-            return 3
-        if cmd == "日程表" or cmd == "日程一周" or cmd == "日程本周":
-            return 4
-        match = re.match(r"日程 ?(\d{1,2})月(\d{1,2})[日号]", cmd)
-        if match:
-            month = int(match.group(1))
-            day = int(match.group(2))
-            return (0x114000 + 0x100*month + day)
-        match = re.match(r"日程 ?(?:20)?(\d{2})年(\d{1,2})月(\d{1,2})[日号]", cmd)
-        if match:
-            year = int(match.group(1))
-            month = int(match.group(2))
-            day = int(match.group(3))
-            return (0x100000 + 0x1000*year + 0x100*month + day)
-        return 1
+            return None
+        if (rg is None) or (rg == "default"):
+            return "未设置区服，请发送“{}设置”".format(self.setting.get("preffix_string", ""))
+        timeline = self.timelines.get(rg)
+        if timeline is None:
+            return "日程表未初始化\n\n更多日程：{}".format(_calender_url.get(rg))
 
-    def execute(self, match_num: int, msg: dict) -> dict:
-        if self.timeline is None:
-            if self.setting.get("calender_region", "default") == "default":
-                reply = "未设置区服，请发送“{}设置”".format(
-                    self.setting.get("preffix_string", ""))
+        if cmd == "日程表" or cmd == "日程一周" or cmd == "日程本周":
+            reply = self.get_week_events(rg)
+            return {"reply": reply, "block": True}
+        if cmd == "日程" or cmd == "日程今日" or cmd == "日程今天":
+            date_num = 2
+        elif cmd == "日程明日" or cmd == "日程明天":
+            date_num = 3
+        elif cmd == "日程表" or cmd == "日程一周" or cmd == "日程本周":
+            date_num = 4
+        else:
+            match = re.match(r"日程 ?(\d{1,2})月(\d{1,2})[日号]", cmd)
+            if match:
+                month = int(match.group(1))
+                day = int(match.group(2))
+                date_num = (0x114000 + 0x100*month + day)
             else:
-                reply = "日程表未初始化\n\n更多日程：{}".format(
-                    _calender_url.get(self.setting["calender_region"]))
-            return {"reply": reply, "block": True}
-        if match_num == 1:
-            return {"reply": "", "block": True}
-        # self.check_and_update()
-        if match_num == 4:
-            reply = self.get_week_events()
-            return {"reply": reply, "block": True}
+                match = re.match(
+                    r"日程 ?(?:20)?(\d{2})年(\d{1,2})月(\d{1,2})[日号]", cmd)
+                if match:
+                    year = int(match.group(1))
+                    month = int(match.group(2))
+                    day = int(match.group(3))
+                    date_num = (0x100000 + 0x1000*year + 0x100*month + day)
+                else:
+                    return None
         try:
-            daystr, events = self.get_day_events(match_num)
+            daystr, events = self.get_day_events(date_num, rg)
         except InputError as e:
             return {"reply": str(e), "block": True}
 
@@ -297,13 +272,19 @@ class Event:
         return sends
 
     def jobs(self):
-        time = self.setting.get("calender_time", "08:00")
-        hour, minute = time.split(":")
-        trigger = CronTrigger(hour=hour, minute=minute)
-        job = (trigger, self.send_daily_async)
+        # 初始化任务
         init_trigger = DateTrigger(
             datetime.datetime.now() +
             datetime.timedelta(seconds=5)
         )  # 启动5秒后初始化
         init_job = (init_trigger, self.load_timeline_async)
+        # 定时任务
+        time = self.setting.get("calender_time", "08:00")
+        splited_time = time.split(":")
+        if len(splited_time) != 2:
+            print('Error: 配置文件 calender_time 格式错误，将停止自动推送任务')
+            return (init_job,)
+        hour, minute = splited_time
+        trigger = CronTrigger(hour=hour, minute=minute)
+        job = (trigger, self.send_daily_async)
         return (job, init_job)

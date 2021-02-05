@@ -18,7 +18,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - uses: actions/cache@v2
+      - name: Cache Dependencies
+        uses: actions/cache@v2
         with:
           path: ~\AppData\Local\pip\Cache
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -29,7 +30,7 @@ jobs:
           cd .\src\client
           pip install -r requirements.txt
           pip install pyinstaller
-          PYTHONOPTIMIZE=1
+          SET PYTHONOPTIMIZE=1
           pyinstaller main.spec
           cd .\dist
           7z a yobot-windows64.zip .\yobot.exe
