@@ -126,7 +126,7 @@ class ClanBattle:
             return 3  # 35~44 周目：四阶段
         return 4  # 45~ 周目：五阶段
 
-    @timed_cached_func(128, 3600, ignore_self=True)
+    @timed_cached_func(65536, 86400, ignore_self=True)
     def _get_nickname_by_qqid(self, qqid) -> Union[str, None]:
         user = User.get_or_create(qqid=qqid)[0]
         if user.nickname is None:
@@ -167,7 +167,7 @@ class ClanBattle:
             group.save()
         return True
 
-    @async_cached_func(16)
+    @async_cached_func(128)
     async def _fetch_member_list_async(self, group_id):
         try:
             group_member_list = await self.api.get_group_member_list(group_id=group_id)
@@ -196,12 +196,22 @@ class ClanBattle:
         # refresh member list
         self.get_member_list(group_id, nocache=True)
 
+    @timed_cached_func(8, 3600, ignore_self=True)
+    async def _get_friends_nickname_dict_async(self):
+        friend_list = await self.api.get_friend_list()
+        friend_dict = {}
+        for f in friend_list:
+            friend_dict[f['user_id']] = f['nickname']
+        return friend_dict
+
     async def _update_user_nickname_async(self, qqid, group_id=None):
         try:
             user = User.get_or_create(qqid=qqid)[0]
             if group_id is None:
-                userinfo = await self.api.get_stranger_info(user_id=qqid)
-                user.nickname = userinfo['nickname']
+                friend_dict = await self._get_friends_nickname_dict_async()
+                user.nickname = friend_dict.get(qqid, 'unknown')
+                # userinfo = await self.api.get_stranger_info(user_id=qqid)
+                # user.nickname = userinfo['nickname']
             else:
                 userinfo = await self.api.get_group_member_info(
                     group_id=group_id, user_id=qqid)
