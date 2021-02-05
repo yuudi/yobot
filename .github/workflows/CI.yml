@@ -34,25 +34,23 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
       - name: Install Dependencies
-        shell: cmd
+        shell: powershell
         run: |
           cd .\src\client
           pip install -r requirements.txt
           pip install pyinstaller
 
       - name: Run Test
-        shell: cmd
+        shell: powershell
         run: |
           cd .\src\client
           python main_test.py
 
       - name: Build exe binary and archive
-        shell: cmd
+        shell: powershell
         run: |
           cd .\src\client
-          for /F %n IN ('git rev-list --count HEAD') DO SET COMMIT_COUNT=%n
-          sed -e "s/\"\[v.*semver$/\"[test-%COMMIT_COUNT%-${{ github.sha }}]\"/" -i.bak yobot.py
-          SET PYTHONOPTIMIZE=0
+          sed -e "s/`"\[v.*semver$/`"[test-$(git rev-list --count HEAD)-${{ github.sha }}]`"/" -i.bak yobot.py
           pyinstaller main.spec
 
       - name: Upload Artifact
