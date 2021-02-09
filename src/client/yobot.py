@@ -1,4 +1,5 @@
 # coding=utf-8
+import gzip
 import json
 import mimetypes
 import os
@@ -7,6 +8,7 @@ import shutil
 import socket
 import sys
 from functools import reduce
+from io import BytesIO
 from typing import Any, Callable, Dict, Iterable, List, Tuple
 from urllib.parse import urljoin
 
@@ -14,18 +16,20 @@ import requests
 from aiocqhttp.api import Api
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from opencc import OpenCC
-from quart import Quart, send_file
+from quart import Quart, request, send_file
 
 if __package__:
-    from .ybplugins import (calender, clan_battle, gacha, homepage,
-                            jjc_consult, login, marionette, push_news, settings,
-                            switcher, templating, updater, web_util, ybdata,
-                            yobot_msg, custom, miner, group_leave)
+    # 插件版 相对导入
+    from .ybplugins import (calender, clan_battle, custom, gacha, group_leave,
+                            homepage, jjc_consult, login, marionette, miner,
+                            push_news, settings, switcher, templating, updater,
+                            web_util, ybdata, yobot_msg)
 else:
-    from ybplugins import (calender, clan_battle, gacha, homepage,
-                           jjc_consult, login, marionette, push_news, settings,
-                           switcher, templating, updater, web_util, ybdata,
-                           yobot_msg, custom, miner, group_leave)
+    # 独立版 绝对导入
+    from ybplugins import (calender, clan_battle, custom, gacha, group_leave,
+                           homepage, jjc_consult, login, marionette, miner,
+                           push_news, settings, switcher, templating, updater,
+                           web_util, ybdata, yobot_msg)
 
 # 本项目构建的框架非常粗糙，不建议各位把时间浪费本项目上
 # 如果想开发自己的机器人，建议直接使用 nonebot 框架
@@ -101,6 +105,29 @@ class Yobot:
 
         # initialize database
         ybdata.init(os.path.join(dirname, 'yobotdata.db'))
+
+        # enable gzip
+        if self.glo_setting["web_gzip"] > 0:
+            @quart_app.after_request
+            async def gzip_response(response):
+                accept_encoding = request.headers.get('Accept-Encoding', '')
+                if (response.status_code < 200 or
+                    response.status_code >= 300 or
+                    len(await response.get_data()) < 1024 or
+                    'gzip' not in accept_encoding.lower() or
+                        'Content-Encoding' in response.headers):
+                    return response
+                
+                gzip_buffer = BytesIO()
+                gzip_file = gzip.GzipFile(mode='wb', compresslevel=self.glo_setting["web_gzip"], fileobj=gzip_buffer)
+                gzip_file.write(await response.get_data())
+                gzip_file.close()
+                gzipped_response = gzip_buffer.getvalue()
+                response.set_data(gzipped_response)
+                response.headers['Content-Encoding'] = 'gzip'
+                response.headers['Content-Length'] = len(gzipped_response)
+
+                return response
 
         # initialize web path
         if not self.glo_setting.get("public_address"):

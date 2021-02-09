@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: "3.7"
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -31,25 +31,24 @@ jobs:
           path: ~\AppData\Local\pip\Cache
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
-      - name: Install Dependencies
-        shell: powershell
+      - name: CI
+        shell: cmd
         run: |
           cd .\src\client
-          pip install -r requirements.txt
-          pip install pyinstaller
 
-      - name: Run Test
-        shell: powershell
-        run: |
-          cd .\src\client
+          echo ::group::Install Dependencies
+          pip install wheel
+          pip install pyinstaller -r requirements.txt
+          echo ::endgroup::
+
+          echo ::group::Run Test
+          sed -e "s/\"\[v.*semver$/\"[test-${{ github.sha }}]\"/" -i.bak yobot.py
           python main_test.py
+          echo ::endgroup::
 
-      - name: Build exe binary and archive
-        shell: powershell
-        run: |
-          cd .\src\client
-          sed -e "s/`"\[v.*semver$/`"[test-$(git rev-list --count HEAD)-${{ github.sha }}]`"/" -i.bak yobot.py
+          echo ::group::Build Binary
           pyinstaller main.spec
+          echo ::endgroup::
 
       - name: Upload Artifact
         if: ${{ github.event_name != 'pull_request' }}

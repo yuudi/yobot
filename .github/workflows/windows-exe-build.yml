@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: "3.7"
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -28,12 +28,21 @@ jobs:
         shell: cmd
         run: |
           cd .\src\client
-          pip install -r requirements.txt
-          pip install pyinstaller
+
+          echo ::group::Install Dependencies
+          pip install wheel
+          pip install pyinstaller -r .\src\client\requirements.txt
+          echo ::endgroup::
+
+          echo ::group::Build Binary
           SET PYTHONOPTIMIZE=1
           pyinstaller main.spec
+          echo ::endgroup::
+
+          echo ::group::Archive Binary
           cd .\dist
           7z a yobot-windows64.zip .\yobot.exe
+          echo ::endgroup::
 
       - name: Create Release
         id: create_release

@@ -36,6 +36,7 @@ class ClanBattle:
         '创建': 1,
         '加入': 2,
         '状态': 3,
+        '进度': 27,
         '报刀': 4,
         '尾刀': 5,
         '撤销': 6,
@@ -1251,6 +1252,10 @@ class ClanBattle:
             except ClanBattleError as e:
                 return str(e)
             return boss_summary
+        elif match_num==27:#进度
+            if cmd != '进度':
+                return
+            return None
         elif match_num == 4:  # 报刀
             match = re.match(
                 r'^报刀 ?(\d+)([Ww万Kk千])? *(?:\[CQ:at,qq=(\d+)\])? *(昨[日天])? *(?:[\:：](.*))?$', cmd)

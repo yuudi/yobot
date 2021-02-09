@@ -16,6 +16,7 @@
     "auto_update": true,
     "update-time": "random",
     "clan_battle_mode": "web",
+    "web_gzip": 1,
     "show_jjc_solution": "url",
     "gacha_on": false,
     "gacha_private_on": false,
