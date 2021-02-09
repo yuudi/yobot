@@ -109,6 +109,7 @@ class Yobot:
 
         # enable gzip
         if self.glo_setting["web_gzip"] > 0:
+            gzipped_types = {'text/html', 'text/javascript', 'text/css', 'application/json'}
             @quart_app.after_request
             async def gzip_response(response):
                 accept_encoding = request.headers.get('Accept-Encoding', '')
