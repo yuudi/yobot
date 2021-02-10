@@ -78,7 +78,7 @@
 	<!-- 
 	出刀顺序 by @Ai-Himmel https://github.com/Ai-Himmel
 	数据图表 by @Diving-Fish & @Winrey https://github.com/Diving-Fish
-	均值偏差 by @Alive24 https://github.com/Alive24
+	均值偏差 by @Alive24 https://github.com/Alive24 @Librazy https://github.com/Librazy/pcr-clan-battle-analyzer-vue
 	多维分析 by @Tan90Qian https://github.com/Tan90Qian
 
 	更多统计方式欢迎提交 pull request，建议采用 api 调用的方式 
@@ -98,7 +98,7 @@ width: 100%;font-size:15px;">
 	var apiurl = window.location.href + "api/?apikey=" + apikey
 	document.getElementById("apiurl").value = apiurl;
 	document.getElementById("pcrd-yobot-fe").href = "http://tools.yobot.win/pcrd-yobot-fe/#" + encodeURIComponent(apiurl);
-	document.getElementById("clan-battle-analyzer").href = "http://clan-battle-analyzer.pcrbot.com/?apiURL=" + encodeURIComponent(apiurl);
+	document.getElementById("clan-battle-analyzer").href = "http://librazy.reinwd.moe/?apiURL=" + encodeURIComponent(apiurl);
 	document.getElementById("copy").addEventListener("click", e => {
 		document.getElementById("apiurl").select();
 		document.execCommand("Copy");
