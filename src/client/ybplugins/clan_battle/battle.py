@@ -1126,7 +1126,7 @@ class ClanBattle:
         if group is None:
             raise GroupNotExist
         if pcrdate is None:
-            pcrdate = pcr_datetime(group.game_server)
+            pcrdate = pcr_datetime(group.game_server)[0]
         if battle_id is None:
             battle_id = group.battle_id
         full_challenge_count = 0
@@ -1307,12 +1307,15 @@ class ClanBattle:
         elif match_num == 27:  # 进度
             if cmd != '进度':
                 return
-            (
-                full_challenge_count,
-                tailing_challenge_count,
-                continued_challenge_count,
-                continued_tailing_challenge_count,
-            ) = self.get_clan_daily_challenge_counts(group_id)
+            try:
+                (
+                    full_challenge_count,
+                    tailing_challenge_count,
+                    continued_challenge_count,
+                    continued_tailing_challenge_count,
+                ) = self.get_clan_daily_challenge_counts(group_id)
+            except GroupNotExist as e:
+                return str(e)
             finished = full_challenge_count + continued_challenge_count
             unfinished = (tailing_challenge_count
                           - continued_challenge_count
