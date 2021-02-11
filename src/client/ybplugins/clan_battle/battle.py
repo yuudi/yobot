@@ -63,6 +63,7 @@ class ClanBattle:
         '查4': 24,
         '查5': 25,
         '强制': 26,
+        '清空': 28,
     }
 
     Server = {
@@ -850,7 +851,14 @@ class ClanBattle:
             Clan_subscribe.subscribe_item == boss_num,
         ).execute()
         return deleted_counts
-
+    
+    def clear_subscribe(self, group_id: Groupid, boss_num) -> int:
+        cleared_counts = Clan_subscribe.delete().where(
+            Clan_subscribe.gid == group_id,
+            Clan_subscribe.subscribe_item == boss_num,
+        ).execute()
+        return cleared_counts
+    
     def notify_subscribe(self, group_id: Groupid, boss_num=None, send_private_msg=False):
         """
         send notification to subsciber and remove them (when boss is defeated).
@@ -1392,8 +1400,17 @@ class ClanBattle:
             except ClanBattleError as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
+            # if behalf:
+            #     user_id = match.group(3) and int(match.group(3))
+            # group = Clan_group.get_or_none(group_id=group_id)
+            # boss_num = group.boss_num
+            # counts = self.cancel_subscribe(group_id, user_id, boss_num)
             _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return str(boss_status)
+            # if counts != 0:
+            #     return str(boss_status) + '\n※已取消该boss的预约'
+            # else:
+            #     return str(boss_status)
         elif match_num == 6:  # 撤销
             if cmd != '撤销':
                 return
@@ -1559,6 +1576,25 @@ class ClanBattle:
                     _logger.info('群聊 成功 {} {} {}'.format(
                         user_id, group_id, cmd))
                     return '已为{}取消'.format(atqq(user_id)) + event
+        elif match_num == 28:  # 清空预约
+            match = re.match(
+                r'^清空(?:预约)?([1-5])? *$', cmd)
+            if match:
+                if ctx['sender']['role'] == 'member':
+                    return '只有管理员才可以清空预约表'
+                elif not match.group(1):
+                    return '请加上需要清空预约的boss'
+                else:
+                    boss_num = match.group(1) and int(match.group(1))
+                    event = f'已清空{boss_num}号boss的预约'
+                    counts = self.clear_subscribe(group_id, boss_num)
+                    if counts == 0:
+                        _logger.info('群聊 失败 {} {}'.format(
+                            group_id, cmd))
+                        return '该boss的预约表为空'
+                    _logger.info('群聊 成功 {} {}'.format(
+                        user_id, cmd))
+                    return event
         elif match_num == 14:  # 解锁
             if cmd != '解锁':
                 return
@@ -1604,7 +1640,7 @@ class ClanBattle:
                     return str(e)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '已记录SL'
-        elif 20 <= match_num <= 26:
+        elif 20 <= match_num <= 28:
             if len(cmd) != 2:
                 return
             beh = '挂树' if match_num == 20 else '预约{}号boss'.format(match_num-20)
