@@ -6,10 +6,11 @@ on:
       - master
     paths:
       - src/client/**
+    tags-ignore:
+      - v*
   pull_request:
     types:
       - opened
-      - edited
       - synchronize
 
 jobs:
@@ -77,4 +78,4 @@ jobs:
       - name: Upload
         uses: docker://rclone/rclone:1
         with:
-          args: --config rclone.conf copy yobot.exe remote:pan/yobot/test/${{ github.run_id }}/
+          args: --config rclone.conf copy yobot.exe remote:pan/yobot/test/${{ github.run_number }}/

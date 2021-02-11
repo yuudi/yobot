@@ -31,7 +31,7 @@ jobs:
 
           echo ::group::Install Dependencies
           pip install wheel
-          pip install pyinstaller -r .\src\client\requirements.txt
+          pip install pyinstaller -r requirements.txt
           echo ::endgroup::
 
           echo ::group::Build Binary
