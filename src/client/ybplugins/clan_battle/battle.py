@@ -851,14 +851,14 @@ class ClanBattle:
             Clan_subscribe.subscribe_item == boss_num,
         ).execute()
         return deleted_counts
-    
+
     def clear_subscribe(self, group_id: Groupid, boss_num) -> int:
         cleared_counts = Clan_subscribe.delete().where(
             Clan_subscribe.gid == group_id,
             Clan_subscribe.subscribe_item == boss_num,
         ).execute()
         return cleared_counts
-    
+
     def notify_subscribe(self, group_id: Groupid, boss_num=None, send_private_msg=False):
         """
         send notification to subsciber and remove them (when boss is defeated).
@@ -1324,7 +1324,9 @@ class ClanBattle:
                 ) = self.get_clan_daily_challenge_counts(group_id)
             except GroupNotExist as e:
                 return str(e)
-            finished = full_challenge_count + continued_challenge_count
+            finished = (full_challenge_count
+                        + continued_challenge_count
+                        + continued_tailing_challenge_count)
             unfinished = (tailing_challenge_count
                           - continued_challenge_count
                           - continued_tailing_challenge_count)
@@ -1640,7 +1642,7 @@ class ClanBattle:
                     return str(e)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '已记录SL'
-        elif 20 <= match_num <= 28:
+        elif 20 <= match_num <= 25:
             if len(cmd) != 2:
                 return
             beh = '挂树' if match_num == 20 else '预约{}号boss'.format(match_num-20)

@@ -26,6 +26,8 @@ jobs:
 
       - name: Build exe binary and archive
         shell: cmd
+        env:
+          PYTHONIOENCODING: utf-8
         run: |
           cd .\src\client
 
