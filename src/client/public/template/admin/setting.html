@@ -52,7 +52,7 @@
       <el-form-item label="此站点的gzip压缩">
         开启 gzip 压缩能很大程度节省流量<br/>
         1级压缩大约节省 70%，9级压缩大约节省 80%<br/>
-        如果你使用了 nginx 之类的反向代理，那么应该由 nginx 负责 gzip 压缩<br/>
+        如果你的反向代理软件（nginx 等）开启了 gzip_proxy，那么应该将此处设置为 0<br/>
         <el-input-number v-model="setting.web_gzip" :min="0" :max="9" placeholder="5"></el-input-number>
       </el-form-item>
       <el-form-item label="主页展示备案号">

@@ -1,12 +1,16 @@
 # yobot
 
-[yobot](./about.md) 是为[公主连接](https://game.bilibili.com/pcr/)公会战设计的辅助机器人，能够帮助公会战管理者提供自动化管理服务。
+[yobot](./about.md) 是为[公主连接](https://priconne-redive.jp/)公会战设计的辅助机器人，能够帮助公会战管理者提供自动化管理服务。
 
 yobot 提供了群聊、web 页面两套用户交互方式，具有操作便捷、通知及时、数据详细的特点。
 
-[源码](./src/client)
+[主页](https://yobot.win)
 
-[使用说明](https://yobot.win)
+[部署教程](https://yobot.win/install/mirai/)
+[用户手册](https://yobot.win/usage/manual/)
+[开源软件](https://yobot.win/project/open-source/)
+[更新日志](https://yobot.win/project/changelog/)
+[贡献者](https://yobot.win/project/contributors/)
 
 ## 开源协议
 

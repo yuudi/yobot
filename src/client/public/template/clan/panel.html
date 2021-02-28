@@ -184,7 +184,7 @@
           <el-col :span="6"><el-button type="danger" size="small" @click="startmodify">修改状态</el-button></el-col>
           <el-col :span="6"><a href='./setting/'><el-button type="info" size="small" @click="leavePage=true">设置</el-button></a></el-col>
           <el-dialog title="修改状态" :visible.sync="statusFormVisible">
-            <el-alert title="如果要清空数据，请在“设置”中操作，否则会导致分析数据不准确"
+            <el-alert title="如需重置进度，请在“公会设置”中操作。如需修改boss血量上限，请在“全局设置”中操作"
               type="warning" :hidden="(bossData.cycle!=1)||(bossData.num!=1)"></el-alert>
             <el-form>
               <el-form-item label="周目数" label-width="120">

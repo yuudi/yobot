@@ -80,7 +80,7 @@ Remove-Item go-cqhttp-v0.9.29-fix2-windows-amd64.zip
 # pause
 # "@
 
-Invoke-WebRequest https://down.yobot.club/yobot/yobot-3.6.10-windows64.zip -OutFile .\yobot.zip
+Invoke-WebRequest https://down.yobot.club/yobot/yobot-3.6.11-windows64.zip -OutFile .\yobot.zip
 
 Expand-ZIPFile yobot.zip -Destination .\yobot\
 Remove-Item yobot.zip

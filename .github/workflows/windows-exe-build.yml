@@ -11,7 +11,8 @@ jobs:
     name: build windows binary
 
     steps:
-      - uses: actions/setup-python@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
         with:
           python-version: "3.7"
 
@@ -46,14 +47,18 @@ jobs:
           7z a yobot-windows64.zip .\yobot.exe
           echo ::endgroup::
 
+      - name: Get release version
+        run: |
+          echo "RELEASE_VER=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ env.RELEASE_VER }}
+          release_name: yobot ${{ env.RELEASE_VER }}
           draft: false
           prerelease: false
 
@@ -64,5 +69,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./src/client/dist/yobot-windows64.zip
-          asset_name: yobot-${GITHUB_REF##*/}-windows64.zip
+          asset_name: yobot-${RELEASE_VER#v}-windows64.zip
           asset_content_type: application/zip

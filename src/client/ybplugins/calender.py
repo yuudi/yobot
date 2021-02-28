@@ -10,9 +10,9 @@ from arrow.arrow import Arrow
 from .yobot_exceptions import InputError, ServerError
 
 _calender_url = {
-    "jp": "https://tools.yobot.win/calender/#jp",
-    "tw": "https://tools.yobot.win/calender/#tw",
-    "cn": "https://tools.yobot.win/calender/#cn",
+    "jp": "https://pcrbot.github.io/pcr-calendar/#jp",
+    "tw": "https://pcrbot.github.io/pcr-calendar/#tw",
+    "cn": "https://pcrbot.github.io/pcr-calendar/#cn",
 }
 
 
