@@ -66,7 +66,8 @@ class Clan_group(_BaseModel):
     boss_cycle = SmallIntegerField(default=1)
     boss_num = SmallIntegerField(default=1)
     boss_health = BigIntegerField(default=6000000)
-    challenging_member_qq_id = IntegerField(null=True)
+    challenging_member_qq_id = TextField(null=True) # 改成字符串方便多人，也省的改数据库表格
+    lock_member_qq_id=IntegerField(null=True)# 锁定和申请出刀分开
     boss_lock_type = IntegerField(default=0)  # 1出刀中，2其他
     challenging_start_time = BigIntegerField(default=0)
     challenging_comment = TextField(null=True)
