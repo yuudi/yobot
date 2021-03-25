@@ -958,11 +958,10 @@ class ClanBattle:
                             appli_type: int = 0,
                             ) -> BossStatus:
         """
-        apply for a challenge to boss.
-
-        Args:
-            group_id: group id
-            qqid: qq id
+        appli_type 表示申请的类型：
+        appli_type = 1 ：申请出刀；
+        appli_type = 2 ：锁定 boss；
+        appli_type = 3 ：申请同时出刀。
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
@@ -972,13 +971,16 @@ class ClanBattle:
             raise UserNotInGroup
         if (appli_type == 2) and (extra_msg is None):
             raise InputError('锁定boss时必须留言')
-        #
-        if group.boss_lock_type == 2:
-            nik = self._get_nickname_by_qqid(
-                group.lock_member_qq_id,
-            ) or group.lock_member_qq_id
+        # 1 和 2 情况下不允许出刀
+        if group.boss_lock_type == 1 or group.boss_lock_type == 2:
+            if group.boss_lock_type == 1:
+                nik = '有人'  # 改得我不都知道怎么获取昵称了
+            elif group.boss_lock_type == 2:
+                nik = self._get_nickname_by_qqid(
+                    group.lock_member_qq_id,
+                ) or group.lock_member_qq_id
             nik = escape(nik)
-            action = '锁定了'
+            action = '正在挑战' if group.boss_lock_type == 1 else '锁定了'
             msg = f'申请失败，{nik}{action}boss\n留言：{group.challenging_comment}'
             raise GroupError(msg)
 
@@ -987,7 +989,16 @@ class ClanBattle:
             for len_in in range(challenge_num):
                 if (int(group.challenging_member_qq_id[len_in * 20:(len_in + 1) * 20]) == qqid):
                     raise GroupError("你申请过了，出刀gkd")
+            # 没看懂……
 
+        if appli_type == 1:
+            group.challenging_member_qq_id = qqid
+            group.challenging_start_time = int(time.time())
+            group.challenging_comment = extra_msg
+            group.boss_lock_type = appli_type
+            nik = self._get_nickname_by_qqid(qqid) or qqid
+            nik = escape(nik)
+            info = f'{nik}已开始挑战boss'
         if appli_type == 2:
             group.challenging_comment = extra_msg
             group.boss_lock_type = appli_type
@@ -996,9 +1007,8 @@ class ClanBattle:
                 group.lock_member_qq_id,
             ) or group.lock_member_qq_id
             nik = escape(nik)
-            action = '锁定了'
-            info = f'\n{nik}{action}boss\n留言：{group.challenging_comment}'
-        else:
+            info = f'{nik}锁定了boss\n留言：{group.challenging_comment}'
+        elif appli_type == 2:
             qqid_str = "%20d" % (qqid)
             if group.challenging_member_qq_id is not None:
                 group.challenging_member_qq_id += qqid_str
@@ -1625,6 +1635,9 @@ class ClanBattle:
             if cmd == '申请出刀':
                 appli_type = 1
                 extra_msg = None
+            if cmd == '申请同时出刀':
+                appli_type = 3
+                extra_msg = None
             elif cmd == '锁定':
                 return '锁定时请留言'
             else:
@@ -1765,7 +1778,7 @@ class ClanBattle:
                     return str(e)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '已记录SL'
-        elif 20 <= match_num <= 26:
+        elif 20 <= match_num <= 25:  # 20~25 分别为查树、查1、……、查5
             if len(cmd) != 2:
                 return
             beh = '挂树' if match_num == 20 else '预约{}号boss'.format(match_num - 20)
