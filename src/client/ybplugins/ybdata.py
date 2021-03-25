@@ -4,7 +4,7 @@ from playhouse.migrate import SqliteMigrator, migrate
 from .web_util import rand_string
 
 _db = SqliteDatabase(None)
-_version = 11  # 目前版本
+_version = 12  # 目前版本
 
 MAX_TRY_TIMES = 3
 
@@ -250,6 +250,13 @@ def db_upgrade(old_version):
         migrate(
             migrator.add_column('user', 'notify_preference',
                                 IntegerField(default=1)),
+        )
+    if old_version < 12:
+        migrate(
+            migrator.alter_column_type('clan_group', 'challenging_member_qq_id',
+                                       TextField(null=True)),
+            migrator.add_column('clan_group', 'lock_member_qq_id',
+                                IntegerField(null=True)),
         )
 
     DB_schema.replace(key='version', value=str(_version)).execute()
