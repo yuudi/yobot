@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import re
 import time
 from email.utils import parsedate_tz
 from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
@@ -139,7 +140,11 @@ class News:
                       + " Exception: " + str(r))
                 continue
             elif isinstance(r, str):
-                news.append(r)
+                rr = r.replace('&nbsp;', ' ')
+                rr = re.sub('\t', '', rr)
+                rr = re.sub('(\s)+', '\\1', rr)
+                rr = rr.strip()
+                news.append(rr)
             else:
                 print("ValueError")
         return news
@@ -215,6 +220,12 @@ class News:
             if self.setting.get(s, True)
         ]
         res = await asyncio.gather(*tasks, return_exceptions=True)
+        for i in range(len(res)):
+            if isinstance(res[i], str):
+                rr = res[i].replace('&nbsp;', ' ')
+                rr = re.sub('\t', '', rr)
+                rr = re.sub('(\s)+', '\\1', rr)
+                res[i] = rr.strip()
         await self.send_news_msg_async(res)
 
     async def send_rss_news_async(self, source):
