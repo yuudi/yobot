@@ -49,6 +49,19 @@ var vm = new Vue({
             };
             return qqid;
         },
+        get_time_delta: function (time) {
+            var dateBegin = new Date(time);
+            var dateEnd = new Date();
+            var dateDiff = dateEnd.getTime() - dateBegin.getTime();
+            if (dateDiff >= 86400000) {
+                return '24小时+'
+            }
+            var leave1 = dateDiff % (24 * 3600 * 1000);
+            var hours = Math.floor(leave1 / (3600 * 1000));
+            var leave2 = leave1 % (3600 * 1000);
+            var minutes = Math.floor(leave2 / (60 * 1000));
+            return (hours + "小时" + minutes + "分钟");
+        },
         handleSelect(key, keyPath) {
             switch (key) {
                 case '1':

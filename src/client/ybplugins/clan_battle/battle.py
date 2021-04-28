@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 import os
 import random
@@ -18,9 +19,8 @@ from ..templating import render_template
 from ..web_util import async_cached_func
 from ..ybdata import (Clan_challenge, Clan_group, Clan_member, Clan_subscribe,
                       User)
-from .exception import (
-    ClanBattleError, GroupError, GroupNotExist, InputError, UserError,
-    UserNotInGroup)
+from .exception import (ClanBattleError, GroupError, GroupNotExist, InputError,
+                        UserError, UserNotInGroup)
 from .typing import BossStatus, ClanBattleReport, Groupid, Pcr_date, QQid
 from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func
 
@@ -136,6 +136,16 @@ class ClanBattle:
                 group_id=None,
             ))
         return user.nickname or str(qqid)
+
+    def _get_timedelta(self, time: datetime.datetime):
+        if type(time) != datetime.datetime:
+            return ''
+        _timedelta = datetime.datetime.now() - time
+        if abs(_timedelta.total_seconds()) >= 86400:
+            return '24小时+'
+        else:
+            time = str(_timedelta)
+            return f"{time.split(':')[0]}小时{time.split(':')[1]}分钟"
 
     def _get_group_previous_challenge(self, group: Clan_group):
         Clan_challenge_alias = Clan_challenge.alias()
@@ -832,6 +842,7 @@ class ClanBattle:
                 'boss': subscribe.subscribe_item,
                 'qqid': subscribe.qqid,
                 'message': subscribe.message,
+                'created_time': subscribe.created_time
             })
         return subscribe_list
 
@@ -1454,6 +1465,8 @@ class ClanBattle:
                             reply += f"==={sub['boss']}号boss===\n"
                         current_boss = sub['boss']
                     reply += self._get_nickname_by_qqid(sub['qqid'])  # 显示昵称
+                    reply += f"(已挂树{self._get_timedelta(sub['created_time'])})" if self._get_timedelta(
+                        sub['created_time']) else ''
                     message = sub['message']  # 如果有留言则显示留言
                     if message:
                         reply += '：' + message
@@ -1614,6 +1627,9 @@ class ClanBattle:
             reply = beh+'的成员：\n'
             for m in subscribers:
                 reply += '\n'+self._get_nickname_by_qqid(m['qqid'])
+                if match_num == 20:
+                    reply += f"(已挂树{self._get_timedelta(m['created_time'])})" if self._get_timedelta(
+                        m['created_time']) else ''
                 if m.get('message'):
                     reply += '：' + m['message']
             return reply
