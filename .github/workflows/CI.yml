@@ -60,24 +60,24 @@ jobs:
           name: windows-executable
           path: ./src/client/dist/yobot.exe
 
-  upload:
-    runs-on: ubuntu-20.04
-    if: ${{ github.event_name != 'pull_request' }}
-    needs: build-windows
-    name: upload binary
+# upload:
+#   runs-on: ubuntu-20.04
+#   if: ${{ github.event_name != 'pull_request' }}
+#   needs: build-windows
+#   name: upload binary
 
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: windows-executable
+#   steps:
+#     - name: Download Artifact
+#       uses: actions/download-artifact@v2
+#       with:
+#         name: windows-executable
 
-      - name: Initial rclone configuration
-        run: echo "$RCLONE_CONF">rclone.conf
-        env:
-          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+#     - name: Initial rclone configuration
+#       run: echo "$RCLONE_CONF">rclone.conf
+#       env:
+#         RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
 
-      - name: Upload
-        uses: docker://rclone/rclone:1
-        with:
-          args: --config rclone.conf copy yobot.exe remote:pan/yobot/test/${{ github.run_number }}/
+#     - name: Upload
+#       uses: docker://rclone/rclone:1
+#       with:
+#         args: --config rclone.conf copy yobot.exe remote:pan/yobot/test/${{ github.run_number }}/
