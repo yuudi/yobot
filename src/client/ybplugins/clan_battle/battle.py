@@ -1303,7 +1303,7 @@ class ClanBattle:
                 }
             )[0]
             if cmd == '加入全部成员':
-                if (ctx['sender']['role'] == 'member') or (user.authority_group >= 100):
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以加入全部成员'
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 asyncio.ensure_future(
@@ -1312,7 +1312,7 @@ class ClanBattle:
             match = re.match(r'^加入[公工行]会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
             if match:
                 if match.group(1):
-                    if (ctx['sender']['role'] == 'member') or (user.authority_group >= 100):
+                    if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                         return '只有管理员才可以加入其他成员'
                     user_id = int(match.group(1))
                     nickname = None
@@ -1585,7 +1585,7 @@ class ClanBattle:
                         'clan_group_id': group_id,
                     }
                 )[0]
-                if (ctx['sender']['role'] == 'member') or (user.authority_group >= 100):
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以强制取消'
                 elif not match.group(1):
                     return '请输入需要取消的boss'
@@ -1614,7 +1614,7 @@ class ClanBattle:
                         'clan_group_id': group_id,
                     }
                 )[0]
-                if (ctx['sender']['role'] == 'member') or (user.authority_group >= 100):
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以清空预约表'
                 elif not match.group(1):
                     return '请加上需要清空预约的boss'
