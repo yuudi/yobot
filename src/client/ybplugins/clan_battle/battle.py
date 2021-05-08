@@ -792,6 +792,7 @@ class ClanBattle:
             group_id: group id
             qqid: qq id of subscriber
             boss_num: number of boss to subscribe, `0` for all
+            created_time: time of subscribe
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
@@ -817,6 +818,7 @@ class ClanBattle:
             qqid=qqid,
             subscribe_item=boss_num,
             message=message,
+            created_time=time.time()
         )
 
     def get_subscribe_list(self, group_id: Groupid, boss_num=None, order_by="sid") -> List[Dict[str, Any]]:
