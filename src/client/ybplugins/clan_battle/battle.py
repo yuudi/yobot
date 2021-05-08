@@ -1484,8 +1484,8 @@ class ClanBattle:
                             reply += f"==={sub['boss']}号boss===\n"
                         current_boss = sub['boss']
                     reply += self._get_nickname_by_qqid(sub['qqid'])  # 显示昵称
-                    reply += f"(已挂树{self._get_timedelta(sub['created_time'])})" if self._get_timedelta(
-                        sub['created_time']) else ''
+                    # reply += f"(已挂树{self._get_timedelta(sub['created_time'])})" if self._get_timedelta(
+                    #     sub['created_time']) else ''
                     message = sub['message']  # 如果有留言则显示留言
                     if message:
                         reply += '：' + message
