@@ -786,7 +786,7 @@ class ClanBattle:
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupNotExist
-        user = User.get_or_none(qqid=qqid)
+        user = User.get_or_none(qqid=qqid, clan_group_id=group_id)
         if user is None:
             raise GroupError('请先加入公会')
         subscribe = Clan_subscribe.get_or_none(
@@ -918,7 +918,7 @@ class ClanBattle:
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
             raise GroupNotExist
-        user = User.get_or_none(qqid=qqid)
+        user = User.get_or_none(qqid=qqid, clan_group_id=group_id)
         if user is None:
             raise UserNotInGroup
         if (appli_type != 1) and (extra_msg is None):
