@@ -1296,8 +1296,14 @@ class ClanBattle:
                     '公会战成员请发送“加入公会”，'
                     '或发送“加入全部成员”')
         elif match_num == 2:  # 加入
+            user = User.get_or_create(
+                qqid=user_id,
+                defaults={
+                    'clan_group_id': group_id,
+                }
+            )[0]
             if cmd == '加入全部成员':
-                if ctx['sender']['role'] == 'member':
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以加入全部成员'
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 asyncio.ensure_future(
@@ -1306,7 +1312,7 @@ class ClanBattle:
             match = re.match(r'^加入[公工行]会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
             if match:
                 if match.group(1):
-                    if ctx['sender']['role'] == 'member':
+                    if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                         return '只有管理员才可以加入其他成员'
                     user_id = int(match.group(1))
                     nickname = None
@@ -1573,7 +1579,13 @@ class ClanBattle:
             match = re.match(
                 r'^强制取消(?:预约)?([1-5])? *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
             if match:
-                if ctx['sender']['role'] == 'member':
+                user = User.get_or_create(
+                    qqid=user_id,
+                    defaults={
+                        'clan_group_id': group_id,
+                    }
+                )[0]
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以强制取消'
                 elif not match.group(1):
                     return '请输入需要取消的boss'
@@ -1596,7 +1608,13 @@ class ClanBattle:
             match = re.match(
                 r'^清空(?:预约)?([1-5])? *$', cmd)
             if match:
-                if ctx['sender']['role'] == 'member':
+                user = User.get_or_create(
+                    qqid=user_id,
+                    defaults={
+                        'clan_group_id': group_id,
+                    }
+                )[0]
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以清空预约表'
                 elif not match.group(1):
                     return '请加上需要清空预约的boss'
