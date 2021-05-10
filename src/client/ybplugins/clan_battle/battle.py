@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 import os
 import random
@@ -18,9 +19,8 @@ from ..templating import render_template
 from ..web_util import async_cached_func
 from ..ybdata import (Clan_challenge, Clan_group, Clan_member, Clan_subscribe,
                       User)
-from .exception import (
-    ClanBattleError, GroupError, GroupNotExist, InputError, UserError,
-    UserNotInGroup)
+from .exception import (ClanBattleError, GroupError, GroupNotExist, InputError,
+                        UserError, UserNotInGroup)
 from .typing import BossStatus, ClanBattleReport, Groupid, Pcr_date, QQid
 from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func
 
@@ -137,6 +137,16 @@ class ClanBattle:
                 group_id=None,
             ))
         return user.nickname or str(qqid)
+
+    def _get_timedelta(self, time: datetime.datetime):
+        if type(time) != datetime.datetime:
+            return ''
+        _timedelta = datetime.datetime.now() - time
+        if abs(_timedelta.total_seconds()) >= 86400:
+            return '24小时+'
+        else:
+            time = str(_timedelta)
+            return f"{time.split(':')[0]}小时{time.split(':')[1]}分钟"
 
     def _get_group_previous_challenge(self, group: Clan_group):
         Clan_challenge_alias = Clan_challenge.alias()
@@ -782,6 +792,7 @@ class ClanBattle:
             group_id: group id
             qqid: qq id of subscriber
             boss_num: number of boss to subscribe, `0` for all
+            created_time: time of subscribe
         """
         group = Clan_group.get_or_none(group_id=group_id)
         if group is None:
@@ -807,6 +818,7 @@ class ClanBattle:
             qqid=qqid,
             subscribe_item=boss_num,
             message=message,
+            created_time=time.time()
         )
 
     def get_subscribe_list(self, group_id: Groupid, boss_num=None, order_by="sid") -> List[Dict[str, Any]]:
@@ -833,6 +845,7 @@ class ClanBattle:
                 'boss': subscribe.subscribe_item,
                 'qqid': subscribe.qqid,
                 'message': subscribe.message,
+                'created_time': subscribe.created_time
             })
         return subscribe_list
 
@@ -1283,8 +1296,14 @@ class ClanBattle:
                     '公会战成员请发送“加入公会”，'
                     '或发送“加入全部成员”')
         elif match_num == 2:  # 加入
+            user = User.get_or_create(
+                qqid=user_id,
+                defaults={
+                    'clan_group_id': group_id,
+                }
+            )[0]
             if cmd == '加入全部成员':
-                if ctx['sender']['role'] == 'member':
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以加入全部成员'
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 asyncio.ensure_future(
@@ -1293,7 +1312,7 @@ class ClanBattle:
             match = re.match(r'^加入[公工行]会 *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
             if match:
                 if match.group(1):
-                    if ctx['sender']['role'] == 'member':
+                    if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                         return '只有管理员才可以加入其他成员'
                     user_id = int(match.group(1))
                     nickname = None
@@ -1471,6 +1490,9 @@ class ClanBattle:
                             reply += f"==={sub['boss']}号boss===\n"
                         current_boss = sub['boss']
                     reply += self._get_nickname_by_qqid(sub['qqid'])  # 显示昵称
+                    if sub['boss'] == 0:
+                        reply += f"(已挂树{self._get_timedelta(sub['created_time'])})" if self._get_timedelta(
+                            sub['created_time']) else ''
                     message = sub['message']  # 如果有留言则显示留言
                     if message:
                         reply += '：' + message
@@ -1557,7 +1579,13 @@ class ClanBattle:
             match = re.match(
                 r'^强制取消(?:预约)?([1-5])? *(?:\[CQ:at,qq=(\d+)\])? *$', cmd)
             if match:
-                if ctx['sender']['role'] == 'member':
+                user = User.get_or_create(
+                    qqid=user_id,
+                    defaults={
+                        'clan_group_id': group_id,
+                    }
+                )[0]
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以强制取消'
                 elif not match.group(1):
                     return '请输入需要取消的boss'
@@ -1580,7 +1608,13 @@ class ClanBattle:
             match = re.match(
                 r'^清空(?:预约)?([1-5])? *$', cmd)
             if match:
-                if ctx['sender']['role'] == 'member':
+                user = User.get_or_create(
+                    qqid=user_id,
+                    defaults={
+                        'clan_group_id': group_id,
+                    }
+                )[0]
+                if (ctx['sender']['role'] == 'member') and (user.authority_group >= 100):
                     return '只有管理员才可以清空预约表'
                 elif not match.group(1):
                     return '请加上需要清空预约的boss'
@@ -1650,6 +1684,9 @@ class ClanBattle:
             reply = beh+'的成员：\n'
             for m in subscribers:
                 reply += '\n'+self._get_nickname_by_qqid(m['qqid'])
+                if match_num == 20:
+                    reply += f"(已挂树{self._get_timedelta(m['created_time'])})" if self._get_timedelta(
+                        m['created_time']) else ''
                 if m.get('message'):
                     reply += '：' + m['message']
             return reply

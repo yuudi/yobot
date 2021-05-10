@@ -32,6 +32,9 @@
                 </span>
                 <p v-for="m in subscribers[bn-1]">
                     [[ find_name(m.qqid) ]]（[[ m.qqid ]]）
+                    <template v-if="bn === 1 && !!m.created_time">
+                        （已挂树[[ get_time_delta(m.created_time) ]]）
+                    </template>
                     <template v-if="m.message">
                         ：[[ m.message ]]
                     </template>
