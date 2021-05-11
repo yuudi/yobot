@@ -36,7 +36,9 @@ class ClanBattle:
         '创建': 1,
         '加入': 2,
         '状态': 3,
-        '进度': 27,
+        '进度': 3,
+        '报告': 3,
+        '查刀': 3,
         '报刀': 4,
         '尾刀': 5,
         '撤销': 6,
@@ -44,8 +46,6 @@ class ClanBattle:
         '修改': 7,
         '选择': 8,
         '切换': 8,
-        '报告': 9,
-        '查刀': 9,
         '预约': 10,
         '挂树': 11,
         '申请': 12,
@@ -356,8 +356,7 @@ class ClanBattle:
         if group is None:
             raise GroupNotExist
         boss_summary = (
-            f'现在{group.boss_cycle}周目，{group.boss_num}号boss\n'
-            f'生命值{group.boss_health:,}'
+            f'现在{group.boss_cycle}周目，{group.boss_num}号boss，生命值{group.boss_health:,}'
         )
         if group.challenging_member_qq_id is not None:
             action = '正在挑战' if group.boss_lock_type == 1 else '锁定了'
@@ -1324,16 +1323,24 @@ class ClanBattle:
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
                 return '{}已加入本公会'.format(atqq(user_id))
         elif match_num == 3:  # 状态
-            if cmd != '状态':
+            if len(cmd) != 2:
                 return
+            if cmd in ['查刀', '报告']:
+                url = '详情请在面板中查看：'
+                url += urljoin(
+                    self.setting['public_address'],
+                    '{}clan/{}/progress/'.format(
+                        self.setting['public_basepath'],
+                        group_id
+                    )
+                )
+                url += '\n'
+            else:
+                url = ''
             try:
                 boss_summary = self.boss_status_summary(group_id)
             except ClanBattleError as e:
                 return str(e)
-            return boss_summary
-        elif match_num == 27:  # 进度
-            if cmd != '进度':
-                return
             try:
                 (
                     full_challenge_count,
@@ -1349,10 +1356,10 @@ class ClanBattle:
             unfinished = (tailing_challenge_count
                           - continued_challenge_count
                           - continued_tailing_challenge_count)
-            return ("今日进度\n\n"
-                    f"已完成出刀：{finished}\n"
-                    f"未完成的尾刀：{unfinished}\n"
-                    f"未开始的出刀：{90-finished-unfinished}")
+            progress = '\n今天已出{}刀，剩余{}刀完整刀和{}刀补偿刀'.format(
+                finished, 90 - finished - unfinished, unfinished
+            )
+            return f'{url}{boss_summary}{progress}'
         elif match_num == 4:  # 报刀
             match = re.match(
                 r'^报刀 ?(\d+)([Ww万Kk千])? *(?:\[CQ:at,qq=(\d+)\])? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
@@ -1462,17 +1469,6 @@ class ClanBattle:
                 )
             )
             return '请登录面板操作：'+url
-        elif match_num == 9:  # 报告
-            if len(cmd) != 2:
-                return
-            url = urljoin(
-                self.setting['public_address'],
-                '{}clan/{}/progress/'.format(
-                    self.setting['public_basepath'],
-                    group_id
-                )
-            )
-            return '请在面板中查看：'+url
         elif match_num == 10:  # 预约
             if cmd == '预约表':
                 # 查询预约表
