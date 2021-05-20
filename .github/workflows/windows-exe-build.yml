@@ -47,18 +47,14 @@ jobs:
           7z a yobot-windows64.zip .\yobot.exe
           echo ::endgroup::
 
-      - name: Get release version
-        run: |
-          echo "RELEASE_VER=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.RELEASE_VER }}
-          release_name: yobot ${{ env.RELEASE_VER }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
 
