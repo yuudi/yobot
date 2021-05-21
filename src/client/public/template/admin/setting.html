@@ -210,22 +210,29 @@
       <el-collapse v-model="activeNames" @change="bossSetting = !bossSetting">
         <el-collapse-item title="boss设置（点击展开）" name="1">
           <div :hidden="!bossSetting">
-            <div v-for="area_health,area in setting.boss">
-              <h4>[[ {jp:"日服",tw:"台服",cn:"国服",eff:"得分系数"}[area] ]]</h4>
+            <div v-for="(area_health, area) in setting.boss">
+              <h4>[[ {jp: "日服", tw: "台服", cn: "国服"}[area] ]]</h4>
               <table>
                 <tr>
                   <th></th>
+                  <th>起始周目数</th>
                   <th v-for="k in 5">[[k]]号boss</th>
                 </tr>
-                <tr v-for="level,k in area_health">
-                  <td>[[k+1]]阶段</td>
-                  <td v-for="health,b in level"><input v-model.number="area_health[k][b]" placeholder="boss血量"
-                      type="number" v-bind="{step: (area=='eff')?0.1:1000000}" />
+                <tr v-for="(stage, i) in area_health">
+                  <td>[[i+1]]阶段</td>
+                  <td>
+                    <input v-if="i == 0" :value="1" disabled type="number" />
+                    <input v-else v-model.number="setting.stage_cycle[area][i - 1]" placeholder="起始周目数" type="number" />
+                  </td>
+                  <td v-for="health, b in stage"><input v-model.number="area_health[i][b]" placeholder="boss血量"
+                      type="number" :step="1000000" />
                   </td>
                 </tr>
-              </table><button @click="switch_levels(area)">切换阶段数</button>
+              </table>
+              <button @click="add_stage(area)">添加阶段数</button>
+              <button :disabled="area_health.length == 1" @click="remove_stage(area)">减少阶段数</button>
             </div>
-            <div class="comment">备注：<br>1阶段：1~3周目<br>2阶段：4~10周目<br>3阶段：11~34周目<br>4阶段：35~44周目<br>5阶段：45以上</div>
+            <div class="comment">备注：<br>当前日服公会战阶段情况如下：<br>1阶段：1~3周目<br>2阶段：4~10周目<br>3阶段：11~34周目<br>4阶段：35~44周目<br>5阶段：45以上</div>
           </div>
         </el-collapse-item>
       </el-collapse>

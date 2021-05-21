@@ -72,12 +72,19 @@ var vm = new Vue({
                 alert(error);
             });
         },
-        switch_levels: function (area) {
-            if (this.setting.boss[area].length < 5) {
-                this.setting.boss[area].push([0, 0, 0, 0, 0]);
+        add_stage: function (area) {
+            this.setting.boss[area].push(this.setting.boss[area][this.setting.boss[area].length - 1].slice());
+            const index = this.setting.stage_cycle[area].length - 1;
+            if (index >= 0) {
+                this.setting.stage_cycle[area].push(this.setting.stage_cycle[area][index] + 1);
             } else {
-                this.setting.boss[area] = this.setting.boss[area].slice(0, -2);
+                this.setting.stage_cycle[area].push(2);
             }
+        },
+        remove_stage: function (area) {
+            if (this.setting.boss[area].length == 1) return;
+            this.setting.boss[area].pop();
+            this.setting.stage_cycle[area].pop();
         },
         comfirm_change_clan_mode: function (event) {
             this.$alert('修改模式后，公会战数据会重置。请不要在公会战期间修改！', '警告', {

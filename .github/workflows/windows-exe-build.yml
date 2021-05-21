@@ -47,6 +47,10 @@ jobs:
           7z a yobot-windows64.zip .\yobot.exe
           echo ::endgroup::
 
+      - name: Get release version
+        run: |
+          echo "RELEASE_VER=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

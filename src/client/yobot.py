@@ -72,15 +72,6 @@ class Yobot:
             with open(config_f_path, "w") as f:
                 f.write("{}")
             print("设置已初始化，发送help获取帮助")
-        boss_filepath = os.path.join(dirname, "boss3.json")
-        if not os.path.exists(boss_filepath):
-            if is_packaged:
-                default_boss_filepath = os.path.join(
-                    sys._MEIPASS, "packedfiles", "default_boss.json")
-            else:
-                default_boss_filepath = os.path.join(
-                    os.path.dirname(__file__), "packedfiles", "default_boss.json")
-            shutil.copyfile(default_boss_filepath, boss_filepath)
         pool_filepath = os.path.join(dirname, "pool3.json")
         if not os.path.exists(pool_filepath):
             if is_packaged:
