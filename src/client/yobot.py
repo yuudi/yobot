@@ -292,6 +292,9 @@ class Yobot:
                 msg["raw_message"] = (
                     msg["raw_message"][len(preffix):])
 
+        # strip
+        msg["raw_message"] = msg["raw_message"].strip()
+
         # black-list
         if msg["sender"]["user_id"] in self.black_list:
             return None
