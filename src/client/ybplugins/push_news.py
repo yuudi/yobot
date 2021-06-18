@@ -94,6 +94,9 @@ class News:
                         jobstore='default',
                         trigger=DateTrigger(nt),
                     )
+        if len(feed["entries"]) == 0:
+            print("rss无效："+rss_source["name"])
+            return None
         last_id = rss_source.get("last_id")
         rss_source["last_id"] = feed["entries"][0]["id"]
         if last_id is None:
