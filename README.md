@@ -1,6 +1,6 @@
 # yobot
 
-**由于新版公会战规则变化，yobot无法适配新版公会战规则，请在下面时间之前改用HoshinoBot Clanbattle V4**  
+**由于新版公会战规则变化，yobot无法适配新版公会战规则，请在下面时间之前改用[HoshinoBot Clanbattle V4](https://ngabbs.com/read.php?tid=26540003)**  
 日服：2021年6月  
 台服：2021年11月  
 国服：2023年7月
