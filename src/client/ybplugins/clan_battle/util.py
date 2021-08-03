@@ -1,4 +1,5 @@
 import datetime
+import random
 import time
 from functools import lru_cache
 from typing import Tuple, Union
@@ -57,3 +58,15 @@ def timed_cached_func(max_len, max_age_seconds, ignore_self=False):
             return value
         return wrapper
     return decorator
+
+def insert_seq(seq, x):
+    for i in seq:
+        if random.random()<0.2:
+            yield x
+        yield i
+
+def insert_zwsp(x: str) -> str:
+    zwsp = '\ufeff'
+    m = insert_seq(x, zwsp)
+    return ''.join(m)
+
