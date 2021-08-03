@@ -39,18 +39,12 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import yobot
 
+
 def insert_seq(seq, x):
-    cq_code = False
     for i in seq:
-        if cq_code:
-            if i == ']':
-                cq_code=False
-            yield i
-            continue
-        if random.random()<0.2:
-            yield x
-        if i == '[':
-            cq_code=True
+        if '\u4e00' <= i <= '\u9fa5':
+            if random.random()<0.2:
+                yield x
         yield i
 
 
