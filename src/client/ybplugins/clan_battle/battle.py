@@ -488,13 +488,13 @@ class ClanBattle:
         nik = user.nickname or user.qqid
         nik = escape(nik)
         if defeat:
-            msg = insert_zwsp('{}对boss造成了{:,}点伤害，击败了boss\n（今日第{}刀，{}）').format(
+            msg = insert_zwsp('{}对boss造成了{:,}点伤害，击败了boss\n（今日第{}刀，{}）'.format(
                 nik, health_before, finished+1, '尾余刀' if is_continue else '收尾刀'
-            )
+            ))
         else:
-            msg = insert_zwsp('{}对boss造成了{:,}点伤害\n（今日第{}刀，{}）').format(
+            msg = insert_zwsp('{}对boss造成了{:,}点伤害\n（今日第{}刀，{}）'.format(
                 nik, damage, finished+1, '剩余刀' if is_continue else '完整刀'
-            )
+            ))
         status = BossStatus(
             group.boss_cycle,
             group.boss_num,
