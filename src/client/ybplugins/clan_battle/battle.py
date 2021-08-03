@@ -488,12 +488,12 @@ class ClanBattle:
         nik = user.nickname or user.qqid
         nik = escape(nik)
         if defeat:
-            msg = '{}对boss造成了{:,}点伤害，击败了boss\n（今日第{}刀，{}）'.format(
-                nik, health_before, finished+1, '尾余刀' if is_continue else '收尾刀'
+            msg = '{}对boss造\ufeff成了{:,}点伤\ufeff害，击\ufeff败了boss\n（今日第{}刀，{}）'.format(
+                nik, health_before, finished+1, '尾\ufeff余刀' if is_continue else '收\ufeff尾\ufeff刀'
             )
         else:
-            msg = '{}对boss造成了{:,}点伤害\n（今日第{}刀，{}）'.format(
-                nik, damage, finished+1, '剩余刀' if is_continue else '完整刀'
+            msg = '{}对boss造\ufeff成了{:,}点伤\ufeff害\n（今日第{}刀，{}）'.format(
+                nik, damage, finished+1, '剩\ufeff余刀' if is_continue else '完\ufeff整刀'
             )
         status = BossStatus(
             group.boss_cycle,
@@ -907,7 +907,7 @@ class ClanBattle:
         if notice:
             asyncio.ensure_future(self.api.send_group_msg(
                 group_id=group_id,
-                message='boss已被击败\n'+'\n'.join(notice),
+                message='bo\ufeffss已被\ufeff击\ufeff败\n'+'\n'.join(notice),
             ))
 
     def apply_for_challenge(self,
@@ -938,7 +938,7 @@ class ClanBattle:
             ) or group.challenging_member_qq_id
             nik = escape(nik)
             action = '正在挑战' if group.boss_lock_type == 1 else '锁定了'
-            msg = f'申请失败，{nik}{action}boss'
+            msg = f'申\ufeff请失败，{nik}{action}boss'
             if group.boss_lock_type != 1:
                 msg += '\n留言：'+group.challenging_comment
             raise GroupError(msg)
@@ -950,8 +950,8 @@ class ClanBattle:
 
         nik = self._get_nickname_by_qqid(qqid) or qqid
         nik = escape(nik)
-        info = (f'{nik}已开始挑战boss' if appli_type == 1 else
-                f'{nik}锁定了boss\n留言：{escape(extra_msg)}')
+        info = (f'{nik}已开始挑\ufeff战bo\ufeffss' if appli_type == 1 else
+                f'{nik}锁\ufeff定了bo\ufeffss\n留言：{escape(extra_msg)}')
         status = BossStatus(
             group.boss_cycle,
             group.boss_num,
@@ -978,7 +978,7 @@ class ClanBattle:
         if group is None:
             raise GroupNotExist
         if group.challenging_member_qq_id is None:
-            raise GroupError('boss没有锁定')
+            raise GroupError('bo\ufeffss没有锁\ufeff定')
         user = User.get_or_create(
             qqid=qqid,
             defaults={
@@ -995,8 +995,8 @@ class ClanBattle:
                 ) or group.challenging_member_qq_id
                 nik = escape(nik)
                 msg = f'失败，{nik}在{challenge_duration}秒前'+(
-                    '开始挑战boss' if is_challenge else
-                    ('锁定了boss\n留言：'+escape(group.challenging_comment))
+                    '开始挑\ufeff战bo\ufeffss' if is_challenge else
+                    ('锁定了bo\ufeffss\n留言：'+escape(group.challenging_comment))
                 )
                 raise GroupError(msg)
         group.challenging_member_qq_id = None
@@ -1035,7 +1035,7 @@ class ClanBattle:
             return (membership.last_save_slot == today)
         if todaystatus:
             if membership.last_save_slot == today:
-                raise UserError('您今天已经存在SL记录了')
+                raise UserError('您今天已经存在S\ufeffL记录了')
             membership.last_save_slot = today
 
             # 如果当前正在挑战，则取消挑战
@@ -1353,7 +1353,7 @@ class ClanBattle:
             unfinished = (tailing_challenge_count
                           - continued_challenge_count
                           - continued_tailing_challenge_count)
-            progress = '\n今天已出{}刀，剩余{}刀完整刀和{}刀补偿刀'.format(
+            progress = '\n今天已出{}刀，剩余{}刀完\ufeff整刀和{}刀补\ufeff偿刀'.format(
                 finished, 90 - finished - unfinished, unfinished
             )
             return f'{url}{boss_summary}{progress}'
@@ -1399,7 +1399,7 @@ class ClanBattle:
             if counts == 0:
                 return str(boss_status)
             else:
-                return str(boss_status) + '\n※已自动取消该boss的预约'
+                return str(boss_status) + '\n※已自动取\ufeff消该bo\ufeffss的预\ufeff约'
         elif match_num == 5:  # 尾刀
             match = re.match(
                 r'^尾刀 ?(?:\[CQ:at,qq=(\d+)\])? *(昨[日天])? *(?:[\:：](.*))?$', cmd)
@@ -1473,12 +1473,12 @@ class ClanBattle:
                     group_id, order_by='subscribe_item')
                 if not subscribers:
                     return '没有预约记录'
-                reply = "预约表：\n"
+                reply = "预\ufeff约表：\n"
                 current_boss = '-1'  # 尚未开始输出结果
                 for sub in subscribers:
                     if sub['boss'] != current_boss:  # boss 号变化前，显示小标题
                         if sub['boss'] == 0:
-                            reply += '====挂树====\n'
+                            reply += '====挂\ufeff树====\n'
                         else:
                             reply += f"==={sub['boss']}号boss===\n"
                         current_boss = sub['boss']
@@ -1508,7 +1508,7 @@ class ClanBattle:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
                 return str(e)
             _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-            return '预约成功'
+            return '预\ufeff约成功'
         elif match_num == 11:  # 挂树
             match = re.match(r'^挂树 *(?:[\:：](.*))?$', cmd)
             if not match:
@@ -1666,7 +1666,7 @@ class ClanBattle:
                         user_id, group_id, cmd))
                     return str(e)
                 _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-                return '已记录SL'
+                return '已记录\ufeffS\ufeffL'
         elif 20 <= match_num <= 25:
             if len(cmd) != 2:
                 return
