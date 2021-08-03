@@ -22,7 +22,7 @@ from ..ybdata import (Clan_challenge, Clan_group, Clan_member, Clan_subscribe,
 from .exception import (ClanBattleError, GroupError, GroupNotExist, InputError,
                         UserError, UserNotInGroup)
 from .typing import BossStatus, ClanBattleReport, Groupid, Pcr_date, QQid
-from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func, insert_zwsp
+from .util import atqq, pcr_datetime, pcr_timestamp, timed_cached_func
 
 _logger = logging.getLogger(__name__)
 
@@ -364,7 +364,7 @@ class ClanBattle:
             )
             if group.boss_lock_type != 1:
                 boss_summary += '\n留言：'+group.challenging_comment
-        return insert_zwsp(boss_summary)
+        return boss_summary
 
     def challenge(self,
                   group_id: Groupid,
@@ -488,13 +488,13 @@ class ClanBattle:
         nik = user.nickname or user.qqid
         nik = escape(nik)
         if defeat:
-            msg = insert_zwsp('{}对boss造成了{:,}点伤害，击败了boss\n（今日第{}刀，{}）'.format(
+            msg = '{}对boss造成了{:,}点伤害，击败了boss\n（今日第{}刀，{}）'.format(
                 nik, health_before, finished+1, '尾余刀' if is_continue else '收尾刀'
-            ))
+            )
         else:
-            msg = insert_zwsp('{}对boss造成了{:,}点伤害\n（今日第{}刀，{}）'.format(
+            msg = '{}对boss造成了{:,}点伤害\n（今日第{}刀，{}）'.format(
                 nik, damage, finished+1, '剩余刀' if is_continue else '完整刀'
-            ))
+            )
         status = BossStatus(
             group.boss_cycle,
             group.boss_num,
@@ -907,7 +907,7 @@ class ClanBattle:
         if notice:
             asyncio.ensure_future(self.api.send_group_msg(
                 group_id=group_id,
-                message=insert_zwsp('boss已被击败\n')+'\n'.join(notice),
+                message='boss已被击败\n'+'\n'.join(notice),
             ))
 
     def apply_for_challenge(self,
@@ -950,7 +950,7 @@ class ClanBattle:
 
         nik = self._get_nickname_by_qqid(qqid) or qqid
         nik = escape(nik)
-        info = insert_zwsp(f'{nik}已开始挑战boss' if appli_type == 1 else
+        info = (f'{nik}已开始挑战boss' if appli_type == 1 else
                 f'{nik}锁定了boss\n留言：{escape(extra_msg)}')
         status = BossStatus(
             group.boss_cycle,
@@ -1491,7 +1491,7 @@ class ClanBattle:
                         reply += '：' + message
                     reply += '\n'
                 reply += '============'  # 结束
-                return insert_zwsp(reply)
+                return reply
             # 预约 boss
             match = re.match(r'^预约([1-5]) *(?:[\:：](.*))?$', cmd)
             if not match:
@@ -1506,7 +1506,7 @@ class ClanBattle:
                 self.add_subscribe(group_id, user_id, boss_num, extra_msg)
             except ClanBattleError as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
-                return insert_zwsp(str(e))
+                return str(e)
             _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
             return '预约成功'
         elif match_num == 11:  # 挂树
@@ -1548,9 +1548,9 @@ class ClanBattle:
                     group_id, user_id, extra_msg=extra_msg, appli_type=appli_type)
             except ClanBattleError as e:
                 _logger.info('群聊 失败 {} {} {}'.format(user_id, group_id, cmd))
-                return insert_zwsp(str(e))
+                return str(e)
             _logger.info('群聊 成功 {} {} {}'.format(user_id, group_id, cmd))
-            return insert_zwsp(str(boss_status))
+            return str(boss_status)
         elif match_num == 13:  # 取消
             match = re.match(r'^取消(?:预约)?([1-5]|挂树)$', cmd)
             if not match:
@@ -1682,7 +1682,7 @@ class ClanBattle:
                         m['created_time']) else ''
                 if m.get('message'):
                     reply += '：' + m['message']
-            return insert_zwsp(reply)
+            return reply
 
     def register_routes(self, app: Quart):
 

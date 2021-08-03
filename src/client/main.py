@@ -30,6 +30,7 @@ done
 
 import asyncio
 import json
+import random
 import time
 
 import tzlocal
@@ -37,6 +38,26 @@ from aiocqhttp import CQHttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import yobot
+
+def insert_seq(seq, x):
+    cq_code = False
+    for i in seq:
+        if cq_code:
+            if i == ']':
+                cq_code=False
+            yield i
+            continue
+        if random.random()<0.2:
+            yield x
+        if i == '[':
+            cq_code=True
+        yield i
+
+
+def insert_zwsp(x: str) -> str:
+    zwsp = '\ufeff'
+    m = insert_seq(x, zwsp)
+    return ''.join(m)
 
 
 def main():
@@ -95,7 +116,7 @@ def main():
         else:
             reply = None
         if isinstance(reply, str) and reply != "":
-            return {'reply': reply,
+            return {'reply': insert_zwsp(reply),
                     'at_sender': False}
         else:
             return None
