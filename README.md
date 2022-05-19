@@ -1,6 +1,6 @@
 # yobot 项目不再更新
 
-**由于新版公会战规则变化，yobot无法适配新版公会战规则，请在下面时间之前改用[HoshinoBot Clanbattle V4](https://ngabbs.com/read.php?tid=26540003)**  
+**由于新版公会战规则变化，yobot无法适配新版公会战规则，请在下面时间之前改用[egggi 编写的 yobot](https://github.com/eggggi/yobot_remix)**  
 日服：2021年6月  
 台服：2021年11月  
 国服：2023年7月
