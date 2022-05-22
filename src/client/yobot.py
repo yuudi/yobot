@@ -38,8 +38,8 @@ else:
 
 
 class Yobot:
-    Version = "[v3.6.15]"  # semver
-    Version_id = 290
+    Version = "[v3.6.16]"  # semver
+    Version_id = 297
     #  "git rev-list --count HEAD"
 
     def __init__(self, *,
@@ -204,6 +204,35 @@ class Yobot:
                     ) as gzip_file:
                         gzip_file.write(of.read())
 
+            response = await make_response(await send_file(gzipped_file))
+            response.mimetype = (
+                mimetypes.guess_type(os.path.basename(origin_file))[0]
+                or "application/octet-stream"
+            )
+            response.headers['Content-Encoding'] = 'gzip'
+            response.headers['Vary'] = 'Accept-Encoding'
+            return response
+
+        # add route for js dependencies
+        @quart_app.route("/yobot-depencency/<path:filename>")
+        async def yobot_js_dependencies(filename):
+            accept_encoding = request.headers.get('Accept-Encoding', '')
+            origin_file = os.path.join(os.path.dirname(
+                __file__), "public", "libs", filename)
+            if ('gzip' not in accept_encoding.lower()
+                    or self.glo_setting['web_gzip'] == 0):
+                return await send_file(origin_file)
+            gzipped_file = origin_file + ".gz"
+            if not os.path.exists(gzipped_file):
+                if not os.path.exists(origin_file):
+                    return "404 not found", 404
+                with open(origin_file, 'rb') as of, open(gzipped_file, 'wb') as gf:
+                    with gzip.GzipFile(
+                        mode='wb',
+                        compresslevel=self.glo_setting["web_gzip"],
+                        fileobj=gf,
+                    ) as gzip_file:
+                        gzip_file.write(of.read())
             response = await make_response(await send_file(gzipped_file))
             response.mimetype = (
                 mimetypes.guess_type(os.path.basename(origin_file))[0]
